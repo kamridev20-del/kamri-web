@@ -1,0 +1,8 @@
+# Fichiers spécifiques à ignorer pour apps/web
+
+apps/admin/
+apps/mobile/
+server/
+packages/lib/src/
+packages/ui/src/
+
