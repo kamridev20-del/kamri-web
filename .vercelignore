@@ -1,8 +1,3 @@
-# Fichiers spécifiques à ignorer pour apps/web
-
-apps/admin/
-apps/mobile/
-server/
-packages/lib/src/
-packages/ui/src/
+# Fichiers spécifiques à ignorer pour kamri-web
+# Ne pas ignorer packages/ car ils sont nécessaires pour le build
 
