@@ -6,8 +6,8 @@ import { ReactNode } from 'react';
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
-if (!stripePublishableKey) {
-  console.error('❌ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY n\'est pas définie dans les variables d\'environnement');
+if (!stripePublishableKey && typeof window !== 'undefined') {
+  console.warn('⚠️ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY n\'est pas définie dans les variables d\'environnement');
 }
 
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle, Package, Truck, Home } from 'lucide-react';
 import ModernHeader from '@/components/ModernHeader';
@@ -8,7 +8,7 @@ import HomeFooter from '@/components/HomeFooter';
 import { useCart } from '@/contexts/CartContext';
 import { apiClient } from '@/lib/api';
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { clearCart } = useCart();
@@ -165,6 +165,23 @@ export default function OrderConfirmationPage() {
 
       <HomeFooter />
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F0F8F0]">
+        <ModernHeader />
+        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4CAF50] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+        <HomeFooter />
+      </div>
+    }>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }
 

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import AccountSettingsNew from '../../components/AccountSettingsNew';
 import AddressSectionNew from '../../components/AddressSectionNew';
 import HomeFooter from '../../components/HomeFooter';
@@ -11,7 +11,7 @@ import OrdersHistoryNew from '../../components/OrdersHistoryNew';
 import PersonalInfo from '../../components/PersonalInfo';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function ProfilePage() {
+function ProfileContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('personal');
   const { isAuthenticated } = useAuth();
@@ -111,5 +111,20 @@ export default function ProfilePage() {
       
       <HomeFooter />
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F0F8F0] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    }>
+      <ProfileContent />
+    </Suspense>
   );
 }
