@@ -49,7 +49,7 @@ export default function CategoriesPage() {
         if (categoriesResponse.data) {
           // L'API backend retourne { data: categories, message: '...' }
           // Notre API client retourne { data: { data: categories, message: '...' } }
-          const backendData = categoriesResponse.data.data || categoriesResponse.data;
+          const backendData = (categoriesResponse.data as any).data || categoriesResponse.data;
           const categoriesList = Array.isArray(backendData) ? backendData : [];
           console.log('📂 [CATEGORIES] Categories list:', categoriesList);
           
@@ -57,7 +57,7 @@ export default function CategoriesPage() {
           const productsResponse = await apiClient.getProducts();
           if (productsResponse.data) {
             // Même logique pour les produits
-            const backendProductsData = productsResponse.data.data || productsResponse.data;
+            const backendProductsData = (productsResponse.data as any).data || productsResponse.data;
             const products = Array.isArray(backendProductsData) ? backendProductsData : [];
             
             // Enrichir les catégories avec le nombre de produits et la configuration

@@ -12,8 +12,8 @@ interface Address {
   zipCode: string;
   country: string;
   isDefault: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export default function AddressSection() {
@@ -59,18 +59,19 @@ export default function AddressSection() {
 
   const handleAddAddress = () => {
     setEditingAddress(null);
-    setFormData({ name: '', fullName: '', address: '', city: '', phone: '' });
+    setFormData({ street: '', city: '', state: '', zipCode: '', country: 'FR', isDefault: false });
     setShowModal(true);
   };
 
-  const handleEditAddress = (address) => {
+  const handleEditAddress = (address: Address) => {
     setEditingAddress(address);
     setFormData({
-      name: address.name,
-      fullName: address.fullName,
-      address: address.address,
+      street: address.street,
       city: address.city,
-      phone: address.phone
+      state: address.state,
+      zipCode: address.zipCode,
+      country: address.country,
+      isDefault: address.isDefault
     });
     setShowModal(true);
   };
@@ -83,8 +84,8 @@ export default function AddressSection() {
       ));
     } else {
       // Ajouter une nouvelle adresse
-      const newAddress = {
-        id: Date.now(),
+      const newAddress: Address = {
+        id: Date.now().toString(),
         ...formData,
         isDefault: addresses.length === 0
       };
@@ -148,7 +149,7 @@ export default function AddressSection() {
                   <svg className="w-5 h-5 text-[#4CAF50]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
-                  <h4 className="font-semibold text-[#424242]">{address.name}</h4>
+                  <h4 className="font-semibold text-[#424242]">{address.street}, {address.city}</h4>
                   {address.isDefault && (
                     <span className="bg-[#4CAF50] text-white text-xs px-2 py-1 rounded-full">
                       Par défaut
@@ -176,10 +177,9 @@ export default function AddressSection() {
               </div>
 
               <div className="space-y-2 text-sm text-[#424242]">
-                <p className="font-medium">{address.fullName}</p>
-                <p>{address.address}</p>
-                <p>{address.city}</p>
-                <p>{address.phone}</p>
+                <p className="font-medium">{address.street}</p>
+                <p>{address.city}, {address.state} {address.zipCode}</p>
+                <p>{address.country}</p>
               </div>
 
               {!address.isDefault && (
@@ -210,38 +210,14 @@ export default function AddressSection() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[#424242] mb-2">
-                  Nom de l'adresse
+                  Rue
                 </label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.street}
+                  onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
-                  placeholder="Ex: Domicile, Bureau..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#424242] mb-2">
-                  Nom complet
-                </label>
-                <input
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#424242] mb-2">
-                  Adresse
-                </label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
+                  placeholder="Ex: 123 Rue de la République"
                 />
               </div>
 
@@ -254,19 +230,59 @@ export default function AddressSection() {
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
+                  placeholder="Ex: Paris"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-[#424242] mb-2">
-                  Téléphone
+                  État/Région
                 </label>
                 <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  type="text"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
+                  placeholder="Ex: Île-de-France"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#424242] mb-2">
+                  Code postal
+                </label>
+                <input
+                  type="text"
+                  value={formData.zipCode}
+                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
+                  placeholder="Ex: 75001"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#424242] mb-2">
+                  Pays
+                </label>
+                <input
+                  type="text"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300"
+                  placeholder="Ex: FR"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.isDefault}
+                  onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                  className="w-4 h-4 text-[#4CAF50] border-gray-300 rounded focus:ring-[#4CAF50]"
+                />
+                <label className="ml-2 text-sm text-[#424242]">
+                  Définir comme adresse par défaut
+                </label>
               </div>
             </div>
 

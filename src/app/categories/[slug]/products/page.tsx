@@ -43,8 +43,8 @@ export default function CategoryProductsPage() {
         
         if (categoriesResponse.data) {
           // L'API backend retourne { data: categories, message: '...' }
-          // Notre API client retourne { data: { data: categories, message: '...' } }
-          const backendData = categoriesResponse.data.data || categoriesResponse.data;
+          // Notre API client peut retourner { data: categories } ou { data: { data: categories, message: '...' } }
+          const backendData = (categoriesResponse.data as any).data || categoriesResponse.data;
           const categories = Array.isArray(backendData) ? backendData : [];
           
           // Trouver la catégorie par slug
@@ -59,7 +59,7 @@ export default function CategoryProductsPage() {
             const productsResponse = await apiClient.getProducts();
             if (productsResponse.data) {
               // Même logique pour les produits
-              const backendProductsData = productsResponse.data.data || productsResponse.data;
+              const backendProductsData = (productsResponse.data as any).data || productsResponse.data;
               const products = Array.isArray(backendProductsData) ? backendProductsData : [];
               // Filtrer les produits de cette catégorie
               const categoryProducts = products.filter((product) => 

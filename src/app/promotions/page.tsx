@@ -6,25 +6,7 @@ import HomeFooter from '../../components/HomeFooter';
 import ModernHeader from '../../components/ModernHeader';
 import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
-import { apiClient } from '../../lib/api';
-
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number | null;
-  image: string | null;
-  category: {
-    id: string;
-    name: string;
-  } | null;
-  badge: string | null;
-  stock: number;
-  supplier: {
-    name: string;
-  };
-}
+import { Product, apiClient } from '../../lib/api';
 
 interface Category {
   id: string;
@@ -51,7 +33,7 @@ export default function PromotionsPage() {
         // Charger les catégories
         const categoriesResponse = await apiClient.getCategories();
         if (categoriesResponse.data) {
-          const categoriesData = categoriesResponse.data.data || categoriesResponse.data;
+          const categoriesData = (categoriesResponse.data as any).data || categoriesResponse.data;
           setCategories(Array.isArray(categoriesData) ? categoriesData : []);
         }
 

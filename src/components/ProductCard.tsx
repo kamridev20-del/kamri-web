@@ -10,7 +10,7 @@ import { useCompare } from '../contexts/CompareContext';
 import { useGeo } from '../contexts/GeoContext';
 import { useToast } from '../contexts/ToastContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { apiClient } from '../lib/api';
+import { Product, apiClient } from '../lib/api';
 import QuickViewModal from './QuickViewModal';
 
 // Fonction utilitaire pour nettoyer les URLs d'images
@@ -55,31 +55,6 @@ const getAllImages = (image: string | string[] | null | undefined): string[] => 
   
   return [];
 };
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number | null;
-  image: string | null;
-  category?: {
-    id: string;
-    name: string;
-  } | null;
-  rating?: number;
-  reviews?: number;
-  badge: string | null;
-  brand?: string;
-  supplier?: {
-    name: string;
-  };
-  isFreeShipping?: boolean;
-  stock?: number;
-  listedNum?: number;
-  sales?: number;
-  deliveryCycle?: string;
-  source?: string;
-}
 
 interface ProductCardProps {
   product: Product;

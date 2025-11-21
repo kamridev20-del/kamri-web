@@ -77,7 +77,7 @@ export default function OrdersHistoryNew() {
       if (response.data) {
         console.log('✅ [OrdersHistory] Commandes chargées:', response.data);
         // L'API retourne { data: [...], message: "..." }, on doit extraire data
-        const ordersData = response.data.data || response.data;
+        const ordersData = (response.data as any).data || response.data;
         // S'assurer que ordersData est un tableau
         const ordersArray = Array.isArray(ordersData) ? ordersData : [];
         setOrders(ordersArray);

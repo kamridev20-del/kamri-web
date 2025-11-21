@@ -60,7 +60,7 @@ export default function AccountSettingsNew() {
       if (response.data) {
         console.log('✅ [AccountSettings] Paramètres chargés:', response.data);
         // L'API retourne { data: {...}, message: "..." }, on doit extraire data
-        const settingsData = response.data.data || response.data;
+        const settingsData = (response.data as any).data || response.data;
         console.log('📋 [AccountSettings] Données extraites:', settingsData);
         setSettings(settingsData);
       } else {

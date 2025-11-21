@@ -62,7 +62,7 @@ export default function StripeCardElement({ onReady, onError }: StripeCardElemen
             setError(null);
             onReady?.();
           }}
-          onChange={(e) => {
+          onChange={(e: any) => {
             if (e.error) {
               setError(e.error.message);
               onError?.(e.error.message);

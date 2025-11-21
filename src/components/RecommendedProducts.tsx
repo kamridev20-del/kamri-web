@@ -3,25 +3,7 @@
 import Link from 'next/link';
 import { calculateDiscountPercentage, formatDiscountPercentage, getBadgeConfig } from '@kamri/lib';
 import Image from 'next/image';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number | null;
-  image: string | null;
-  category?: {
-    id: string;
-    name: string;
-  } | null;
-  badge: string | null;
-  brand?: string;
-  supplier?: {
-    name: string;
-  };
-  rating?: number;
-  reviews?: number;
-}
+import { Product } from '../lib/api';
 
 interface RecommendedProductsProps {
   products?: Product[];

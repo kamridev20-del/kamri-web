@@ -300,7 +300,7 @@ export default function ComparePage() {
                                   );
 
                                 case 'boolean':
-                                  const boolValue = value === true || value === 'true' || value === 1;
+                                  const boolValue = value === 'true' || value === 1 || value === '1';
                                   return boolValue ? (
                                     <CheckCircle2 className="w-5 h-5 text-[#4CAF50] mx-auto" />
                                   ) : (

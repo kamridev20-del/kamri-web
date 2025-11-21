@@ -50,7 +50,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setError('');
     setSuccess('');
 
-    const result = await updateProfile({ name: name.trim() });
+    // Diviser le nom en firstName et lastName
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const result = await updateProfile({ firstName, lastName });
     
     if (result.success) {
       setSuccess('Profil mis à jour !');

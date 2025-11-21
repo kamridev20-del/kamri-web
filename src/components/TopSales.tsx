@@ -37,7 +37,7 @@ export default function TopSales() {
         if (response.data) {
           // L'API backend retourne { data: products, message: '...' }
           // Notre API client retourne { data: { data: products, message: '...' } }
-          const backendData = response.data.data || response.data;
+          const backendData = (response.data as any).data || response.data;
           const products = Array.isArray(backendData) ? backendData : [];
           
           // Filtrer les produits avec badge 'top-ventes' ou les plus vendus

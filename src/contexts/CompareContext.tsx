@@ -1,32 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number | null;
-  image: string | null;
-  rating?: number;
-  reviews?: number;
-  stock?: number;
-  category?: {
-    id?: string;
-    name: string;
-  } | null;
-  brand?: string;
-  supplier?: {
-    name: string;
-  };
-  isFreeShipping?: boolean;
-  deliveryCycle?: string;
-  badge?: string | null;
-  sales?: number;
-  listedNum?: number;
-  description?: string;
-  [key: string]: any; // Pour permettre d'autres propriétés
-}
+import { Product } from '../lib/api';
 
 interface CompareContextType {
   compareItems: Product[];

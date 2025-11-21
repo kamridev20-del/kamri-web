@@ -46,7 +46,7 @@ export default function AddressSectionNew() {
       if (response.data) {
         console.log('✅ [AddressSection] Adresses chargées:', response.data);
         // L'API retourne { data: [...], message: "..." }, on doit extraire data
-        const addressesData = response.data.data || response.data;
+        const addressesData = (response.data as any).data || response.data;
         // S'assurer que addressesData est un tableau
         const addressesArray = Array.isArray(addressesData) ? addressesData : [];
         setAddresses(addressesArray);

@@ -5,21 +5,7 @@ import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number | null;
-  image: string | null;
-  description?: string;
-  stock?: number;
-  rating?: number;
-  reviews?: number;
-  category?: {
-    name: string;
-  } | null;
-}
+import { Product } from '../lib/api';
 
 interface QuickViewModalProps {
   product: Product | null;

@@ -13,6 +13,7 @@ export interface Product {
   originalPrice?: number;
   image?: string;
   category?: {
+    id?: string;
     name: string;
   };
   supplier?: {
@@ -21,8 +22,15 @@ export interface Product {
   status: string;
   badge?: string;
   stock: number;
-  sales: number;
+  sales?: number;
+  listedNum?: number;
   description?: string;
+  source?: string;
+  rating?: number;
+  reviews?: number;
+  brand?: string;
+  deliveryCycle?: string;
+  isFreeShipping?: boolean;
 }
 
 export interface Category {

@@ -76,7 +76,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children, us
       if (response.data) {
         // Le backend retourne { data: wishlist, message: '...' }
         // Donc response.data contient { data: [...], message: '...' }
-        const backendData = response.data.data || response.data;
+        const backendData = (response.data as any).data || response.data;
         const items = Array.isArray(backendData) ? backendData : [];
         console.log('📦 [refreshWishlist] Items récupérés:', items.length, items);
         setWishlistItems(items);
