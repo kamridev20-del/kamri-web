@@ -1,13 +1,9 @@
 {
-  "buildCommand": "cd ../.. && pnpm install && pnpm build --filter=web",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "installCommand": "cd ../.. && pnpm install --filter=web...",
+  "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["cdg1"],
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@api_url",
-    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "@stripe_publishable_key"
-  },
   "headers": [
     {
       "source": "/(.*)",
@@ -50,12 +46,6 @@
           "value": "Content-Type, Authorization"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "@api_url/api/:path*"
     }
   ],
   "redirects": [
