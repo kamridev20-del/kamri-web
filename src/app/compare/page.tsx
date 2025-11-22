@@ -354,10 +354,10 @@ export default function ComparePage() {
                         <button
                           onClick={() => handleAddToCart(product.id)}
                           disabled={!product.stock || product.stock === 0}
-                          className="w-full px-4 py-2 bg-white border-2 border-[#4CAF50] text-[#4CAF50] rounded-lg hover:bg-[#E8F5E8] transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full px-2 py-2 bg-white border-2 border-[#4CAF50] text-[#4CAF50] rounded-lg hover:bg-[#E8F5E8] transition-colors text-sm font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Ajouter au panier"
                         >
-                          <ShoppingCart className="w-4 h-4" />
-                          Ajouter au panier
+                          <ShoppingCart className="w-5 h-5" />
                         </button>
                       </div>
                     </td>

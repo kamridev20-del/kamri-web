@@ -633,43 +633,41 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         <button 
           onClick={handleAddToCart}
           disabled={isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping}
-          className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
+          className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold flex items-center justify-center transition-all duration-200 ${
             isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-[#4CAF50] text-white hover:bg-[#2E7D32] hover:shadow-lg transform hover:scale-105'
           }`}
-          title={isShippable === false ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}` : ''}
+          title={
+            isShippable === false 
+              ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}` 
+              : isCheckingShipping 
+                ? 'Vérification...' 
+                : isAddingToCart 
+                  ? 'Ajout en cours...' 
+                  : displayStock <= 0 
+                    ? 'Rupture de stock' 
+                    : 'Ajouter au panier'
+          }
         >
           {isCheckingShipping ? (
-            <>
-              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Vérification...
-            </>
+            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
           ) : isAddingToCart ? (
-            <>
-              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Ajout en cours...
-            </>
+            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
           ) : isShippable === false ? (
-            <>
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Non livrable
-            </>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           ) : (
-            <>
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              {displayStock <= 0 ? 'Rupture de stock' : 'Ajouter au panier'}
-            </>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
           )}
         </button>
         <button 

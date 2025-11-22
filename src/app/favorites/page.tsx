@@ -383,7 +383,7 @@ export default function FavoritesPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
+                      className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
                     >
                       {paginatedFavorites.map((item, index) => (
                         <motion.div
@@ -499,11 +499,10 @@ export default function FavoritesPage() {
                               {(item.product as any).stock > 0 && (
                                 <button
                                   onClick={() => handleAddToCart(item.product.id)}
-                                  className="px-3 py-1.5 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors text-xs flex items-center gap-1.5"
+                                  className="px-2 py-1.5 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors text-xs flex items-center justify-center"
                                   title="Ajouter au panier"
                                 >
-                                  <ShoppingCart className="w-3.5 h-3.5" />
-                                  Panier
+                                  <ShoppingCart className="w-4 h-4" />
                                 </button>
                               )}
                               <button
