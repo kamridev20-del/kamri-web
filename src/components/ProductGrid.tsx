@@ -1,7 +1,9 @@
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
+import { Product } from '../lib/api';
 import ProductCard from './ProductCard';
 
 // Skeleton loader pour les cartes produits
@@ -38,6 +40,45 @@ function ProductCardSkeleton() {
 
 export default function ProductGrid() {
   const { products, isLoading, error } = useApp();
+  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+  const [rotationIndex, setRotationIndex] = useState(0);
+
+  // Limiter à 50 produits et rotation toutes les 2 minutes
+  useEffect(() => {
+    if (products.length === 0) {
+      setDisplayedProducts([]);
+      return;
+    }
+
+    const PRODUCTS_TO_SHOW = 50;
+    const ROTATION_INTERVAL = 2 * 60 * 1000; // 2 minutes en millisecondes
+
+    // Calculer le nombre de "pages" de 50 produits
+    const totalPages = Math.ceil(products.length / PRODUCTS_TO_SHOW);
+    
+    // Fonction pour obtenir les produits à afficher pour une page donnée
+    const getProductsForPage = (pageIndex: number) => {
+      const startIndex = (pageIndex % totalPages) * PRODUCTS_TO_SHOW;
+      const endIndex = startIndex + PRODUCTS_TO_SHOW;
+      return products.slice(startIndex, endIndex);
+    };
+
+    // Initialiser avec la première page
+    setDisplayedProducts(getProductsForPage(0));
+    setRotationIndex(0);
+
+    // Configurer l'intervalle de rotation
+    const intervalId = setInterval(() => {
+      setRotationIndex((prevIndex) => {
+        const newIndex = (prevIndex + 1) % totalPages;
+        setDisplayedProducts(getProductsForPage(newIndex));
+        return newIndex;
+      });
+    }, ROTATION_INTERVAL);
+
+    // Nettoyage
+    return () => clearInterval(intervalId);
+  }, [products]);
 
   if (isLoading) {
     return (
@@ -86,17 +127,17 @@ export default function ProductGrid() {
             Nos produits
           </h2>
           <p className="text-xl text-[#81C784] font-light font-['Inter']">
-            Découvrez notre sélection exclusive ({products.length} produits)
+            Découvrez notre sélection exclusive ({displayedProducts.length} produits sur {products.length})
           </p>
         </div>
         
-        {products.length === 0 ? (
+        {displayedProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-base text-gray-500">Aucun produit disponible pour le moment</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {products.map((product) => (
+            {displayedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
