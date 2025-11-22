@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 /**
  * Hook pour tracker les viewers actifs d'un produit en temps réel
@@ -19,7 +19,7 @@ export function useProductViewers(productId: string | undefined) {
   };
 
   // Enregistrer qu'on regarde le produit
-  const startTracking = async () => {
+  const startTracking = useCallback(async () => {
     if (!productId || isTrackingRef.current) return;
 
     try {
@@ -41,10 +41,10 @@ export function useProductViewers(productId: string | undefined) {
     } catch (error) {
       console.error('Erreur démarrage tracking viewers:', error);
     }
-  };
+  }, [productId]);
 
   // Arrêter le tracking
-  const stopTracking = async () => {
+  const stopTracking = useCallback(async () => {
     if (!productId || !isTrackingRef.current) return;
 
     try {
@@ -62,10 +62,10 @@ export function useProductViewers(productId: string | undefined) {
     } finally {
       isTrackingRef.current = false;
     }
-  };
+  }, [productId]);
 
   // Récupérer le nombre de viewers
-  const fetchViewersCount = async () => {
+  const fetchViewersCount = useCallback(async () => {
     if (!productId) return;
 
     try {
@@ -78,7 +78,7 @@ export function useProductViewers(productId: string | undefined) {
     } catch (error) {
       console.error('Erreur récupération viewers:', error);
     }
-  };
+  }, [productId]);
 
   // Démarrer le tracking quand le composant monte
   useEffect(() => {
@@ -118,7 +118,7 @@ export function useProductViewers(productId: string | undefined) {
       }
       stopTracking();
     };
-  }, [productId]);
+  }, [productId, startTracking, stopTracking, fetchViewersCount]);
 
   return { viewersCount };
 }
