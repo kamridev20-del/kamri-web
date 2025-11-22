@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface Category {
-  id: number;
+  id: number | string;
   name: string;
-  image: string;
+  image?: string;
+  imageUrl?: string; // ✅ URL de l'image personnalisée depuis le backend
   count: number;
   color: string;
   icon: string;
@@ -44,8 +45,23 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
         {/* Image de la catégorie */}
         <div className="relative h-48 overflow-hidden">
+          {category.imageUrl ? (
+            // ✅ Afficher l'image personnalisée si disponible
+            <img 
+              src={category.imageUrl} 
+              alt={category.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback sur l'icône si l'image ne charge pas
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+          ) : null}
           <div 
-            className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center"
+            className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${category.imageUrl ? 'hidden' : ''}`}
             style={{ backgroundColor: category.color + '20' }}
           >
             <div className="text-6xl opacity-80">

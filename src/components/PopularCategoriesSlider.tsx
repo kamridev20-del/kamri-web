@@ -7,7 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 interface Category {
   id: number;
   name: string;
-  image: string;
+  image?: string;
+  imageUrl?: string; // ✅ URL de l'image personnalisée
   count: number;
   color: string;
   icon: string;
@@ -157,8 +158,23 @@ export default function PopularCategoriesSlider({ categories }: PopularCategorie
               >
                 {/* Image de la catégorie */}
                 <div className="relative h-40 overflow-hidden">
+                  {category.imageUrl ? (
+                    // ✅ Afficher l'image personnalisée si disponible
+                    <img 
+                      src={category.imageUrl} 
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback sur l'icône si l'image ne charge pas
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
                   <div 
-                    className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center"
+                    className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${category.imageUrl ? 'hidden' : ''}`}
                     style={{ backgroundColor: category.color + '20' }}
                   >
                     <div className="text-5xl opacity-80">

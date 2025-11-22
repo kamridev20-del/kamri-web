@@ -60,6 +60,7 @@ export default function CategoriesPage() {
               id: category.id,
               name: category.name,
               image: '/api/placeholder/300/200',
+              imageUrl: category.imageUrl, // ✅ URL de l'image personnalisée
               count: category.productCount || 0, // Utiliser le compteur du backend
               color: config.color,
               icon: config.icon
@@ -327,13 +328,38 @@ export default function CategoriesPage() {
                           whileHover={{ scale: 1.05, y: -5 }}
                           className="bg-white/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg text-center cursor-pointer hover:shadow-xl transition-all duration-300 group/item"
                         >
-                          <motion.div
-                            className="text-3xl sm:text-4xl lg:text-5xl mb-2 sm:mb-3"
-                            animate={{ rotate: [0, 5, -5, 0] }}
-                            transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
-                          >
-                            {category.icon || '🛍️'}
-                          </motion.div>
+                          {category.imageUrl ? (
+                            // ✅ Afficher l'image personnalisée si disponible
+                            <div className="mb-2 sm:mb-3 h-16 sm:h-20 lg:h-24 flex items-center justify-center overflow-hidden rounded-lg">
+                              <img 
+                                src={category.imageUrl} 
+                                alt={category.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Fallback sur l'icône si l'image ne charge pas
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const fallback = target.nextElementSibling as HTMLElement;
+                                  if (fallback) fallback.style.display = 'block';
+                                }}
+                              />
+                              <motion.div
+                                className="text-3xl sm:text-4xl lg:text-5xl hidden"
+                                animate={{ rotate: [0, 5, -5, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
+                              >
+                                {category.icon || '🛍️'}
+                              </motion.div>
+                            </div>
+                          ) : (
+                            <motion.div
+                              className="text-3xl sm:text-4xl lg:text-5xl mb-2 sm:mb-3"
+                              animate={{ rotate: [0, 5, -5, 0] }}
+                              transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
+                            >
+                              {category.icon || '🛍️'}
+                            </motion.div>
+                          )}
                           <div className="text-xs sm:text-sm font-semibold text-[#4CAF50] mb-1">
                             {category.name}
                           </div>
