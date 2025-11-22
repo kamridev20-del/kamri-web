@@ -1,4 +1,17 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Vérifier que l'URL de l'API est correctement configurée
+const getApiBaseUrl = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  
+  // Avertissement si on est en production et que l'URL pointe vers localhost
+  if (typeof window !== 'undefined' && apiUrl.includes('localhost')) {
+    console.error('⚠️ [API] ATTENTION: NEXT_PUBLIC_API_URL pointe vers localhost en production!');
+    console.error('⚠️ [API] Veuillez configurer NEXT_PUBLIC_API_URL dans Vercel avec: https://kamri-server-production.up.railway.app/api');
+  }
+  
+  return apiUrl;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export interface ApiResponse<T = any> {
   data?: T;
