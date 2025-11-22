@@ -11,7 +11,7 @@ interface User {
   lastName?: string;
   phone?: string;
   address?: string;
-  role: string;
+  role?: string;
   createdAt: string;
   updatedAt: string;
 }
