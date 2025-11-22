@@ -55,16 +55,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setToken(storedToken);
           apiClient.setToken(storedToken); // ✅ Mettre à jour l'ApiClient
           
-          // Récupérer le profil utilisateur
-          const response = await fetch('http://localhost:3001/api/users/profile', {
-            headers: {
-              'Authorization': `Bearer ${storedToken}`,
-            },
-          });
+          // Récupérer le profil utilisateur via apiClient
+          const response = await apiClient.getUserProfile();
 
-          if (response.ok) {
-            const responseData = await response.json();
-            const userData = responseData.data || responseData;
+          if (response.data) {
+            const userData = response.data;
             setUser(userData);
             console.log('✅ [AuthProvider] Utilisateur connecté:', userData.email);
           } else {
@@ -94,29 +89,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('🔑 [AuthProvider] Tentative de connexion pour:', email);
       setIsLoading(true);
 
-      const response = await fetch('http://localhost:3001/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      // Utiliser apiClient.login qui gère déjà l'URL correcte
+      const response = await apiClient.login(email, ''); // Le backend semble accepter juste l'email
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('✅ [AuthProvider] Connexion réussie:', data.user.email);
+      if (response.data) {
+        const data = response.data;
+        console.log('✅ [AuthProvider] Connexion réussie:', data.user?.email || email);
         
-        // Stocker le token
-        localStorage.setItem('auth_token', data.access_token);
-        setToken(data.access_token);
-        apiClient.setToken(data.access_token); // ✅ Mettre à jour l'ApiClient
-        setUser(data.user);
+        // Stocker le token (apiClient.login le fait déjà, mais on le fait aussi ici pour être sûr)
+        if (data.access_token) {
+          localStorage.setItem('auth_token', data.access_token);
+          setToken(data.access_token);
+          apiClient.setToken(data.access_token);
+        }
+        if (data.user) {
+          setUser(data.user);
+        }
         
         return { success: true };
       } else {
-        console.log('❌ [AuthProvider] Erreur de connexion:', data.message);
-        return { success: false, error: data.message || 'Erreur de connexion' };
+        console.log('❌ [AuthProvider] Erreur de connexion:', response.error);
+        return { success: false, error: response.error || 'Erreur de connexion' };
       }
     } catch (error) {
       console.error('❌ [AuthProvider] Erreur réseau:', error);
@@ -138,30 +131,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('👤 [AuthProvider] Mise à jour du profil:', data);
       
-      const response = await fetch('http://localhost:3001/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
+      // Utiliser apiClient.updateUserProfile qui gère déjà l'URL correcte
+      const response = await apiClient.updateUserProfile(data);
 
-      const responseData = await response.json();
-
-      if (response.ok) {
-        console.log('✅ [AuthProvider] Profil mis à jour:', responseData.data);
-        setUser(responseData.data);
+      if (response.data) {
+        console.log('✅ [AuthProvider] Profil mis à jour:', response.data);
+        setUser(response.data);
         return { success: true };
       } else {
-        console.log('❌ [AuthProvider] Erreur de mise à jour:', responseData.message);
-        return { success: false, error: responseData.message || 'Erreur de mise à jour' };
+        console.log('❌ [AuthProvider] Erreur de mise à jour:', response.error);
+        return { success: false, error: response.error || 'Erreur de mise à jour' };
       }
     } catch (error) {
       console.error('❌ [AuthProvider] Erreur réseau:', error);
       return { success: false, error: 'Erreur réseau' };
     }
-  }, [token]);
+  }, []);
 
   const isAuthenticated = useMemo(() => !!user && !!token, [user, token]);
 
