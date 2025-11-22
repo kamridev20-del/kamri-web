@@ -157,13 +157,19 @@ export default function PopularCategoriesSlider({ categories }: PopularCategorie
                 onClick={() => handleCategoryClick(category)}
               >
                 {/* Image de la catégorie */}
-                <div className="relative h-40 overflow-hidden">
+                <div className="relative h-40 w-full overflow-hidden bg-gray-100">
                   {category.imageUrl ? (
                     // ✅ Afficher l'image personnalisée si disponible
                     <img 
                       src={category.imageUrl} 
                       alt={category.name}
                       className="w-full h-full object-cover"
+                      style={{ 
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        minWidth: '100%',
+                        minHeight: '100%'
+                      }}
                       onError={(e) => {
                         // Fallback sur l'icône si l'image ne charge pas
                         const target = e.target as HTMLImageElement;

@@ -44,13 +44,19 @@ export default function CategoryCard({ category }: CategoryCardProps) {
     >
       <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
         {/* Image de la catégorie */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-48 w-full overflow-hidden bg-gray-100">
           {category.imageUrl ? (
             // ✅ Afficher l'image personnalisée si disponible
             <img 
               src={category.imageUrl} 
               alt={category.name}
               className="w-full h-full object-cover"
+              style={{ 
+                objectFit: 'cover',
+                objectPosition: 'center',
+                minWidth: '100%',
+                minHeight: '100%'
+              }}
               onError={(e) => {
                 // Fallback sur l'icône si l'image ne charge pas
                 const target = e.target as HTMLImageElement;
