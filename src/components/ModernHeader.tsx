@@ -177,7 +177,7 @@ export default function ModernHeader() {
 
                   {/* Menu déroulant */}
                   {showUserMenu && (
-                    <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-[9999]">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-[9999]">
                       <div className="px-4 py-2 border-b border-gray-100">
                         <p className="text-sm font-semibold text-gray-900">
                           {user?.firstName} {user?.lastName}
