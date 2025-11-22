@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { Product } from '../lib/api';
 import ProductCard from './ProductCard';
@@ -43,10 +43,17 @@ export default function ProductGrid() {
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [rotationIndex, setRotationIndex] = useState(0);
 
+  // S'assurer que products est toujours un tableau (mémorisé pour éviter les re-rendus)
+  const safeProducts = useMemo(() => {
+    return Array.isArray(products) ? products : [];
+  }, [products]);
+
   // Limiter à 50 produits et rotation toutes les 2 minutes
   useEffect(() => {
-    if (products.length === 0) {
+    // Si pas de produits, réinitialiser
+    if (safeProducts.length === 0) {
       setDisplayedProducts([]);
+      setRotationIndex(0);
       return;
     }
 
@@ -54,13 +61,21 @@ export default function ProductGrid() {
     const ROTATION_INTERVAL = 2 * 60 * 1000; // 2 minutes en millisecondes
 
     // Calculer le nombre de "pages" de 50 produits
-    const totalPages = Math.ceil(products.length / PRODUCTS_TO_SHOW);
+    const totalPages = Math.ceil(safeProducts.length / PRODUCTS_TO_SHOW);
+    
+    // Si moins de 50 produits, afficher tous
+    if (totalPages <= 1) {
+      setDisplayedProducts(safeProducts.slice(0, PRODUCTS_TO_SHOW));
+      setRotationIndex(0);
+      return;
+    }
     
     // Fonction pour obtenir les produits à afficher pour une page donnée
     const getProductsForPage = (pageIndex: number) => {
-      const startIndex = (pageIndex % totalPages) * PRODUCTS_TO_SHOW;
+      const safeIndex = pageIndex % totalPages;
+      const startIndex = safeIndex * PRODUCTS_TO_SHOW;
       const endIndex = startIndex + PRODUCTS_TO_SHOW;
-      return products.slice(startIndex, endIndex);
+      return safeProducts.slice(startIndex, endIndex);
     };
 
     // Initialiser avec la première page
@@ -77,8 +92,10 @@ export default function ProductGrid() {
     }, ROTATION_INTERVAL);
 
     // Nettoyage
-    return () => clearInterval(intervalId);
-  }, [products]);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [safeProducts]);
 
   if (isLoading) {
     return (
@@ -127,7 +144,7 @@ export default function ProductGrid() {
             Nos produits
           </h2>
           <p className="text-xl text-[#81C784] font-light font-['Inter']">
-            Découvrez notre sélection exclusive ({displayedProducts.length} produits sur {products.length})
+            Découvrez notre sélection exclusive ({displayedProducts.length} produits sur {safeProducts.length})
           </p>
         </div>
         
