@@ -42,62 +42,32 @@ export default function CategoriesPage() {
       try {
         setLoading(true);
         
-        // Charger les catégories depuis l'API
-        const categoriesResponse = await apiClient.getCategories();
+        // ✅ OPTIMISÉ : Utiliser le nouvel endpoint qui retourne directement les compteurs
+        // Au lieu de charger tous les produits juste pour compter
+        const categoriesResponse = await apiClient.getCategoriesWithCounts();
         console.log('🔍 [CATEGORIES] Response from API:', categoriesResponse);
         
         if (categoriesResponse.data) {
-          // L'API backend retourne { data: categories, message: '...' }
-          // Notre API client retourne { data: { data: categories, message: '...' } }
           const backendData = (categoriesResponse.data as any).data || categoriesResponse.data;
           const categoriesList = Array.isArray(backendData) ? backendData : [];
           console.log('📂 [CATEGORIES] Categories list:', categoriesList);
           
-          // Charger les produits pour compter par catégorie
-          const productsResponse = await apiClient.getProducts();
-          if (productsResponse.data) {
-            // Même logique pour les produits
-            const backendProductsData = (productsResponse.data as any).data || productsResponse.data;
-            const products = Array.isArray(backendProductsData) ? backendProductsData : [];
+          // Enrichir les catégories avec la configuration
+          const enrichedCategories = categoriesList.map((category: any) => {
+            const config = getCategoryConfig(category);
             
-            // Enrichir les catégories avec le nombre de produits et la configuration
-            const enrichedCategories = categoriesList.map(category => {
-              const productCount = products.filter((product: Product) => 
-                product.category?.name === category.name
-              ).length;
-              
-              const config = getCategoryConfig(category);
-              
-              return {
-                id: category.id,
-                name: category.name,
-                image: '/api/placeholder/300/200',
-                count: productCount, // Afficher 0 si pas de produits
-                color: config.color,
-                icon: config.icon
-              };
-            });
-            
-            setCategories(enrichedCategories);
-          } else {
-            // Si pas de produits, afficher quand même les catégories avec 0 produits
-            const enrichedCategories = categoriesList.map(category => {
-              const config = getCategoryConfig(category);
-              
-              return {
-                id: category.id,
-                name: category.name,
-                image: '/api/placeholder/300/200',
-                count: 0,
-                color: config.color,
-                icon: config.icon
-              };
-            });
-            
-            setCategories(enrichedCategories);
-          }
+            return {
+              id: category.id,
+              name: category.name,
+              image: '/api/placeholder/300/200',
+              count: category.productCount || 0, // Utiliser le compteur du backend
+              color: config.color,
+              icon: config.icon
+            };
+          });
+          
+          setCategories(enrichedCategories);
         } else {
-          // Si pas de catégories, afficher un message
           console.log('⚠️ [CATEGORIES] No data in response');
           setCategories([]);
         }

@@ -280,6 +280,11 @@ export class ApiClient {
     return this.fetchPublic('/categories');
   }
 
+  // ✅ OPTIMISÉ : Récupérer les catégories avec les compteurs de produits (une seule requête)
+  async getCategoriesWithCounts(): Promise<ApiResponse<Array<Category & { productCount: number }>>> {
+    return this.fetchPublic('/categories/with-product-counts');
+  }
+
   async createCategory(categoryData: { name: string; description?: string; icon?: string; color?: string }): Promise<ApiResponse<Category>> {
     return this.fetchWithAuth('/categories', {
       method: 'POST',
