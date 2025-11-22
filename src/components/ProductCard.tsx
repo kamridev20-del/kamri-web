@@ -11,6 +11,7 @@ import { useGeo } from '../contexts/GeoContext';
 import { useToast } from '../contexts/ToastContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { Product, apiClient } from '../lib/api';
+import { useProductViewers } from '../hooks/useProductViewers';
 import QuickViewModal from './QuickViewModal';
 
 // Fonction utilitaire pour nettoyer les URLs d'images
@@ -72,7 +73,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isCheckingShipping, setIsCheckingShipping] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
-  const [viewersCount] = useState(Math.floor(Math.random() * 20) + 1); // Simulé pour l'instant
+  // Utiliser le hook pour tracker les viewers réels
+  const { viewersCount } = useProductViewers(product.id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   
