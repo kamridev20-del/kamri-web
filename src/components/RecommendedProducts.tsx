@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { calculateDiscountPercentage, formatDiscountPercentage, getBadgeConfig } from '@kamri/lib';
 import Image from 'next/image';
 import { Product } from '../lib/api';
+import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface RecommendedProductsProps {
   products?: Product[];
@@ -32,6 +35,26 @@ const getCleanImageUrl = (image: string | string[] | null | undefined): string |
 };
 
 export default function RecommendedProducts({ products = [], title = 'Vous pourriez aussi aimer' }: RecommendedProductsProps) {
+  const { addToCart } = useCart();
+  const toast = useToast();
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+
+  const handleAddToCart = async (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setAddingToCart(productId);
+    try {
+      await addToCart(productId, 1);
+      toast?.success?.('Produit ajouté au panier !');
+    } catch (error: any) {
+      console.error('Erreur lors de l\'ajout au panier:', error);
+      toast?.error?.(error.message || 'Erreur lors de l\'ajout au panier');
+    } finally {
+      setAddingToCart(null);
+    }
+  };
+
   if (!products || products.length === 0) return null;
 
   return (
@@ -51,7 +74,7 @@ export default function RecommendedProducts({ products = [], title = 'Vous pourr
             <Link
               key={product.id}
               href={`/product/${product.id}`}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 group"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 group relative"
             >
               {/* Image */}
               <div className="relative h-32 bg-gray-100 overflow-hidden">
@@ -117,15 +140,36 @@ export default function RecommendedProducts({ products = [], title = 'Vous pourr
                 )}
                 
                 {/* Price */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-bold text-[#4CAF50]">
-                    {product.price.toFixed(2)}$
-                  </span>
-                  {product.originalPrice && product.originalPrice > product.price && (
-                    <span className="text-[10px] text-gray-400 line-through">
-                      {product.originalPrice.toFixed(2)}$
+                <div className="flex items-center justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-[#4CAF50]">
+                      {product.price.toFixed(2)}$
                     </span>
-                  )}
+                    {product.originalPrice && product.originalPrice > product.price && (
+                      <span className="text-[10px] text-gray-400 line-through">
+                        {product.originalPrice.toFixed(2)}$
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Bouton d'ajout au panier */}
+                  <button
+                    onClick={(e) => handleAddToCart(e, product.id)}
+                    disabled={addingToCart === product.id}
+                    className="p-1.5 bg-[#4CAF50] text-white rounded-full hover:bg-[#2E7D32] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    title="Ajouter au panier"
+                  >
+                    {addingToCart === product.id ? (
+                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               </div>
             </Link>
