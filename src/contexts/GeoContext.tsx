@@ -96,10 +96,20 @@ export const GeoProvider: React.FC<GeoProviderProps> = ({ children }) => {
         const stored = localStorage.getItem('user_country');
         if (stored) {
           const parsed = JSON.parse(stored);
-          setCountryState(parsed);
-          setLoading(false);
-          console.log('🌍 [GeoContext] Pays chargé depuis localStorage:', parsed);
-          return true;
+          // Vérifier si le pays stocké a été défini manuellement ou automatiquement
+          // Si c'était automatique, on redétecte pour être sûr
+          if (parsed.source === 'manual') {
+            // Pays défini manuellement, on le garde
+            setCountryState(parsed);
+            setLoading(false);
+            console.log('🌍 [GeoContext] Pays chargé depuis localStorage (manuel):', parsed);
+            return true;
+          } else {
+            // Pays détecté automatiquement précédemment, on redétecte pour être à jour
+            console.log('🌍 [GeoContext] Pays précédemment détecté, nouvelle détection...');
+            localStorage.removeItem('user_country'); // Supprimer l'ancien pour forcer la détection
+            return false;
+          }
         }
       } catch (error) {
         console.error('❌ [GeoContext] Erreur chargement pays:', error);
@@ -108,12 +118,10 @@ export const GeoProvider: React.FC<GeoProviderProps> = ({ children }) => {
     };
 
     // Essayer de charger depuis localStorage
-    if (loadStoredCountry()) {
-      return; // Pays trouvé, pas besoin de détecter
+    if (!loadStoredCountry()) {
+      // Sinon, détecter automatiquement
+      detectCountry();
     }
-
-    // Sinon, détecter automatiquement
-    detectCountry();
   }, [detectCountry]);
 
   // Définir manuellement le pays
