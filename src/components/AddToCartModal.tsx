@@ -360,14 +360,21 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
         }
       }
       
-      const colorMatch = selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : true;
-      const sizeMatch = selectedSize ? variantSize.toUpperCase() === selectedSize.toUpperCase() : true;
+      // Si on a des couleurs disponibles, il faut que la couleur corresponde
+      const colorMatch = availableColors.length > 0 
+        ? (selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : false)
+        : true; // Si pas de couleurs, on accepte tout
+      
+      // Si on a des tailles disponibles, il faut que la taille corresponde
+      const sizeMatch = availableSizes.length > 0
+        ? (selectedSize ? variantSize.toUpperCase() === selectedSize.toUpperCase() : false)
+        : true; // Si pas de tailles, on accepte tout
       
       return colorMatch && sizeMatch && (variant.stock || 0) > 0;
     });
     
     setSelectedVariant(matchingVariant || null);
-  }, [selectedColor, selectedSize, availableVariants]);
+  }, [selectedColor, selectedSize, availableVariants, availableColors.length, availableSizes.length]);
 
   // ✅ Sélectionner automatiquement la première couleur et taille disponibles (comme ProductInfo)
   useEffect(() => {
@@ -386,6 +393,39 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
   const displayPrice = selectedVariant?.price || (productDetails?.price || product?.price || 0);
   const displayStock = selectedVariant?.stock ?? (productDetails?.stock ?? product?.stock ?? 0);
   const displayImage = selectedVariant?.image || productDetails?.image || product?.image;
+
+  // Debug: Log pour vérifier l'état
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🔍 [AddToCartModal] État:', {
+        availableVariants: availableVariants.length,
+        availableColors: availableColors.length,
+        availableSizes: availableSizes.length,
+        selectedColor,
+        selectedSize,
+        selectedVariant: selectedVariant?.id,
+        displayStock,
+        isShippable,
+        isCheckingShipping,
+        buttonDisabled: isAddingToCart || displayStock <= 0 || isShippable === false || isCheckingShipping || (availableVariants.length > 0 && !selectedVariant)
+      });
+    }
+  }, [isOpen, availableVariants.length, availableColors.length, availableSizes.length, selectedColor, selectedSize, selectedVariant, displayStock, isShippable, isCheckingShipping, isAddingToCart]);
+
+  // Debug: Log pour vérifier l'état
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🔍 [AddToCartModal] État:', {
+        availableVariants: availableVariants.length,
+        selectedColor,
+        selectedSize,
+        selectedVariant: selectedVariant?.id,
+        displayStock,
+        isShippable,
+        isCheckingShipping
+      });
+    }
+  }, [isOpen, availableVariants.length, selectedColor, selectedSize, selectedVariant, displayStock, isShippable, isCheckingShipping]);
 
   // ✅ Construire la liste des images : image du variant en premier, puis images du produit (comme ProductImageGallery)
   const allImages = useMemo(() => {
@@ -794,7 +834,13 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
             </button>
             <button
               onClick={handleAddToCart}
-              disabled={isAddingToCart || displayStock <= 0 || isShippable === false || isCheckingShipping || (availableVariants.length > 0 && !selectedVariant)}
+              disabled={
+                isAddingToCart || 
+                displayStock <= 0 || 
+                isShippable === false || 
+                isCheckingShipping || 
+                (availableVariants.length > 0 && !selectedVariant)
+              }
               className="px-6 py-2 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isAddingToCart ? (
