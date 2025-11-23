@@ -183,10 +183,10 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
               }
             }
           } else {
-            const props = variant.properties;
-            if (props.value1) {
+            const props = variant.properties as any;
+            if (props?.value1) {
               color = props.value1;
-            } else if (props.key) {
+            } else if (props?.key) {
               color = String(props.key).split(/[-\s]/)[0];
             }
           }
@@ -256,10 +256,10 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
               }
             }
           } else {
-            const props = variant.properties;
-            if (props.value2) {
+            const props = variant.properties as any;
+            if (props?.value2) {
               size = props.value2;
-            } else if (props.key) {
+            } else if (props?.key) {
               const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
               if (sizeMatch) {
                 size = sizeMatch[1];
@@ -328,8 +328,9 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 }
               }
             } else {
-              variantColor = variant.properties.value1 || '';
-              variantSize = variant.properties.value2 || '';
+              const props = variant.properties as any;
+              variantColor = props?.value1 || '';
+              variantSize = props?.value2 || '';
             }
           } catch (e) {
             console.warn('Erreur parsing variant:', e);
