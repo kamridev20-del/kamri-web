@@ -13,6 +13,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { Product, apiClient } from '../lib/api';
 import { useProductViewers } from '../hooks/useProductViewers';
 import QuickViewModal from './QuickViewModal';
+import AddToCartModal from './AddToCartModal';
 
 // Fonction utilitaire pour nettoyer les URLs d'images
 const getCleanImageUrl = (image: string | string[] | null | undefined): string | null => {
@@ -72,6 +73,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isShippable, setIsShippable] = useState<boolean | null>(null);
   const [isCheckingShipping, setIsCheckingShipping] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
+  const [showAddToCartModal, setShowAddToCartModal] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   // Utiliser le hook pour tracker les viewers réels
   const { viewersCount } = useProductViewers(product.id);
@@ -102,7 +104,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isAddingToCart) return;
     
     // Vérifier si l'utilisateur est connecté
     if (!isAuthenticated) {
@@ -110,46 +111,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       return;
     }
     
-    // Vérifier la livraison uniquement si c'est un produit CJ et que le pays est défini
-    if (country?.countryCode && product.source === 'cj-dropshipping') {
-      // Si on n'a pas encore vérifié, le faire maintenant
-      if (isShippable === null) {
-        setIsCheckingShipping(true);
-        try {
-          const response = await apiClient.checkProductShipping(product.id, country.countryCode);
-          if (response.data) {
-            setIsShippable(response.data.shippable);
-            if (!response.data.shippable) {
-              toast?.error?.(response.data.error || `Ce produit n'est pas livrable en ${country.countryName}`);
-              setIsCheckingShipping(false);
-              return;
-            }
-          }
-        } catch (error) {
-          console.error('Erreur vérification livraison:', error);
-          // En cas d'erreur, considérer comme livrable (fallback)
-          setIsShippable(true);
-        } finally {
-          setIsCheckingShipping(false);
-        }
-      } else if (isShippable === false) {
-        toast?.error?.(`Ce produit n'est pas livrable en ${country.countryName}`);
-        return;
-      }
-    }
-    
-    setIsAddingToCart(true);
-    try {
-      await addToCart(product.id, 1);
-      setShowSuccessAnimation(true);
-      toast?.success?.('Produit ajouté au panier !');
-      setTimeout(() => setShowSuccessAnimation(false), 2000);
-    } catch (error: any) {
-      console.error('Erreur lors de l\'ajout au panier:', error);
-      toast?.error?.(error.message || 'Erreur lors de l\'ajout au panier');
-    } finally {
-      setIsAddingToCart(false);
-    }
+    // ✅ Ouvrir la modale de sélection des options au lieu d'ajouter directement
+    setShowAddToCartModal(true);
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -534,7 +497,21 @@ export default function ProductCard({ product }: ProductCardProps) {
       product={showQuickView ? product : null}
       isOpen={showQuickView}
       onClose={() => setShowQuickView(false)}
-      onAddToCart={(e) => handleAddToCart(e || ({} as React.MouseEvent))}
+      onAddToCart={(e) => {
+        setShowQuickView(false);
+        setShowAddToCartModal(true);
+      }}
+    />
+
+    {/* Add to Cart Modal */}
+    <AddToCartModal
+      product={product}
+      isOpen={showAddToCartModal}
+      onClose={() => setShowAddToCartModal(false)}
+      onAddToCart={() => {
+        setShowSuccessAnimation(true);
+        setTimeout(() => setShowSuccessAnimation(false), 2000);
+      }}
     />
     </>
   );

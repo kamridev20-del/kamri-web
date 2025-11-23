@@ -25,6 +25,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image?: string;
+  images?: string[];
   category?: {
     id?: string;
     name: string;
@@ -44,6 +45,20 @@ export interface Product {
   brand?: string;
   deliveryCycle?: string;
   isFreeShipping?: boolean;
+  // ✅ Support des variants
+  productVariants?: Array<{
+    id: string;
+    productId: string;
+    cjVariantId: string | null;
+    name: string | null;
+    sku: string | null;
+    price: number | null;
+    stock: number | null;
+    image: string | null;
+    properties: string | null;
+    isActive: boolean;
+  }>;
+  variants?: string; // JSON string des variants CJ
 }
 
 export interface Category {
