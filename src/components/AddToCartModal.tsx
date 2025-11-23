@@ -263,13 +263,15 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
               } else if (props.value2) {
                 size = props.value2;
               } else if (props.key) {
-                const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
+                // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+                const sizeMatch = String(props.key).match(/[-\s]([A-Za-z0-9]+)$/i);
                 if (sizeMatch) {
                   size = sizeMatch[1];
                 }
               }
             } catch {
-              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
+              // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+              const sizeMatch = variant.properties.match(/[-\s]([A-Za-z0-9]+)$/i);
               if (sizeMatch) {
                 size = sizeMatch[1];
               }
@@ -279,7 +281,8 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
             if (props?.value2) {
               size = props.value2;
             } else if (props?.key) {
-              const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
+              // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+              const sizeMatch = String(props.key).match(/[-\s]([A-Za-z0-9]+)$/i);
               if (sizeMatch) {
                 size = sizeMatch[1];
               }
@@ -290,8 +293,9 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
         }
       }
       
+      // ✅ Convertir en majuscules comme ProductInfo.tsx pour la cohérence
       if (size) {
-        sizesSet.add(size);
+        sizesSet.add(size.toUpperCase());
       }
     });
     
@@ -324,45 +328,62 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
       let variantColor = '';
       let variantSize = '';
       
+      // Utiliser la MÊME logique d'extraction que pour availableColors et availableSizes
       if (variant.properties) {
         try {
           if (typeof variant.properties === 'string') {
+            // Essayer de parser comme JSON d'abord
             try {
               const props = JSON.parse(variant.properties);
+              
               if (typeof props === 'string') {
-                const zoneMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-                variantColor = zoneMatch ? zoneMatch[1].trim() : props.split(/[-\s]/)[0];
-                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
-                if (sizeMatch) {
-                  variantSize = sizeMatch[1];
-                }
-              } else {
+                // Pattern : "Purple-S", "Black Zone2-S", "Beige-66cm"
+                const colorMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+                variantColor = colorMatch ? colorMatch[1].trim() : props.split(/[-\s]/)[0];
+                // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+                const sizeMatch = props.match(/[-\s]([A-Za-z0-9]+)$/i);
+                variantSize = sizeMatch ? sizeMatch[1] : '';
+              } else if (props.value1 || props.value2) {
                 variantColor = props.value1 || '';
                 variantSize = props.value2 || '';
+              } else if (props.key) {
+                variantColor = String(props.key).split(/[-\s]/)[0];
+                const sizeMatch = String(props.key).match(/[-\s]([A-Za-z0-9]+)$/i);
+                variantSize = sizeMatch ? sizeMatch[1] : '';
               }
             } catch {
-              const zoneMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-              if (zoneMatch) {
-                variantColor = zoneMatch[1].trim();
-              }
-              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
-              if (sizeMatch) {
-                variantSize = sizeMatch[1];
-              }
+              // Ce n'est pas du JSON, c'est une string directe
+              const colorMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+              variantColor = colorMatch ? colorMatch[1].trim() : variant.properties.split(/[-\s]/)[0];
+              // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+              const sizeMatch = variant.properties.match(/[-\s]([A-Za-z0-9]+)$/i);
+              variantSize = sizeMatch ? sizeMatch[1] : '';
             }
           } else {
+            // C'est un objet
             const props = variant.properties as any;
-            variantColor = props?.value1 || '';
-            variantSize = props?.value2 || '';
+            variantColor = props.value1 || '';
+            variantSize = props.value2 || '';
+            if (props.key) {
+              variantColor = variantColor || String(props.key).split(/[-\s]/)[0];
+              const sizeMatch = String(props.key).match(/[-\s]([A-Za-z0-9]+)$/i);
+              variantSize = variantSize || (sizeMatch ? sizeMatch[1] : '');
+            }
           }
         } catch (e) {
-          console.warn('Erreur parsing variant:', e);
+          console.warn('Erreur matching variant:', e);
         }
       }
       
       // ✅ Utiliser la MÊME logique que ProductInfo.tsx
       const colorMatch = !selectedColor || variantColor.toLowerCase() === selectedColor.toLowerCase();
+      // ✅ Comparaison case-insensitive pour la taille aussi
       const sizeMatch = !selectedSize || variantSize.toUpperCase() === selectedSize.toUpperCase();
+      
+      // Debug: Log pour chaque variant
+      if (isOpen && (selectedColor || selectedSize)) {
+        console.log(`🔍 [AddToCartModal] Variant "${variant.name}": color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch}), stock=${variant.stock || 0}`);
+      }
       
       return colorMatch && sizeMatch && (variant.stock || 0) > 0;
     });
