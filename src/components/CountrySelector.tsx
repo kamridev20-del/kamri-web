@@ -50,6 +50,26 @@ const COUNTRIES = [
   { code: 'MX', name: 'Mexique', flag: '🇲🇽' },
   { code: 'AR', name: 'Argentine', flag: '🇦🇷' },
   { code: 'ZA', name: 'Afrique du Sud', flag: '🇿🇦' },
+  // Afrique - FCFA (XAF)
+  { code: 'CM', name: 'Cameroun', flag: '🇨🇲' },
+  { code: 'TD', name: 'Tchad', flag: '🇹🇩' },
+  { code: 'CF', name: 'République centrafricaine', flag: '🇨🇫' },
+  { code: 'CG', name: 'Congo', flag: '🇨🇬' },
+  { code: 'GA', name: 'Gabon', flag: '🇬🇦' },
+  { code: 'GQ', name: 'Guinée équatoriale', flag: '🇬🇶' },
+  // Afrique - FCFA (XOF)
+  { code: 'SN', name: 'Sénégal', flag: '🇸🇳' },
+  { code: 'CI', name: 'Côte d\'Ivoire', flag: '🇨🇮' },
+  { code: 'BF', name: 'Burkina Faso', flag: '🇧🇫' },
+  { code: 'ML', name: 'Mali', flag: '🇲🇱' },
+  { code: 'NE', name: 'Niger', flag: '🇳🇪' },
+  { code: 'TG', name: 'Togo', flag: '🇹🇬' },
+  { code: 'BJ', name: 'Bénin', flag: '🇧🇯' },
+  { code: 'GW', name: 'Guinée-Bissau', flag: '🇬🇼' },
+  // Asie
+  { code: 'TH', name: 'Thaïlande', flag: '🇹🇭' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'NZ', name: 'Nouvelle-Zélande', flag: '🇳🇿' },
 ];
 
 export default function CountrySelector() {
