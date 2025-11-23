@@ -1,18 +1,44 @@
 'use client';
 
-import { Menu, Search, X as XIcon } from 'lucide-react';
+import { Menu, Search, X as XIcon, Package, Tag } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { apiClient } from '../lib/api';
 import AuthModal from './AuthModal';
 import CountrySelector from './CountrySelector';
 
+interface SearchResult {
+  products: Array<{
+    id: string;
+    name: string;
+    price: number;
+    image?: string;
+    images?: string[];
+    category?: { name: string };
+  }>;
+  categories: Array<{
+    id: string;
+    name: string;
+    nameEn?: string;
+    icon?: string;
+    imageUrl?: string;
+    productCount: number;
+  }>;
+  totalProducts: number;
+  totalCategories: number;
+}
+
 export default function ModernHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -21,15 +47,69 @@ export default function ModernHeader() {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const menuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLFormElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Log pour debug
   console.log('📊 [Header] wishlistCount:', wishlistCount, 'cartCount:', cartCount);
+
+  // Recherche avec debounce
+  const performSearch = useCallback(async (query: string) => {
+    if (!query || query.trim().length < 2) {
+      setSearchResults(null);
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await apiClient.searchProducts(query.trim(), 8);
+      if (response.data) {
+        setSearchResults(response.data);
+        setShowSearchDropdown(true);
+      } else {
+        setSearchResults(null);
+        setShowSearchDropdown(false);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      setSearchResults(null);
+      setShowSearchDropdown(false);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounce de la recherche
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim().length >= 2) {
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(searchQuery);
+      }, 300);
+    } else {
+      setSearchResults(null);
+      setShowSearchDropdown(false);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, performSearch]);
 
   // Fermer le menu quand on clique ailleurs
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowUserMenu(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchDropdown(false);
       }
     };
 
@@ -38,6 +118,16 @@ export default function ModernHeader() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Gérer la soumission de la recherche
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim().length >= 2) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSearchDropdown(false);
+      setSearchQuery('');
+    }
+  };
 
   // Fermer le menu mobile quand on change de page
   useEffect(() => {
@@ -109,7 +199,7 @@ export default function ModernHeader() {
 
             {/* Barre de recherche - Desktop */}
             <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
-              <div className="relative w-full">
+              <form onSubmit={handleSearchSubmit} className="relative w-full" ref={searchRef}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-[#81C784]" />
                 </div>
@@ -118,9 +208,145 @@ export default function ModernHeader() {
                   placeholder="Rechercher des produits..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => {
+                    if (searchResults) {
+                      setShowSearchDropdown(true);
+                    }
+                  }}
                   className="w-full pl-12 pr-4 py-3 bg-[#E8F5E8] rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:bg-white transition-all duration-300 ease-in-out font-medium text-[#424242] placeholder-[#81C784] text-base"
                 />
-              </div>
+                
+                {/* Dropdown de résultats */}
+                {showSearchDropdown && searchQuery.trim().length >= 2 && (
+                  <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 z-[10000] max-h-[500px] overflow-y-auto">
+                    {isSearching ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin h-6 w-6 border-2 border-[#4CAF50] border-t-transparent rounded-full mx-auto"></div>
+                        <p className="mt-2 text-sm">Recherche en cours...</p>
+                      </div>
+                    ) : searchResults ? (
+                      <>
+                        {/* Catégories */}
+                        {searchResults.categories.length > 0 && (
+                          <div className="p-3 border-b border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                              <Tag className="h-4 w-4" />
+                              Catégories
+                            </h3>
+                            <div className="space-y-1">
+                              {searchResults.categories.map((category) => (
+                                <Link
+                                  key={category.id}
+                                  href={`/categories/${encodeURIComponent(category.name.toLowerCase().replace(/\s+/g, '-'))}`}
+                                  onClick={() => {
+                                    setShowSearchDropdown(false);
+                                    setSearchQuery('');
+                                  }}
+                                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#E8F5E8] transition-colors group"
+                                >
+                                  {category.imageUrl ? (
+                                    <img
+                                      src={category.imageUrl}
+                                      alt={category.name}
+                                      className="w-10 h-10 rounded-lg object-cover"
+                                    />
+                                  ) : category.icon ? (
+                                    <span className="text-2xl">{category.icon}</span>
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-lg bg-[#E8F5E8] flex items-center justify-center">
+                                      <Tag className="h-5 w-5 text-[#4CAF50]" />
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-[#424242] group-hover:text-[#4CAF50] truncate">
+                                      {category.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {category.productCount} produit{category.productCount > 1 ? 's' : ''}
+                                    </p>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Produits */}
+                        {searchResults.products.length > 0 && (
+                          <div className="p-3">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                              <Package className="h-4 w-4" />
+                              Produits
+                            </h3>
+                            <div className="space-y-1">
+                              {searchResults.products.map((product) => (
+                                <Link
+                                  key={product.id}
+                                  href={`/product/${product.id}`}
+                                  onClick={() => {
+                                    setShowSearchDropdown(false);
+                                    setSearchQuery('');
+                                  }}
+                                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#E8F5E8] transition-colors group"
+                                >
+                                  <img
+                                    src={product.image || product.images?.[0] || '/images/modelo.png'}
+                                    alt={product.name}
+                                    className="w-12 h-12 rounded-lg object-cover"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-[#424242] group-hover:text-[#4CAF50] truncate">
+                                      {product.name}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                      <span className="text-sm font-bold text-[#4CAF50]">
+                                        {product.price.toFixed(2)}$
+                                      </span>
+                                      {product.category && (
+                                        <span className="text-xs text-gray-500">
+                                          • {product.category.name}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Bouton "Voir tous les résultats" */}
+                        {(searchResults.totalProducts > searchResults.products.length || searchResults.totalCategories > searchResults.categories.length) && (
+                          <div className="p-3 border-t border-gray-100 bg-gray-50">
+                            <Link
+                              href={`/search?q=${encodeURIComponent(searchQuery.trim())}`}
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                              }}
+                              className="block w-full text-center py-2 px-4 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors font-medium text-sm"
+                            >
+                              Voir tous les résultats
+                              {searchResults.totalProducts > 0 && (
+                                <span className="ml-2 text-xs opacity-90">
+                                  ({searchResults.totalProducts} produit{searchResults.totalProducts > 1 ? 's' : ''})
+                                </span>
+                              )}
+                            </Link>
+                          </div>
+                        )}
+
+                        {/* Message si aucun résultat */}
+                        {searchResults.products.length === 0 && searchResults.categories.length === 0 && (
+                          <div className="p-4 text-center text-gray-500">
+                            <p className="text-sm">Aucun résultat trouvé pour "{searchQuery}"</p>
+                          </div>
+                        )}
+                      </>
+                    ) : null}
+                  </div>
+                )}
+              </form>
             </div>
 
             {/* Bouton recherche mobile */}
@@ -228,7 +454,7 @@ export default function ModernHeader() {
           {/* Barre de recherche mobile */}
           {showMobileSearch && (
             <div className="lg:hidden pb-3">
-              <div className="relative">
+              <form onSubmit={handleSearchSubmit} className="relative" ref={searchRef}>
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-[#81C784]" />
                 </div>
@@ -237,9 +463,148 @@ export default function ModernHeader() {
                   placeholder="Rechercher des produits..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => {
+                    if (searchResults) {
+                      setShowSearchDropdown(true);
+                    }
+                  }}
                   className="w-full pl-10 pr-3 py-2.5 bg-[#E8F5E8] rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:bg-white transition-all duration-300 ease-in-out font-medium text-[#424242] placeholder-[#81C784] text-sm"
                 />
-              </div>
+                
+                {/* Dropdown de résultats mobile */}
+                {showSearchDropdown && searchQuery.trim().length >= 2 && (
+                  <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 z-[10000] max-h-[400px] overflow-y-auto">
+                    {isSearching ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin h-6 w-6 border-2 border-[#4CAF50] border-t-transparent rounded-full mx-auto"></div>
+                        <p className="mt-2 text-sm">Recherche en cours...</p>
+                      </div>
+                    ) : searchResults ? (
+                      <>
+                        {/* Catégories */}
+                        {searchResults.categories.length > 0 && (
+                          <div className="p-3 border-b border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                              <Tag className="h-4 w-4" />
+                              Catégories
+                            </h3>
+                            <div className="space-y-1">
+                              {searchResults.categories.map((category) => (
+                                <Link
+                                  key={category.id}
+                                  href={`/categories/${encodeURIComponent(category.name.toLowerCase().replace(/\s+/g, '-'))}`}
+                                  onClick={() => {
+                                    setShowSearchDropdown(false);
+                                    setSearchQuery('');
+                                    setShowMobileSearch(false);
+                                  }}
+                                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#E8F5E8] transition-colors group"
+                                >
+                                  {category.imageUrl ? (
+                                    <img
+                                      src={category.imageUrl}
+                                      alt={category.name}
+                                      className="w-10 h-10 rounded-lg object-cover"
+                                    />
+                                  ) : category.icon ? (
+                                    <span className="text-2xl">{category.icon}</span>
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-lg bg-[#E8F5E8] flex items-center justify-center">
+                                      <Tag className="h-5 w-5 text-[#4CAF50]" />
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-[#424242] group-hover:text-[#4CAF50] truncate">
+                                      {category.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {category.productCount} produit{category.productCount > 1 ? 's' : ''}
+                                    </p>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Produits */}
+                        {searchResults.products.length > 0 && (
+                          <div className="p-3">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                              <Package className="h-4 w-4" />
+                              Produits
+                            </h3>
+                            <div className="space-y-1">
+                              {searchResults.products.map((product) => (
+                                <Link
+                                  key={product.id}
+                                  href={`/product/${product.id}`}
+                                  onClick={() => {
+                                    setShowSearchDropdown(false);
+                                    setSearchQuery('');
+                                    setShowMobileSearch(false);
+                                  }}
+                                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#E8F5E8] transition-colors group"
+                                >
+                                  <img
+                                    src={product.image || product.images?.[0] || '/images/modelo.png'}
+                                    alt={product.name}
+                                    className="w-12 h-12 rounded-lg object-cover"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-[#424242] group-hover:text-[#4CAF50] truncate">
+                                      {product.name}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                      <span className="text-sm font-bold text-[#4CAF50]">
+                                        {product.price.toFixed(2)}$
+                                      </span>
+                                      {product.category && (
+                                        <span className="text-xs text-gray-500">
+                                          • {product.category.name}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Bouton "Voir tous les résultats" */}
+                        {(searchResults.totalProducts > searchResults.products.length || searchResults.totalCategories > searchResults.categories.length) && (
+                          <div className="p-3 border-t border-gray-100 bg-gray-50">
+                            <Link
+                              href={`/search?q=${encodeURIComponent(searchQuery.trim())}`}
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                setShowMobileSearch(false);
+                              }}
+                              className="block w-full text-center py-2 px-4 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors font-medium text-sm"
+                            >
+                              Voir tous les résultats
+                              {searchResults.totalProducts > 0 && (
+                                <span className="ml-2 text-xs opacity-90">
+                                  ({searchResults.totalProducts} produit{searchResults.totalProducts > 1 ? 's' : ''})
+                                </span>
+                              )}
+                            </Link>
+                          </div>
+                        )}
+
+                        {/* Message si aucun résultat */}
+                        {searchResults.products.length === 0 && searchResults.categories.length === 0 && (
+                          <div className="p-4 text-center text-gray-500">
+                            <p className="text-sm">Aucun résultat trouvé pour "{searchQuery}"</p>
+                          </div>
+                        )}
+                      </>
+                    ) : null}
+                  </div>
+                )}
+              </form>
             </div>
           )}
 

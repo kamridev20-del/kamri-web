@@ -286,6 +286,45 @@ export class ApiClient {
     return this.fetchPublic('/products');
   }
 
+  /**
+   * Rechercher des produits et catégories
+   */
+  async searchProducts(query: string, limit: number = 10): Promise<ApiResponse<{
+    products: Product[];
+    categories: Array<{
+      id: string;
+      name: string;
+      nameEn?: string;
+      description?: string;
+      icon?: string;
+      imageUrl?: string;
+      productCount: number;
+    }>;
+    totalProducts: number;
+    totalCategories: number;
+  }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}&limit=${limit}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { data };
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Erreur lors de la recherche',
+      };
+    }
+  }
+
   async getProduct(id: string): Promise<ApiResponse<Product>> {
     return this.fetchPublic(`/products/${id}`);
   }
