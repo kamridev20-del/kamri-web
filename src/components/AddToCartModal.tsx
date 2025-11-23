@@ -594,8 +594,9 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                                 }
                               }
                             } else {
-                              variantColor = v.properties.value1 || '';
-                              variantSize = v.properties.value2 || '';
+                              const props = v.properties as any;
+                              variantColor = props?.value1 || '';
+                              variantSize = props?.value2 || '';
                             }
                           } catch (e) {
                             // Ignorer
