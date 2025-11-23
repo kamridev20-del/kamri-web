@@ -9,6 +9,7 @@ export function useProductViewers(productId: string | undefined) {
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fetchIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isTrackingRef = useRef(false);
+  const endpointExistsRef = useRef<boolean | null>(null); // null = pas encore vérifié, true = existe, false = n'existe pas
 
   // Fonction pour générer un ID de session unique
   const getSessionId = () => {
@@ -21,6 +22,9 @@ export function useProductViewers(productId: string | undefined) {
   // Enregistrer qu'on regarde le produit
   const startTracking = useCallback(async () => {
     if (!productId || isTrackingRef.current) return;
+    
+    // Si on sait que l'endpoint n'existe pas, ne pas faire de requête
+    if (endpointExistsRef.current === false) return;
 
     try {
       const sessionId = getSessionId();
@@ -37,9 +41,15 @@ export function useProductViewers(productId: string | undefined) {
         const data = await response.json();
         setViewersCount(data.viewersCount || 0);
         isTrackingRef.current = true;
+        endpointExistsRef.current = true;
+      } else if (response.status === 404) {
+        // Endpoint n'existe pas encore, désactiver toutes les futures requêtes
+        endpointExistsRef.current = false;
+        return;
       }
     } catch (error) {
-      console.error('Erreur démarrage tracking viewers:', error);
+      // Ne pas logger les erreurs pour éviter le spam dans la console
+      // console.error('Erreur démarrage tracking viewers:', error);
     }
   }, [productId]);
 
@@ -50,15 +60,21 @@ export function useProductViewers(productId: string | undefined) {
     try {
       const sessionId = getSessionId();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-      await fetch(`${apiUrl}/products/${productId}/viewers`, {
+      const response = await fetch(`${apiUrl}/products/${productId}/viewers`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ sessionId }),
       });
+      
+      if (response.status === 404) {
+        // Endpoint n'existe pas encore, ne pas logger d'erreur
+        return;
+      }
     } catch (error) {
-      console.error('Erreur arrêt tracking viewers:', error);
+      // Ne pas logger les erreurs pour éviter le spam dans la console
+      // console.error('Erreur arrêt tracking viewers:', error);
     } finally {
       isTrackingRef.current = false;
     }
@@ -67,6 +83,9 @@ export function useProductViewers(productId: string | undefined) {
   // Récupérer le nombre de viewers
   const fetchViewersCount = useCallback(async () => {
     if (!productId) return;
+    
+    // Si on sait que l'endpoint n'existe pas, ne pas faire de requête
+    if (endpointExistsRef.current === false) return;
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -74,9 +93,24 @@ export function useProductViewers(productId: string | undefined) {
       if (response.ok) {
         const data = await response.json();
         setViewersCount(data.viewersCount || 0);
+        endpointExistsRef.current = true;
+      } else if (response.status === 404) {
+        // Endpoint n'existe pas encore, désactiver toutes les futures requêtes
+        endpointExistsRef.current = false;
+        // Arrêter les intervalles
+        if (heartbeatIntervalRef.current) {
+          clearInterval(heartbeatIntervalRef.current);
+          heartbeatIntervalRef.current = null;
+        }
+        if (fetchIntervalRef.current) {
+          clearInterval(fetchIntervalRef.current);
+          fetchIntervalRef.current = null;
+        }
+        return;
       }
     } catch (error) {
-      console.error('Erreur récupération viewers:', error);
+      // Ne pas logger les erreurs pour éviter le spam dans la console
+      // console.error('Erreur récupération viewers:', error);
     }
   }, [productId]);
 
@@ -92,15 +126,27 @@ export function useProductViewers(productId: string | undefined) {
 
       // Envoyer un heartbeat toutes les 15 secondes pour rester actif
       heartbeatIntervalRef.current = setInterval(() => {
-        if (mounted) {
+        if (mounted && endpointExistsRef.current !== false) {
           startTracking(); // Ré-enregistrer pour rester actif
+        } else if (mounted && endpointExistsRef.current === false) {
+          // Arrêter l'intervalle si l'endpoint n'existe pas
+          if (heartbeatIntervalRef.current) {
+            clearInterval(heartbeatIntervalRef.current);
+            heartbeatIntervalRef.current = null;
+          }
         }
       }, 15000);
 
       // Mettre à jour le compteur toutes les 5 secondes
       fetchIntervalRef.current = setInterval(() => {
-        if (mounted) {
+        if (mounted && endpointExistsRef.current !== false) {
           fetchViewersCount();
+        } else if (mounted && endpointExistsRef.current === false) {
+          // Arrêter l'intervalle si l'endpoint n'existe pas
+          if (fetchIntervalRef.current) {
+            clearInterval(fetchIntervalRef.current);
+            fetchIntervalRef.current = null;
+          }
         }
       }, 5000);
     });

@@ -360,21 +360,26 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
         }
       }
       
-      // Si on a des couleurs disponibles, il faut que la couleur corresponde
-      const colorMatch = availableColors.length > 0 
-        ? (selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : false)
-        : true; // Si pas de couleurs, on accepte tout
-      
-      // Si on a des tailles disponibles, il faut que la taille corresponde
-      const sizeMatch = availableSizes.length > 0
-        ? (selectedSize ? variantSize.toUpperCase() === selectedSize.toUpperCase() : false)
-        : true; // Si pas de tailles, on accepte tout
+      // ✅ Utiliser la MÊME logique que ProductInfo.tsx
+      const colorMatch = !selectedColor || variantColor.toLowerCase() === selectedColor.toLowerCase();
+      const sizeMatch = !selectedSize || variantSize.toUpperCase() === selectedSize.toUpperCase();
       
       return colorMatch && sizeMatch && (variant.stock || 0) > 0;
     });
     
     setSelectedVariant(matchingVariant || null);
-  }, [selectedColor, selectedSize, availableVariants, availableColors.length, availableSizes.length]);
+    
+    // Debug: Log pour vérifier le matching
+    if (isOpen && (selectedColor || selectedSize)) {
+      console.log('🔍 [AddToCartModal] Matching variant:', {
+        selectedColor,
+        selectedSize,
+        availableVariants: availableVariants.length,
+        matchingVariant: matchingVariant?.id || null,
+        matchingVariantStock: matchingVariant?.stock || null
+      });
+    }
+  }, [selectedColor, selectedSize, availableVariants, availableColors.length, availableSizes.length, isOpen]);
 
   // ✅ Sélectionner automatiquement la première couleur et taille disponibles (comme ProductInfo)
   useEffect(() => {
@@ -516,17 +521,9 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
       return;
     }
 
-    // Si des variants existent, vérifier qu'un variant est sélectionné
+    // Si des variants existent, vérifier qu'un variant est sélectionné (comme ProductInfo)
     if (availableVariants.length > 0 && !selectedVariant) {
-      if (!selectedColor && availableColors.length > 0) {
-        toast?.error?.('Veuillez sélectionner une couleur');
-        return;
-      }
-      if (!selectedSize && availableSizes.length > 0) {
-        toast?.error?.('Veuillez sélectionner une taille');
-        return;
-      }
-      toast?.error?.('Veuillez sélectionner toutes les options');
+      toast?.error?.('Veuillez sélectionner une couleur et une taille');
       return;
     }
 
@@ -842,6 +839,17 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 (availableVariants.length > 0 && !selectedVariant)
               }
               className="px-6 py-2 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              title={
+                isAddingToCart 
+                  ? 'Ajout en cours...' 
+                  : displayStock <= 0 
+                    ? 'Rupture de stock' 
+                    : isShippable === false
+                    ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}`
+                    : availableVariants.length > 0 && !selectedVariant
+                    ? 'Veuillez sélectionner toutes les options'
+                    : 'Ajouter au panier'
+              }
             >
               {isAddingToCart ? (
                 <>
