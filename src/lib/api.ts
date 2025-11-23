@@ -289,7 +289,7 @@ export class ApiClient {
   /**
    * Rechercher des produits et catégories
    */
-  async searchProducts(query: string, limit: number = 10): Promise<ApiResponse<{
+  async searchProducts(query: string, limit: number = 10, includePopular: boolean = false): Promise<ApiResponse<{
     products: Product[];
     categories: Array<{
       id: string;
@@ -302,9 +302,19 @@ export class ApiClient {
     }>;
     totalProducts: number;
     totalCategories: number;
+    popularSearches?: string[];
   }>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}&limit=${limit}`, {
+      const params = new URLSearchParams();
+      if (query) {
+        params.append('q', query);
+      }
+      params.append('limit', limit.toString());
+      if (includePopular) {
+        params.append('popular', 'true');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/products/search?${params.toString()}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

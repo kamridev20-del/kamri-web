@@ -30,6 +30,7 @@ interface SearchResult {
   }>;
   totalProducts: number;
   totalCategories: number;
+  popularSearches?: string[];
 }
 
 export default function ModernHeader() {
@@ -53,11 +54,30 @@ export default function ModernHeader() {
   // Log pour debug
   console.log('📊 [Header] wishlistCount:', wishlistCount, 'cartCount:', cartCount);
 
+  // Charger les recherches populaires
+  const loadPopularSearches = useCallback(async () => {
+    try {
+      const response = await apiClient.searchProducts('', 8, true);
+      if (response.data && response.data.popularSearches) {
+        setSearchResults({
+          products: [],
+          categories: [],
+          totalProducts: 0,
+          totalCategories: 0,
+          popularSearches: response.data.popularSearches,
+        } as SearchResult);
+        setShowSearchDropdown(true);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des recherches populaires:', error);
+    }
+  }, []);
+
   // Recherche avec debounce
   const performSearch = useCallback(async (query: string) => {
     if (!query || query.trim().length < 2) {
-      setSearchResults(null);
-      setShowSearchDropdown(false);
+      // Si pas de query, charger les recherches populaires
+      await loadPopularSearches();
       return;
     }
 
@@ -78,7 +98,7 @@ export default function ModernHeader() {
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  }, [loadPopularSearches]);
 
   // Debounce de la recherche
   useEffect(() => {
@@ -90,6 +110,11 @@ export default function ModernHeader() {
       searchTimeoutRef.current = setTimeout(() => {
         performSearch(searchQuery);
       }, 300);
+    } else if (searchQuery.trim().length === 0) {
+      // Si la barre est vide, charger les recherches populaires
+      searchTimeoutRef.current = setTimeout(() => {
+        loadPopularSearches();
+      }, 100);
     } else {
       setSearchResults(null);
       setShowSearchDropdown(false);
@@ -100,7 +125,7 @@ export default function ModernHeader() {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery, performSearch]);
+  }, [searchQuery, performSearch, loadPopularSearches]);
 
   // Fermer le menu quand on clique ailleurs
   useEffect(() => {
@@ -209,7 +234,9 @@ export default function ModernHeader() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {
-                    if (searchResults) {
+                    if (searchQuery.trim().length === 0) {
+                      loadPopularSearches();
+                    } else if (searchResults) {
                       setShowSearchDropdown(true);
                     }
                   }}
@@ -217,7 +244,7 @@ export default function ModernHeader() {
                 />
                 
                 {/* Dropdown de résultats */}
-                {showSearchDropdown && searchQuery.trim().length >= 2 && (
+                {showSearchDropdown && (
                   <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 z-[10000] max-h-[500px] overflow-y-auto">
                     {isSearching ? (
                       <div className="p-4 text-center text-gray-500">
@@ -226,6 +253,29 @@ export default function ModernHeader() {
                       </div>
                     ) : searchResults ? (
                       <>
+                        {/* Recherches populaires (quand la barre est vide) */}
+                        {searchQuery.trim().length === 0 && searchResults.popularSearches && searchResults.popularSearches.length > 0 && (
+                          <div className="p-3 border-b border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                              <Search className="h-4 w-4" />
+                              Recherches populaires
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {searchResults.popularSearches.map((searchTerm, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => {
+                                    setSearchQuery(searchTerm);
+                                    performSearch(searchTerm);
+                                  }}
+                                  className="px-3 py-1.5 bg-[#E8F5E8] text-[#424242] rounded-full text-sm hover:bg-[#4CAF50] hover:text-white transition-colors"
+                                >
+                                  {searchTerm}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         {/* Catégories */}
                         {searchResults.categories.length > 0 && (
                           <div className="p-3 border-b border-gray-100">
@@ -336,8 +386,8 @@ export default function ModernHeader() {
                           </div>
                         )}
 
-                        {/* Message si aucun résultat */}
-                        {searchResults.products.length === 0 && searchResults.categories.length === 0 && (
+                        {/* Message si aucun résultat (seulement si on a tapé quelque chose) */}
+                        {searchQuery.trim().length >= 2 && searchResults.products.length === 0 && searchResults.categories.length === 0 && (
                           <div className="p-4 text-center text-gray-500">
                             <p className="text-sm">Aucun résultat trouvé pour "{searchQuery}"</p>
                           </div>
@@ -464,7 +514,9 @@ export default function ModernHeader() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {
-                    if (searchResults) {
+                    if (searchQuery.trim().length === 0) {
+                      loadPopularSearches();
+                    } else if (searchResults) {
                       setShowSearchDropdown(true);
                     }
                   }}
@@ -472,7 +524,7 @@ export default function ModernHeader() {
                 />
                 
                 {/* Dropdown de résultats mobile */}
-                {showSearchDropdown && searchQuery.trim().length >= 2 && (
+                {showSearchDropdown && (
                   <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 z-[10000] max-h-[400px] overflow-y-auto">
                     {isSearching ? (
                       <div className="p-4 text-center text-gray-500">
@@ -481,6 +533,29 @@ export default function ModernHeader() {
                       </div>
                     ) : searchResults ? (
                       <>
+                        {/* Recherches populaires (quand la barre est vide) */}
+                        {searchQuery.trim().length === 0 && searchResults.popularSearches && searchResults.popularSearches.length > 0 && (
+                          <div className="p-3 border-b border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                              <Search className="h-4 w-4" />
+                              Recherches populaires
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {searchResults.popularSearches.map((searchTerm, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => {
+                                    setSearchQuery(searchTerm);
+                                    performSearch(searchTerm);
+                                  }}
+                                  className="px-3 py-1.5 bg-[#E8F5E8] text-[#424242] rounded-full text-sm hover:bg-[#4CAF50] hover:text-white transition-colors"
+                                >
+                                  {searchTerm}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         {/* Catégories */}
                         {searchResults.categories.length > 0 && (
                           <div className="p-3 border-b border-gray-100">
@@ -594,8 +669,8 @@ export default function ModernHeader() {
                           </div>
                         )}
 
-                        {/* Message si aucun résultat */}
-                        {searchResults.products.length === 0 && searchResults.categories.length === 0 && (
+                        {/* Message si aucun résultat (seulement si on a tapé quelque chose) */}
+                        {searchQuery.trim().length >= 2 && searchResults.products.length === 0 && searchResults.categories.length === 0 && (
                           <div className="p-4 text-center text-gray-500">
                             <p className="text-sm">Aucun résultat trouvé pour "{searchQuery}"</p>
                           </div>
