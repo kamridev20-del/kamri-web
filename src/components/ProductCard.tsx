@@ -10,6 +10,7 @@ import { useCompare } from '../contexts/CompareContext';
 import { useGeo } from '../contexts/GeoContext';
 import { useToast } from '../contexts/ToastContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { Product, apiClient } from '../lib/api';
 import { useProductViewers } from '../hooks/useProductViewers';
 import QuickViewModal from './QuickViewModal';
@@ -63,6 +64,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { formatPrice } = useCurrency();
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCompare, removeFromCompare, isInCompare, canAddMore } = useCompare();
@@ -429,9 +431,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mb-1.5">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1">
-              <p className="text-base font-bold text-[#4CAF50]">{product.price.toFixed(2)}$</p>
+              <p className="text-base font-bold text-[#4CAF50]">{formatPrice(product.price)}</p>
               {product.originalPrice && product.originalPrice > product.price && (
-                <p className="text-xs text-[#9CA3AF] line-through">{product.originalPrice.toFixed(2)}$</p>
+                <p className="text-xs text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</p>
               )}
             </div>
             
@@ -483,7 +485,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
               </motion.span>
               <span className="text-[9px] text-[#9CA3AF] font-medium">
-                Économisez {(product.originalPrice - product.price).toFixed(2)}$
+                Économisez {formatPrice(product.originalPrice - product.price)}
               </span>
             </motion.div>
           )}

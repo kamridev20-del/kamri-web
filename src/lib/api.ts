@@ -457,6 +457,41 @@ export class ApiClient {
   }
 
   // Cart grouping methods
+  /**
+   * Récupérer les taux de change
+   */
+  async getExchangeRates(): Promise<ApiResponse<{
+    success: boolean;
+    rates: Record<string, number>;
+    base: string;
+  }>> {
+    return this.fetchPublic('/currency/rates');
+  }
+
+  /**
+   * Obtenir la devise d'un pays
+   */
+  async getCurrencyFromCountry(countryCode: string): Promise<ApiResponse<{
+    success: boolean;
+    countryCode: string;
+    currency: string;
+  }>> {
+    return this.fetchPublic(`/currency/currency-from-country?countryCode=${encodeURIComponent(countryCode)}`);
+  }
+
+  /**
+   * Convertir un prix USD vers une devise
+   */
+  async convertPrice(price: number, currency: string): Promise<ApiResponse<{
+    success: boolean;
+    originalPrice: number;
+    currency: string;
+    convertedPrice: number;
+    formattedPrice: string;
+  }>> {
+    return this.fetchPublic(`/currency/convert?price=${price}&currency=${encodeURIComponent(currency)}`);
+  }
+
   async getGroupedCart(countryCode: string): Promise<ApiResponse<Array<{
     originCountryCode: string;
     originCountryName: string;

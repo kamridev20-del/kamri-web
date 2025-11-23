@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useGeo } from '../contexts/GeoContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { apiClient } from '../lib/api';
 
 interface ProductVariant {
@@ -69,6 +70,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   const { addToCart } = useCart();
   const toast = useToast();
   const { country } = useGeo();
+  const { formatPrice } = useCurrency();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -520,9 +522,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
         {/* Prix - utilise displayPrice du variant sélectionné */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xl font-bold text-[#4CAF50]">{displayPrice.toFixed(2)}$</span>
+          <span className="text-xl font-bold text-[#4CAF50]">{formatPrice(displayPrice)}</span>
           {product.originalPrice && (
-            <span className="text-sm text-[#9CA3AF] line-through">{product.originalPrice.toFixed(2)}$</span>
+            <span className="text-sm text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</span>
           )}
           {selectedVariant && selectedVariant.sku && (
             <span className="text-xs text-gray-500 ml-2">SKU: {selectedVariant.sku}</span>

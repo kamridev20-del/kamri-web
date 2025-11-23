@@ -4,6 +4,7 @@ import PaymentButton from '@/components/PaymentButton';
 import StripeCardElement from '@/components/StripeCardElement';
 import StripeProvider from '@/components/StripeProvider';
 import { useCart } from '@/contexts/CartContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { motion } from 'framer-motion';
 import { CheckCircle, Lock } from 'lucide-react';
 import { useMemo } from 'react';
@@ -34,6 +35,7 @@ export default function ReviewStep({
   error,
 }: ReviewStepProps) {
   const { cartItems } = useCart();
+  const { formatPrice } = useCurrency();
 
   const subtotal = useMemo(() => {
     return (cartItems || []).reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
@@ -128,7 +130,7 @@ export default function ReviewStep({
                   <p className="text-sm text-gray-600">Qté: {item.quantity}</p>
                 </div>
                 <p className="font-semibold text-gray-900">
-                  ${(item.product.price * item.quantity).toFixed(2)}
+                  {formatPrice(item.product.price * item.quantity)}
                 </p>
               </div>
             );
@@ -176,7 +178,7 @@ export default function ReviewStep({
             ) : (
               <>
                 <Lock className="w-5 h-5" />
-                <span>Confirmer et payer ${total.toFixed(2)}</span>
+                <span>Confirmer et payer {formatPrice(total)}</span>
               </>
             )}
           </button>

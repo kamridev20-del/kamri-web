@@ -2,9 +2,11 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export default function OrdersHistory() {
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const { formatPrice } = useCurrency();
   
   const orders = [
     {
@@ -116,7 +118,7 @@ export default function OrdersHistory() {
           </div>
           <div className="bg-gray-100 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-gray-600">
-              {orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}$
+              {formatPrice(orders.reduce((sum, order) => sum + order.total, 0))}
             </p>
             <p className="text-sm text-gray-600">Total dépensé</p>
           </div>
@@ -146,7 +148,7 @@ export default function OrdersHistory() {
 
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-lg font-bold text-[#4CAF50]">{order.total.toFixed(2)}$</p>
+                    <p className="text-lg font-bold text-[#4CAF50]">{formatPrice(order.total)}</p>
                     <p className="text-sm text-gray-500">{order.items.length} article(s)</p>
                   </div>
                   <motion.button
@@ -209,7 +211,7 @@ export default function OrdersHistory() {
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-gray-500">Quantité: {item.quantity}</p>
                       </div>
-                      <p className="font-medium">{(item.price * item.quantity).toFixed(2)}$</p>
+                      <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   ))}
                 </div>
@@ -219,7 +221,7 @@ export default function OrdersHistory() {
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-[#424242]">Total</span>
-                  <span className="text-xl font-bold text-[#4CAF50]">{selectedOrder.total.toFixed(2)}$</span>
+                  <span className="text-xl font-bold text-[#4CAF50]">{formatPrice(selectedOrder.total)}</span>
                 </div>
               </div>
 

@@ -7,6 +7,7 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useGeo } from '../contexts/GeoContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { apiClient, Product } from '../lib/api';
 
 // ✅ Utiliser les MÊMES interfaces que ProductInfo.tsx
@@ -88,6 +89,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
   const toast = useToast();
   const { isAuthenticated } = useAuth();
   const { country } = useGeo();
+  const { formatPrice } = useCurrency();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isCheckingShipping, setIsCheckingShipping] = useState(false);
   const [isShippable, setIsShippable] = useState<boolean | null>(null);
@@ -684,7 +686,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 
                 {/* Prix - utilise displayPrice */}
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-2xl font-bold text-[#4CAF50]">{displayPrice.toFixed(2)}$</span>
+                  <span className="text-2xl font-bold text-[#4CAF50]">{formatPrice(displayPrice)}</span>
                   {productToDisplay.originalPrice && productToDisplay.originalPrice > displayPrice && (
                     <span className="text-sm text-gray-400 line-through">{productToDisplay.originalPrice.toFixed(2)}$</span>
                   )}
@@ -877,7 +879,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
         {/* Footer */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-between gap-4">
           <div className="text-lg font-bold text-[#424242]">
-            Total: <span className="text-[#4CAF50]">{(displayPrice * quantity).toFixed(2)}$</span>
+            Total: <span className="text-[#4CAF50]">{formatPrice(displayPrice * quantity)}</span>
           </div>
           <div className="flex gap-3">
             <button

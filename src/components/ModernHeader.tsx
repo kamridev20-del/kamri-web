@@ -10,6 +10,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { apiClient } from '../lib/api';
 import AuthModal from './AuthModal';
 import CountrySelector from './CountrySelector';
+import CurrencySelector from './CurrencySelector';
 
 interface SearchResult {
   products: Array<{
@@ -410,6 +411,11 @@ export default function ModernHeader() {
 
             {/* Icônes d'action */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
+              {/* Sélecteur de devise - Desktop seulement */}
+              <div className="hidden sm:block">
+                <CurrencySelector />
+              </div>
+              
               {/* Sélecteur de pays - Desktop seulement */}
               <div className="hidden sm:block">
                 <CountrySelector />
