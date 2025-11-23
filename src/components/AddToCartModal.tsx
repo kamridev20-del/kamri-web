@@ -108,6 +108,19 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
             const fullProduct = response.data as any;
             // Gérer les deux formats de réponse possibles
             const backendData = fullProduct?.data || fullProduct;
+            console.log('🔍 [AddToCartModal] Produit chargé depuis API:', {
+              id: backendData.id,
+              name: backendData.name,
+              productVariantsCount: backendData.productVariants?.length || 0,
+              variantsString: backendData.variants ? 'présent' : 'absent',
+              productVariants: backendData.productVariants?.map((v: any) => ({
+                id: v.id,
+                name: v.name,
+                stock: v.stock,
+                isActive: v.isActive,
+                properties: v.properties
+              })) || []
+            });
             setProductDetails(backendData);
           }
         } catch (error) {
@@ -138,7 +151,18 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     if (!productToUse) return [];
     
     if ((productToUse as ProductWithVariants).productVariants && (productToUse as ProductWithVariants).productVariants!.length > 0) {
-      return (productToUse as ProductWithVariants).productVariants!.filter(v => v.isActive !== false);
+      const filtered = (productToUse as ProductWithVariants).productVariants!.filter(v => v.isActive !== false);
+      console.log('🔍 [AddToCartModal] Variants disponibles (productVariants):', {
+        total: (productToUse as ProductWithVariants).productVariants!.length,
+        filtered: filtered.length,
+        variants: filtered.map(v => ({
+          id: v.id,
+          name: v.name,
+          stock: v.stock,
+          properties: v.properties
+        }))
+      });
+      return filtered;
     }
     
     // Fallback : parser le champ JSON variants
@@ -711,20 +735,27 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                                 if (typeof props === 'string') {
                                   const zoneMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
                                   variantColor = zoneMatch ? zoneMatch[1].trim() : props.split(/[-\s]/)[0];
-                                  const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
+                                  // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+                                  const sizeMatch = props.match(/[-\s]([A-Za-z0-9]+)$/i);
                                   if (sizeMatch) {
                                     variantSize = sizeMatch[1];
                                   }
                                 } else {
                                   variantColor = props.value1 || '';
                                   variantSize = props.value2 || '';
+                                  if (props.key) {
+                                    variantColor = variantColor || String(props.key).split(/[-\s]/)[0];
+                                    const sizeMatch = String(props.key).match(/[-\s]([A-Za-z0-9]+)$/i);
+                                    variantSize = variantSize || (sizeMatch ? sizeMatch[1] : '');
+                                  }
                                 }
                               } catch {
                                 const zoneMatch = v.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
                                 if (zoneMatch) {
                                   variantColor = zoneMatch[1].trim();
                                 }
-                                const sizeMatch = v.properties.match(/[-\s]([A-Z0-9]+)$/i);
+                                // ✅ Corriger le pattern pour capturer aussi les lettres minuscules (ex: "66cm")
+                                const sizeMatch = v.properties.match(/[-\s]([A-Za-z0-9]+)$/i);
                                 if (sizeMatch) {
                                   variantSize = sizeMatch[1];
                                 }
@@ -733,6 +764,11 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                               const props = v.properties as any;
                               variantColor = props?.value1 || '';
                               variantSize = props?.value2 || '';
+                              if (props?.key) {
+                                variantColor = variantColor || String(props.key).split(/[-\s]/)[0];
+                                const sizeMatch = String(props.key).match(/[-\s]([A-Za-z0-9]+)$/i);
+                                variantSize = variantSize || (sizeMatch ? sizeMatch[1] : '');
+                              }
                             }
                           } catch (e) {
                             // Ignorer
