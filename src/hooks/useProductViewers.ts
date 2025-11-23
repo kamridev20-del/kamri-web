@@ -45,6 +45,15 @@ export function useProductViewers(productId: string | undefined) {
       } else if (response.status === 404) {
         // Endpoint n'existe pas encore, désactiver toutes les futures requêtes
         endpointExistsRef.current = false;
+        // Arrêter les intervalles
+        if (heartbeatIntervalRef.current) {
+          clearInterval(heartbeatIntervalRef.current);
+          heartbeatIntervalRef.current = null;
+        }
+        if (fetchIntervalRef.current) {
+          clearInterval(fetchIntervalRef.current);
+          fetchIntervalRef.current = null;
+        }
         return;
       }
     } catch (error) {
