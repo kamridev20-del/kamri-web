@@ -132,19 +132,6 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     }
   }, [isOpen]);
 
-  // ✅ Sélectionner automatiquement la première couleur et taille disponibles (comme ProductInfo)
-  useEffect(() => {
-    if (isOpen && availableColors.length > 0 && !selectedColor) {
-      setSelectedColor(availableColors[0].name);
-    }
-  }, [isOpen, availableColors, selectedColor]);
-
-  useEffect(() => {
-    if (isOpen && availableSizes.length > 0 && !selectedSize) {
-      setSelectedSize(availableSizes[0]);
-    }
-  }, [isOpen, availableSizes, selectedSize]);
-
   // ✅ Utiliser la MÊME logique que ProductInfo.tsx pour extraire les variants
   const availableVariants = useMemo(() => {
     const productToUse = productDetails || product;
@@ -381,6 +368,19 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     
     setSelectedVariant(matchingVariant || null);
   }, [selectedColor, selectedSize, availableVariants]);
+
+  // ✅ Sélectionner automatiquement la première couleur et taille disponibles (comme ProductInfo)
+  useEffect(() => {
+    if (isOpen && availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0].name);
+    }
+  }, [isOpen, availableColors, selectedColor]);
+
+  useEffect(() => {
+    if (isOpen && availableSizes.length > 0 && !selectedSize) {
+      setSelectedSize(availableSizes[0]);
+    }
+  }, [isOpen, availableSizes, selectedSize]);
 
   // ✅ Utiliser les MÊMES noms de variables que ProductInfo.tsx
   const displayPrice = selectedVariant?.price || (productDetails?.price || product?.price || 0);
