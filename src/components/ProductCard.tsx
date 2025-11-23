@@ -464,11 +464,45 @@ export default function ProductCard({ product }: ProductCardProps) {
         
         {/* Price */}
         <div className="mb-2">
-          <div className="flex items-baseline gap-1.5">
-            <p className="text-lg font-bold text-[#4CAF50]">{product.price.toFixed(2)}$</p>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <p className="text-sm text-[#9CA3AF] line-through">{product.originalPrice.toFixed(2)}$</p>
-            )}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-1.5">
+              <p className="text-lg font-bold text-[#4CAF50]">{product.price.toFixed(2)}$</p>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <p className="text-sm text-[#9CA3AF] line-through">{product.originalPrice.toFixed(2)}$</p>
+              )}
+            </div>
+            
+            {/* Bouton d'ajout au panier - petit et compact */}
+            <button 
+          onClick={handleAddToCart}
+          disabled={isAddingToCart || isShippable === false || isCheckingShipping}
+          className={`p-1.5 rounded-full hover:shadow-lg transform hover:scale-110 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${
+            isShippable === false
+              ? 'bg-gray-400 text-white cursor-not-allowed'
+              : 'bg-gradient-to-r from-[#4CAF50] to-[#66BB6A] hover:from-[#2E7D32] hover:to-[#4CAF50] text-white'
+          }`}
+          title={isShippable === false ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}` : 'Ajouter au panier'}
+        >
+          {isCheckingShipping ? (
+            <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+          ) : isAddingToCart ? (
+            <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+          ) : isShippable === false ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          )}
+        </button>
           </div>
           
           {/* Badge de réduction animé */}
@@ -491,37 +525,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             </motion.div>
           )}
         </div>
-        
-        <button 
-          onClick={handleAddToCart}
-          disabled={isAddingToCart || isShippable === false || isCheckingShipping}
-          className={`w-full py-2 px-2 rounded-full text-sm font-semibold hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${
-            isShippable === false
-              ? 'bg-gray-400 text-white cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#4CAF50] to-[#66BB6A] hover:from-[#2E7D32] hover:to-[#4CAF50] text-white'
-          }`}
-          title={isShippable === false ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}` : 'Ajouter au panier'}
-        >
-          {isCheckingShipping ? (
-            <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
-          ) : isAddingToCart ? (
-            <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
-          ) : isShippable === false ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-          )}
-        </button>
       </div>
       </Link>
     </motion.div>
