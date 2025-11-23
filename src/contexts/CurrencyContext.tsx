@@ -115,7 +115,10 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
   // Déterminer la devise automatiquement selon le pays
   useEffect(() => {
     if (country?.countryCode) {
-      const detectedCurrency = getCurrencyFromCountry(country.countryCode);
+      // Priorité 1 : Devise depuis l'API ipapi.com (si disponible)
+      // Priorité 2 : Mapping manuel pays → devise
+      // Priorité 3 : USD par défaut
+      const detectedCurrency = country.currency || getCurrencyFromCountry(country.countryCode);
       
       // Charger la devise depuis localStorage ou utiliser la détection
       const storedCurrency = localStorage.getItem('user_currency');
@@ -126,7 +129,7 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
         localStorage.setItem('user_currency', detectedCurrency);
       }
       
-      console.log('🌍 [CurrencyContext] Devise détectée:', detectedCurrency, 'pour pays:', country.countryCode);
+      console.log('🌍 [CurrencyContext] Devise détectée:', detectedCurrency, 'pour pays:', country.countryCode, country.currency ? '(depuis API)' : '(depuis mapping)');
     }
   }, [country, getCurrencyFromCountry]);
 

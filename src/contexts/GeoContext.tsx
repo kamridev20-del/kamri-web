@@ -6,6 +6,7 @@ import { apiClient } from '../lib/api';
 interface GeoLocation {
   countryCode: string;
   countryName: string;
+  currency?: string; // Code devise depuis l'API (ex: USD, EUR, XAF)
   source: 'ipapi' | 'manual' | 'address';
 }
 
@@ -67,6 +68,7 @@ export const GeoProvider: React.FC<GeoProviderProps> = ({ children }) => {
         const geoData: GeoLocation = {
           countryCode: response.data.countryCode,
           countryName: response.data.countryName || response.data.countryCode,
+          currency: response.data.currency, // Devise depuis l'API si disponible
           source: validSource,
         };
 
