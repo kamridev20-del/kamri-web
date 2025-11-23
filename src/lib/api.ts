@@ -394,7 +394,7 @@ export class ApiClient {
   }
 
   // Geo location methods
-  async detectCountry(ip?: string): Promise<ApiResponse<{ countryCode: string; countryName: string; source: string; ip?: string }>> {
+  async detectCountry(ip?: string): Promise<ApiResponse<{ countryCode: string; countryName: string; currency?: string; source: string; ip?: string }>> {
     const url = ip ? `/geo/detect-country?ip=${ip}` : '/geo/detect-country';
     return this.fetchPublic(url);
   }
