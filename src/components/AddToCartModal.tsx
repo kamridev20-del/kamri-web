@@ -132,6 +132,19 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     }
   }, [isOpen]);
 
+  // ✅ Sélectionner automatiquement la première couleur et taille disponibles (comme ProductInfo)
+  useEffect(() => {
+    if (isOpen && availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0].name);
+    }
+  }, [isOpen, availableColors, selectedColor]);
+
+  useEffect(() => {
+    if (isOpen && availableSizes.length > 0 && !selectedSize) {
+      setSelectedSize(availableSizes[0]);
+    }
+  }, [isOpen, availableSizes, selectedSize]);
+
   // ✅ Utiliser la MÊME logique que ProductInfo.tsx pour extraire les variants
   const availableVariants = useMemo(() => {
     const productToUse = productDetails || product;
@@ -361,7 +374,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
       }
       
       const colorMatch = selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : true;
-      const sizeMatch = selectedSize ? variantSize === selectedSize : true;
+      const sizeMatch = selectedSize ? variantSize.toUpperCase() === selectedSize.toUpperCase() : true;
       
       return colorMatch && sizeMatch && (variant.stock || 0) > 0;
     });
@@ -373,6 +386,66 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
   const displayPrice = selectedVariant?.price || (productDetails?.price || product?.price || 0);
   const displayStock = selectedVariant?.stock ?? (productDetails?.stock ?? product?.stock ?? 0);
   const displayImage = selectedVariant?.image || productDetails?.image || product?.image;
+
+  // ✅ Construire la liste des images : image du variant en premier, puis images du produit (comme ProductImageGallery)
+  const allImages = useMemo(() => {
+    const images: string[] = [];
+    const productToUse = productDetails || product;
+    
+    // Si un variant est sélectionné et a une image, l'ajouter en premier
+    if (selectedVariant?.image) {
+      images.push(selectedVariant.image);
+    }
+    
+    // Ajouter les images du produit (depuis product.images ou product.image)
+    const productImages = (productToUse as any)?.images;
+    if (productImages && Array.isArray(productImages)) {
+      productImages.forEach((img: string) => {
+        if (img && img !== selectedVariant?.image && !images.includes(img)) {
+          images.push(img);
+        }
+      });
+    }
+    
+    // Essayer aussi product.image (peut être un JSON array)
+    const mainImage = productToUse?.image;
+    if (mainImage) {
+      try {
+        const parsed = JSON.parse(mainImage);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((img: string) => {
+            if (img && img !== selectedVariant?.image && !images.includes(img)) {
+              images.push(img);
+            }
+          });
+        } else if (typeof parsed === 'string' && parsed !== selectedVariant?.image && !images.includes(parsed)) {
+          images.push(parsed);
+        }
+      } catch {
+        // Ce n'est pas du JSON, c'est une string simple
+        if (mainImage !== selectedVariant?.image && !images.includes(mainImage)) {
+          images.push(mainImage);
+        }
+      }
+    }
+    
+    // Si aucune image, utiliser displayImage
+    if (images.length === 0 && displayImage) {
+      images.push(displayImage);
+    }
+    
+    return images.filter(Boolean);
+  }, [selectedVariant, productDetails, product, displayImage]);
+
+  // Mettre à jour l'index de l'image quand displayImage change
+  useEffect(() => {
+    if (selectedVariant?.image) {
+      const variantImageIndex = allImages.findIndex(img => getCleanImageUrl(img) === selectedVariant?.image);
+      if (variantImageIndex >= 0) {
+        setCurrentImageIndex(variantImageIndex);
+      }
+    }
+  }, [selectedVariant, allImages]);
 
   // Vérifier la livraison
   useEffect(() => {
@@ -451,8 +524,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
   if (!isOpen || !product) return null;
 
   const productToDisplay = productDetails || product;
-  const allImages = getAllImages(productToDisplay.image);
-  const mainImage = displayImage || getCleanImageUrl(productToDisplay.image);
+  const mainImage = allImages[currentImageIndex] || displayImage || getCleanImageUrl(productToDisplay.image);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -476,44 +548,48 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
             <div className="space-y-2">
               <div className="relative h-64 bg-gray-100 rounded-lg overflow-hidden">
                 {mainImage ? (
-                  <Image
+                  <img
                     src={mainImage}
                     alt={productToDisplay.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    unoptimized={mainImage?.includes('cjdropshipping.com')}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <svg className="h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                )}
+                ) : null}
+                <div className={`${mainImage ? 'hidden' : 'flex'} w-full h-full items-center justify-center`}>
+                  <svg className="h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
               </div>
               
               {/* Miniatures si plusieurs images */}
               {allImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto">
-                  {allImages.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentImageIndex(idx)}
-                      className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 ${
-                        currentImageIndex === idx ? 'border-[#4CAF50]' : 'border-transparent'
-                      }`}
-                    >
-                      <Image
-                        src={img}
-                        alt={`${productToDisplay.name} - Image ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                        unoptimized={img?.includes('cjdropshipping.com')}
-                      />
-                    </button>
-                  ))}
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {allImages.map((img, idx) => {
+                    const imageUrl = getCleanImageUrl(img);
+                    return imageUrl ? (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                          currentImageIndex === idx ? 'border-[#4CAF50] shadow-md' : 'border-gray-200 hover:border-[#81C784]'
+                        }`}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`${productToDisplay.name} - Image ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </button>
+                    ) : null;
+                  })}
                 </div>
               )}
             </div>
@@ -536,21 +612,19 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 </div>
               </div>
 
-              {/* Sélection de couleur - utilise availableColors */}
+              {/* Sélection de couleur - utilise availableColors (comme ProductInfo) */}
               {availableColors.length > 0 && (
                 <div>
-                  <label className="block text-sm font-semibold text-[#424242] mb-2">
-                    Couleur {selectedColor ? `: ${selectedColor}` : ''}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
+                  <h3 className="text-sm font-semibold text-[#424242] mb-1.5">Couleur</h3>
+                  <div className="flex flex-wrap gap-1.5">
                     {availableColors.map((colorData) => (
                       <button
                         key={colorData.name}
                         onClick={() => setSelectedColor(colorData.name)}
-                        className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                        className={`px-3 py-1.5 rounded-lg border-2 transition-all text-sm ${
                           selectedColor === colorData.name
-                            ? 'border-[#4CAF50] bg-[#E8F5E9] text-[#2E7D32]'
-                            : 'border-gray-300 hover:border-[#4CAF50]'
+                            ? 'border-[#4CAF50] bg-[#E8F5E9] text-[#2E7D32] font-semibold'
+                            : 'border-gray-300 hover:border-[#4CAF50] text-[#424242]'
                         }`}
                       >
                         {colorData.name}
@@ -560,13 +634,11 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 </div>
               )}
 
-              {/* Sélection de taille - utilise availableSizes */}
+              {/* Sélection de taille - utilise availableSizes (comme ProductInfo) */}
               {availableSizes.length > 0 && (
                 <div>
-                  <label className="block text-sm font-semibold text-[#424242] mb-2">
-                    Taille {selectedSize ? `: ${selectedSize}` : ''}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
+                  <h3 className="text-sm font-semibold text-[#424242] mb-1.5">Taille</h3>
+                  <div className="flex flex-wrap gap-1.5">
                     {availableSizes.map((size) => {
                       // Vérifier si cette taille est disponible pour la couleur sélectionnée
                       const isAvailable = availableVariants.some(v => {
@@ -610,7 +682,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                         }
                         
                         const colorMatch = selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : true;
-                        const sizeMatch = variantSize === size;
+                        const sizeMatch = variantSize.toUpperCase() === size.toUpperCase();
                         
                         return colorMatch && sizeMatch && (v.stock || 0) > 0;
                       });
@@ -620,11 +692,11 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                           key={size}
                           onClick={() => isAvailable && setSelectedSize(size)}
                           disabled={!isAvailable}
-                          className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                          className={`px-3 py-1.5 rounded-lg border-2 transition-all text-sm ${
                             selectedSize === size
-                              ? 'border-[#4CAF50] bg-[#E8F5E9] text-[#2E7D32]'
+                              ? 'border-[#4CAF50] bg-[#E8F5E9] text-[#2E7D32] font-semibold'
                               : isAvailable
-                              ? 'border-gray-300 hover:border-[#4CAF50]'
+                              ? 'border-gray-300 hover:border-[#4CAF50] text-[#424242]'
                               : 'border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
                           }`}
                         >
@@ -722,7 +794,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
             </button>
             <button
               onClick={handleAddToCart}
-              disabled={isAddingToCart || displayStock <= 0 || isShippable === false || isCheckingShipping || (availableVariants.length > 0 && !selectedVariant && (availableColors.length > 0 || availableSizes.length > 0))}
+              disabled={isAddingToCart || displayStock <= 0 || isShippable === false || isCheckingShipping || (availableVariants.length > 0 && !selectedVariant)}
               className="px-6 py-2 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isAddingToCart ? (
