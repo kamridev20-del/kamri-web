@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useGeo } from '../contexts/GeoContext';
 import { apiClient, Product } from '../lib/api';
 
+// ✅ Utiliser les MÊMES interfaces que ProductInfo.tsx
 interface ProductVariant {
   id: string;
   productId: string;
@@ -23,6 +24,14 @@ interface ProductVariant {
   properties: string | null;
   stock: number | null;
   isActive: boolean;
+  lastSyncAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProductWithVariants extends Product {
+  productVariants?: ProductVariant[];
+  variants?: string; // JSON string des variants CJ
 }
 
 interface AddToCartModalProps {
@@ -86,8 +95,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [productDetails, setProductDetails] = useState<Product | null>(null);
-  const [availableVariants, setAvailableVariants] = useState<ProductVariant[]>([]);
+  const [productDetails, setProductDetails] = useState<ProductWithVariants | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Charger les détails complets du produit avec variants
@@ -98,43 +106,13 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
           const response = await apiClient.getProduct(product.id);
           if (response.data) {
             const fullProduct = response.data as any;
-            setProductDetails(fullProduct);
-            
-            // Extraire les variants
-            if (fullProduct.productVariants && Array.isArray(fullProduct.productVariants)) {
-              setAvailableVariants(fullProduct.productVariants.filter((v: ProductVariant) => v.isActive !== false));
-            } else if (fullProduct.variants && typeof fullProduct.variants === 'string') {
-              try {
-                const parsed = JSON.parse(fullProduct.variants);
-                if (Array.isArray(parsed)) {
-                  const variants = parsed.map((v: any, idx: number) => ({
-                    id: `variant-${idx}-${v.vid || idx}`,
-                    productId: fullProduct.id,
-                    cjVariantId: String(v.vid || v.variantId || ''),
-                    name: v.variantNameEn || v.variantName || v.name || `Variant ${idx + 1}`,
-                    sku: v.variantSku || v.sku || '',
-                    price: parseFloat(v.variantSellPrice || v.variantPrice || v.price || v.sellPrice || 0),
-                    stock: parseInt(v.variantStock || v.stock || 0, 10),
-                    weight: parseFloat(v.variantWeight || v.weight || 0),
-                    dimensions: typeof v.variantDimensions === 'string' ? v.variantDimensions : JSON.stringify(v.variantDimensions || {}),
-                    image: v.variantImage || v.image || '',
-                    status: v.status || 'active',
-                    properties: typeof v.variantProperties === 'string' ? v.variantProperties : (v.variantKey || JSON.stringify(v.variantProperties || {})),
-                    isActive: v.isActive !== false,
-                  }));
-                  setAvailableVariants(variants);
-                }
-              } catch (e) {
-                console.error('Erreur parsing variants:', e);
-                setAvailableVariants([]);
-              }
-            } else {
-              setAvailableVariants([]);
-            }
+            // Gérer les deux formats de réponse possibles
+            const backendData = fullProduct?.data || fullProduct;
+            setProductDetails(backendData);
           }
         } catch (error) {
           console.error('Erreur lors du chargement des détails du produit:', error);
-          setProductDetails(product);
+          setProductDetails(product as ProductWithVariants);
         }
       };
       
@@ -154,11 +132,52 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     }
   }, [isOpen]);
 
-  // Extraire les couleurs disponibles
+  // ✅ Utiliser la MÊME logique que ProductInfo.tsx pour extraire les variants
+  const availableVariants = useMemo(() => {
+    const productToUse = productDetails || product;
+    if (!productToUse) return [];
+    
+    if ((productToUse as ProductWithVariants).productVariants && (productToUse as ProductWithVariants).productVariants!.length > 0) {
+      return (productToUse as ProductWithVariants).productVariants!.filter(v => v.isActive !== false);
+    }
+    
+    // Fallback : parser le champ JSON variants
+    if ((productToUse as ProductWithVariants).variants && typeof (productToUse as ProductWithVariants).variants === 'string') {
+      try {
+        const parsed = JSON.parse((productToUse as ProductWithVariants).variants!);
+        if (Array.isArray(parsed)) {
+          return parsed.map((v: any, idx: number) => ({
+            id: `variant-${idx}-${v.vid || idx}`,
+            productId: productToUse.id,
+            cjVariantId: String(v.vid || v.variantId || ''),
+            name: v.variantNameEn || v.variantName || v.name || `Variant ${idx + 1}`,
+            sku: v.variantSku || v.sku || '',
+            price: parseFloat(v.variantSellPrice || v.variantPrice || v.price || v.sellPrice || 0),
+            stock: parseInt(v.variantStock || v.stock || 0, 10),
+            weight: parseFloat(v.variantWeight || v.weight || 0),
+            dimensions: typeof v.variantDimensions === 'string' ? v.variantDimensions : JSON.stringify(v.variantDimensions || {}),
+            image: v.variantImage || v.image || '',
+            status: v.status || 'active',
+            properties: typeof v.variantProperties === 'string' ? v.variantProperties : (v.variantKey || JSON.stringify(v.variantProperties || {})),
+            isActive: v.isActive !== false,
+            lastSyncAt: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }));
+        }
+      } catch (e) {
+        console.error('Erreur parsing variants JSON:', e);
+      }
+    }
+    
+    return [];
+  }, [productDetails, product]);
+
+  // ✅ Utiliser la MÊME logique que ProductInfo.tsx pour extraire les couleurs
   const availableColors = useMemo(() => {
     const colorsMap = new Map<string, { name: string; image: string; count: number }>();
     
-    availableVariants.forEach((variant) => {
+    availableVariants.forEach((variant, idx) => {
       let color = '';
       
       if (variant.properties) {
@@ -224,7 +243,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     return Array.from(colorsMap.values());
   }, [availableVariants]);
 
-  // Extraire les tailles disponibles
+  // ✅ Utiliser la MÊME logique que ProductInfo.tsx pour extraire les tailles
   const availableSizes = useMemo(() => {
     const sizesSet = new Set<string>();
     
@@ -294,80 +313,66 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     });
   }, [availableVariants]);
 
-  // Trouver le variant correspondant à la couleur et taille sélectionnées
+  // ✅ Utiliser la MÊME logique que ProductInfo.tsx pour trouver le variant correspondant
   useEffect(() => {
-    if (availableVariants.length > 0 && (selectedColor || selectedSize)) {
-      const matchingVariant = availableVariants.find(variant => {
-        let variantColor = '';
-        let variantSize = '';
-        
-        if (variant.properties) {
-          try {
-            if (typeof variant.properties === 'string') {
-              try {
-                const props = JSON.parse(variant.properties);
-                if (typeof props === 'string') {
-                  const zoneMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-                  variantColor = zoneMatch ? zoneMatch[1].trim() : props.split(/[-\s]/)[0];
-                  const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
-                  if (sizeMatch) {
-                    variantSize = sizeMatch[1];
-                  }
-                } else {
-                  variantColor = props.value1 || '';
-                  variantSize = props.value2 || '';
-                }
-              } catch {
-                const zoneMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-                if (zoneMatch) {
-                  variantColor = zoneMatch[1].trim();
-                }
-                const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
+    if (!selectedColor && !selectedSize) {
+      setSelectedVariant(null);
+      return;
+    }
+    
+    const matchingVariant = availableVariants.find(variant => {
+      let variantColor = '';
+      let variantSize = '';
+      
+      if (variant.properties) {
+        try {
+          if (typeof variant.properties === 'string') {
+            try {
+              const props = JSON.parse(variant.properties);
+              if (typeof props === 'string') {
+                const zoneMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+                variantColor = zoneMatch ? zoneMatch[1].trim() : props.split(/[-\s]/)[0];
+                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
                 if (sizeMatch) {
                   variantSize = sizeMatch[1];
                 }
+              } else {
+                variantColor = props.value1 || '';
+                variantSize = props.value2 || '';
               }
-            } else {
-              const props = variant.properties as any;
-              variantColor = props?.value1 || '';
-              variantSize = props?.value2 || '';
+            } catch {
+              const zoneMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+              if (zoneMatch) {
+                variantColor = zoneMatch[1].trim();
+              }
+              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
+              if (sizeMatch) {
+                variantSize = sizeMatch[1];
+              }
             }
-          } catch (e) {
-            console.warn('Erreur parsing variant:', e);
+          } else {
+            const props = variant.properties as any;
+            variantColor = props?.value1 || '';
+            variantSize = props?.value2 || '';
           }
+        } catch (e) {
+          console.warn('Erreur parsing variant:', e);
         }
-        
-        const colorMatch = selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : true;
-        const sizeMatch = selectedSize ? variantSize === selectedSize : true;
-        
-        return colorMatch && sizeMatch && (variant.stock || 0) > 0;
-      });
+      }
       
-      setSelectedVariant(matchingVariant || null);
-    } else if (availableVariants.length === 0) {
-      setSelectedVariant(null);
-    }
+      const colorMatch = selectedColor ? variantColor.toLowerCase() === selectedColor.toLowerCase() : true;
+      const sizeMatch = selectedSize ? variantSize === selectedSize : true;
+      
+      return colorMatch && sizeMatch && (variant.stock || 0) > 0;
+    });
+    
+    setSelectedVariant(matchingVariant || null);
   }, [selectedColor, selectedSize, availableVariants]);
 
-  // Calculer le prix et le stock affichés
-  const displayPrice = useMemo(() => {
-    if (selectedVariant && selectedVariant.price && selectedVariant.price > 0) {
-      return selectedVariant.price;
-    }
-    return productDetails?.price || product?.price || 0;
-  }, [selectedVariant, productDetails, product]);
-
-  const displayStock = useMemo(() => {
-    if (selectedVariant) {
-      return selectedVariant.stock || 0;
-    }
-    // Si pas de variants, utiliser le stock du produit
-    if (availableVariants.length === 0) {
-      return productDetails?.stock || product?.stock || 0;
-    }
-    // Si des variants existent mais aucun n'est sélectionné, retourner 0
-    return 0;
-  }, [selectedVariant, productDetails, product, availableVariants.length]);
+  // ✅ Utiliser les MÊMES noms de variables que ProductInfo.tsx
+  const displayPrice = selectedVariant?.price || (productDetails?.price || product?.price || 0);
+  const displayStock = selectedVariant?.stock ?? (productDetails?.stock ?? product?.stock ?? 0);
+  const displayImage = selectedVariant?.image || productDetails?.image || product?.image;
 
   // Vérifier la livraison
   useEffect(() => {
@@ -399,19 +404,17 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     }
 
     // Si des variants existent, vérifier qu'un variant est sélectionné
-    if (availableVariants.length > 0) {
-      if (!selectedVariant) {
-        if (!selectedColor && availableColors.length > 0) {
-          toast?.error?.('Veuillez sélectionner une couleur');
-          return;
-        }
-        if (!selectedSize && availableSizes.length > 0) {
-          toast?.error?.('Veuillez sélectionner une taille');
-          return;
-        }
-        toast?.error?.('Veuillez sélectionner toutes les options');
+    if (availableVariants.length > 0 && !selectedVariant) {
+      if (!selectedColor && availableColors.length > 0) {
+        toast?.error?.('Veuillez sélectionner une couleur');
         return;
       }
+      if (!selectedSize && availableSizes.length > 0) {
+        toast?.error?.('Veuillez sélectionner une taille');
+        return;
+      }
+      toast?.error?.('Veuillez sélectionner toutes les options');
+      return;
     }
 
     if (displayStock <= 0) {
@@ -449,7 +452,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
 
   const productToDisplay = productDetails || product;
   const allImages = getAllImages(productToDisplay.image);
-  const mainImage = getCleanImageUrl(productToDisplay.image);
+  const mainImage = displayImage || getCleanImageUrl(productToDisplay.image);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -521,40 +524,43 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 <p className="text-sm text-gray-500 mb-1">{productToDisplay.brand || productToDisplay.supplier?.name || 'KAMRI'}</p>
                 <h3 className="text-lg font-bold text-[#424242] mb-2">{productToDisplay.name}</h3>
                 
-                {/* Prix */}
+                {/* Prix - utilise displayPrice */}
                 <div className="flex items-baseline gap-2 mb-4">
                   <span className="text-2xl font-bold text-[#4CAF50]">{displayPrice.toFixed(2)}$</span>
                   {productToDisplay.originalPrice && productToDisplay.originalPrice > displayPrice && (
                     <span className="text-sm text-gray-400 line-through">{productToDisplay.originalPrice.toFixed(2)}$</span>
                   )}
+                  {selectedVariant && selectedVariant.sku && (
+                    <span className="text-xs text-gray-500 ml-2">SKU: {selectedVariant.sku}</span>
+                  )}
                 </div>
               </div>
 
-              {/* Sélection de couleur */}
+              {/* Sélection de couleur - utilise availableColors */}
               {availableColors.length > 0 && (
                 <div>
                   <label className="block text-sm font-semibold text-[#424242] mb-2">
                     Couleur {selectedColor ? `: ${selectedColor}` : ''}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {availableColors.map((color) => (
+                    {availableColors.map((colorData) => (
                       <button
-                        key={color.name}
-                        onClick={() => setSelectedColor(color.name)}
+                        key={colorData.name}
+                        onClick={() => setSelectedColor(colorData.name)}
                         className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                          selectedColor === color.name
+                          selectedColor === colorData.name
                             ? 'border-[#4CAF50] bg-[#E8F5E9] text-[#2E7D32]'
                             : 'border-gray-300 hover:border-[#4CAF50]'
                         }`}
                       >
-                        {color.name}
+                        {colorData.name}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Sélection de taille */}
+              {/* Sélection de taille - utilise availableSizes */}
               {availableSizes.length > 0 && (
                 <div>
                   <label className="block text-sm font-semibold text-[#424242] mb-2">
@@ -653,6 +659,28 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                 </div>
               </div>
 
+              {/* Stock - utilise displayStock */}
+              <div className={`flex items-center gap-2 text-sm ${displayStock > 0 ? 'text-[#4CAF50]' : 'text-red-600'}`}>
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  {displayStock > 0 ? (
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  )}
+                </svg>
+                <span className="font-medium">
+                  {displayStock > 0 ? `${displayStock} en stock` : 'Rupture de stock'}
+                </span>
+              </div>
+
+              {/* Info variant sélectionné */}
+              {selectedVariant && (
+                <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-2">
+                  <p><span className="font-semibold">Variant sélectionné:</span> {selectedVariant.name || `${selectedColor} - ${selectedSize}`}</p>
+                  {selectedVariant.sku && <p><span className="font-semibold">SKU:</span> {selectedVariant.sku}</p>}
+                </div>
+              )}
+
               {/* Informations supplémentaires */}
               <div className="pt-4 border-t border-gray-200 space-y-2 text-sm">
                 {productToDisplay.deliveryCycle && (
@@ -694,7 +722,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
             </button>
             <button
               onClick={handleAddToCart}
-              disabled={isAddingToCart || displayStock <= 0 || isShippable === false || isCheckingShipping || (availableVariants.length > 0 && !selectedVariant)}
+              disabled={isAddingToCart || displayStock <= 0 || isShippable === false || isCheckingShipping || (availableVariants.length > 0 && !selectedVariant && (availableColors.length > 0 || availableSizes.length > 0))}
               className="px-6 py-2 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isAddingToCart ? (
@@ -718,4 +746,3 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     </div>
   );
 }
-
