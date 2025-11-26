@@ -135,7 +135,11 @@ export default function ProductsPage() {
 
   // Obtenir les filtres actifs
   const activeFilters = [
-    selectedCategory !== 'tous' && { type: 'category', label: categories.find(c => c.id === selectedCategory)?.name || 'Catégorie', value: selectedCategory },
+    selectedCategory !== 'tous' && { 
+      type: 'category', 
+      label: categories.find(c => c.id === selectedCategory)?.name || 'Catégorie', 
+      value: selectedCategory 
+    },
     searchQuery && { type: 'search', label: 'Recherche', value: searchQuery },
     (priceRange[0] > 0 || priceRange[1] < 2000) && { type: 'price', label: 'Prix', value: `${priceRange[0]}$ - ${priceRange[1]}$` },
     selectedBadges.length > 0 && { type: 'badges', label: 'Badges', value: selectedBadges.join(', ') },
@@ -237,7 +241,9 @@ export default function ProductsPage() {
                           }}
                           className="flex items-center gap-1.5 px-3 py-1 bg-[#E8F5E8] text-[#424242] rounded-full text-xs hover:bg-[#4CAF50] hover:text-white transition-colors"
                         >
-                          <span>{filter.label}: {filter.value}</span>
+                          <span>
+                            {filter.type === 'category' ? filter.label : `${filter.label}: ${filter.value}`}
+                          </span>
                           <X className="w-3 h-3" />
                         </button>
                       ))}
