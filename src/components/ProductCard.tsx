@@ -331,11 +331,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       
       {/* Product info */}
       <div className="p-3">
-        <div className="mb-1">
-          <span className="text-[9px] text-[#9CA3AF] font-normal">
-            {product.brand || (product.supplier?.name && !product.supplier.name.toLowerCase().includes('dropshipping') && !product.supplier.name.toLowerCase().includes('cj') ? product.supplier.name : 'KAMRI')}
-          </span>
-        </div>
+        {/* Nom de marque/fournisseur masqué */}
         
         {/* Tooltip informatif au survol */}
         <div className="group/tooltip relative">

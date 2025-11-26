@@ -498,9 +498,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
       {/* Informations de base */}
       <div>
-        <p className="text-[10px] text-[#81C784] font-medium mb-1">
-          {product.brand || (product.supplier?.name && !product.supplier.name.toLowerCase().includes('dropshipping') && !product.supplier.name.toLowerCase().includes('cj') ? product.supplier.name : 'KAMRI')}
-        </p>
+        {/* Nom de marque/fournisseur masqué */}
         <h1 className="text-lg font-bold text-[#424242] mb-2">{product.name}</h1>
         
         {/* Rating */}
