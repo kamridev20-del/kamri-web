@@ -110,7 +110,7 @@ export default function HomeHero() {
             >
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                <span>Livraison gratuite à partir de 100$</span>
+                <span>Livraison gratuite</span>
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
