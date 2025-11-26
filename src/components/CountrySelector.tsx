@@ -188,25 +188,25 @@ export default function CountrySelector() {
       )}
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto">
-          <div className="px-4 py-2 border-b border-gray-100">
-            <p className="text-xs font-semibold text-gray-500 uppercase">Sélectionner le pays</p>
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 max-h-80 overflow-y-auto" style={{ zIndex: 9999 }}>
+          <div className="px-3 py-2 border-b border-gray-100 sticky top-0 bg-white">
+            <p className="text-[10px] font-semibold text-gray-500 uppercase">Sélectionner le pays</p>
           </div>
-          <div className="py-1">
+          <div className="py-0.5">
             {COUNTRIES.map((countryOption) => (
               <button
                 key={countryOption.code}
                 onClick={() => handleSelectCountry(countryOption.code)}
-                className={`w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-[#E8F5E8] transition-colors ${
+                className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs hover:bg-[#E8F5E8] transition-colors ${
                   country?.countryCode === countryOption.code
                     ? 'bg-[#E8F5E8] text-[#4CAF50] font-semibold'
                     : 'text-gray-700'
                 }`}
               >
-                <span className="text-xl">{countryOption.flag}</span>
+                <span className="text-base">{countryOption.flag}</span>
                 <span className="flex-1 text-left">{countryOption.name}</span>
                 {country?.countryCode === countryOption.code && (
-                  <svg className="w-4 h-4 text-[#4CAF50]" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-3 h-3 text-[#4CAF50]" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
