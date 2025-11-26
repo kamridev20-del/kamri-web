@@ -330,12 +330,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
       
       {/* Product info */}
-      <div className="p-3">
+      <div className="p-2">
         {/* Nom de marque/fournisseur masqué */}
         
         {/* Tooltip informatif au survol */}
         <div className="group/tooltip relative">
-          <h3 className="text-xs font-semibold text-[#424242] mb-1.5 line-clamp-2 group-hover:text-[#4CAF50] transition-colors cursor-help">
+          <h3 className="text-[11px] font-semibold text-[#424242] mb-0.5 line-clamp-2 group-hover:text-[#4CAF50] transition-colors cursor-help">
             {product.name}
           </h3>
           {/* Tooltip avec détails - Positionné en bas */}
@@ -355,7 +355,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         
         {/* ✅ NOUVEAUX INDICATEURS */}
-        <div className="flex flex-wrap gap-0.5 mb-1.5">
+        <div className="flex flex-wrap gap-0.5 mb-1">
           {/* Livraison gratuite */}
           {product.isFreeShipping && (
             <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[9px] font-semibold bg-[#E8F5E9] text-[#2E7D32]">
@@ -378,11 +378,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
           
           {/* Étoiles d'avis - toujours affichées */}
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-[#FFF8E1] text-[#F57F17] gap-0.5">
+          <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-semibold bg-[#FFF8E1] text-[#F57F17] gap-0.5">
             {[...Array(5)].map((_, i) => (
               <svg
                 key={i}
-                className={`w-2.5 h-2.5 ${i < Math.floor(product.rating || 0) ? 'text-yellow-500' : 'text-gray-300'}`}
+                className={`w-2 h-2 ${i < Math.floor(product.rating || 0) ? 'text-yellow-500' : 'text-gray-300'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -404,14 +404,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-1.5">
+        <div className="flex items-center gap-1 mb-0.5">
           {product.reviews && product.reviews > 0 ? (
             <>
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-2.5 h-2.5 ${i < Math.floor(product.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    className={`w-2 h-2 ${i < Math.floor(product.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -419,27 +419,27 @@ export default function ProductCard({ product }: ProductCardProps) {
                   </svg>
                 ))}
               </div>
-              <span className="text-[10px] text-[#81C784] font-medium">
-                ({product.reviews} avis)
+              <span className="text-[9px] text-[#81C784] font-medium">
+                ({product.reviews})
               </span>
             </>
           ) : null}
         </div>
         
         {/* Nombre de ventes */}
-        <div className="mb-1.5">
-          <span className="text-[10px] text-[#9CA3AF] font-medium">
+        <div className="mb-1">
+          <span className="text-[9px] text-[#9CA3AF] font-medium">
             {product.sales || 0} vente{(product.sales || 0) !== 1 ? 's' : ''}
           </span>
         </div>
         
         {/* Price */}
-        <div className="mb-1.5">
+        <div className="mb-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1">
-              <p className="text-base font-bold text-[#4CAF50]">{formatPrice(product.price)}</p>
+              <p className="text-sm font-bold text-[#4CAF50]">{formatPrice(product.price)}</p>
               {product.originalPrice && product.originalPrice > product.price && (
-                <p className="text-xs text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</p>
+                <p className="text-[10px] text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</p>
               )}
             </div>
             
