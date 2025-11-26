@@ -426,25 +426,23 @@ export default function ProductCard({ product }: ProductCardProps) {
           ) : null}
         </div>
         
-        {/* Nombre de ventes */}
-        <div className="mb-1">
-          <span className="text-[9px] text-[#9CA3AF] font-medium">
-            {product.sales || 0} vente{(product.sales || 0) !== 1 ? 's' : ''}
-          </span>
-        </div>
-        
-        {/* Price */}
-        <div className="mb-1">
-          <div className="flex items-center justify-between gap-2">
+        {/* Prix, Ventes et Panier sur la même ligne */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Prix et ventes en colonne */}
+          <div className="flex flex-col gap-0.5">
             <div className="flex items-baseline gap-1">
               <p className="text-sm font-bold text-[#4CAF50]">{formatPrice(product.price)}</p>
               {product.originalPrice && product.originalPrice > product.price && (
                 <p className="text-[10px] text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</p>
               )}
             </div>
-            
-            {/* Bouton d'ajout au panier - petit et compact */}
-            <button 
+            <span className="text-[9px] text-[#9CA3AF] font-medium">
+              {product.sales || 0} vente{(product.sales || 0) !== 1 ? 's' : ''}
+            </span>
+          </div>
+          
+          {/* Bouton d'ajout au panier - petit et compact */}
+          <button 
           onClick={handleAddToCart}
           disabled={isAddingToCart || isShippable === false || isCheckingShipping}
           className={`p-1.5 rounded-full hover:shadow-lg transform hover:scale-110 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${
@@ -474,28 +472,27 @@ export default function ProductCard({ product }: ProductCardProps) {
             </svg>
           )}
         </button>
-          </div>
-          
-          {/* Badge de réduction animé */}
-          {product.originalPrice && product.originalPrice > product.price && (
-            <motion.div 
-              className="flex items-center gap-1.5 mt-1"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <motion.span 
-                className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white bg-gradient-to-r from-[#FF5722] to-[#F44336] shadow-lg"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-              </motion.span>
-              <span className="text-[9px] text-[#9CA3AF] font-medium">
-                Économisez {formatPrice(product.originalPrice - product.price)}
-              </span>
-            </motion.div>
-          )}
         </div>
+        
+        {/* Badge de réduction animé */}
+        {product.originalPrice && product.originalPrice > product.price && (
+          <motion.div 
+            className="flex items-center gap-1.5 mt-1"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <motion.span 
+              className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white bg-gradient-to-r from-[#FF5722] to-[#F44336] shadow-lg"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+            >
+              -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+            </motion.span>
+            <span className="text-[9px] text-[#9CA3AF] font-medium">
+              Économisez {formatPrice(product.originalPrice - product.price)}
+            </span>
+          </motion.div>
+        )}
       </div>
       </Link>
     </motion.div>
