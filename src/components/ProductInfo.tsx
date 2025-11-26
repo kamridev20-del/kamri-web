@@ -529,9 +529,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               -{Math.round(((product.originalPrice - displayPrice) / product.originalPrice) * 100)}%
             </span>
           )}
-          {selectedVariant && selectedVariant.sku && (
-            <span className="text-xs text-gray-500 ml-2">SKU: {selectedVariant.sku}</span>
-          )}
         </div>
 
         {/* Description retirée - maintenant dans les onglets */}
@@ -705,9 +702,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       
       {/* Info variant sélectionné */}
       {selectedVariant && (
-        <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-2">
-          <p><span className="font-semibold">Variant sélectionné:</span> {selectedVariant.name || `${selectedColor} - ${selectedSize}`}</p>
-          {selectedVariant.sku && <p><span className="font-semibold">SKU:</span> {selectedVariant.sku}</p>}
+        <div className="text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
+          <p className="font-medium">{selectedVariant.name || `${selectedColor} - ${selectedSize}`}</p>
         </div>
       )}
     </div>
