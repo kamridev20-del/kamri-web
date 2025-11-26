@@ -143,12 +143,13 @@ export const GeoProvider: React.FC<GeoProviderProps> = ({ children }) => {
         const geoData: GeoLocation = {
           countryCode: response.data.countryCode,
           countryName: response.data.countryName,
+          currency: response.data.currency, // ✅ Récupérer la devise depuis l'API
           source: 'manual',
         };
 
         setCountryState(geoData);
         localStorage.setItem('user_country', JSON.stringify(geoData));
-        console.log('✅ [GeoContext] Pays défini:', geoData);
+        console.log('✅ [GeoContext] Pays défini:', geoData, '→ Devise:', geoData.currency);
       }
     } catch (error) {
       console.error('❌ [GeoContext] Erreur définition pays:', error);

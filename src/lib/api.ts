@@ -399,7 +399,7 @@ export class ApiClient {
     return this.fetchPublic(url);
   }
 
-  async setCountry(countryCode: string): Promise<ApiResponse<{ success: boolean; countryCode: string; countryName: string }>> {
+  async setCountry(countryCode: string): Promise<ApiResponse<{ success: boolean; countryCode: string; countryName: string; currency: string }>> {
     return this.fetchPublic('/geo/set-country', {
       method: 'POST',
       body: JSON.stringify({ countryCode }),

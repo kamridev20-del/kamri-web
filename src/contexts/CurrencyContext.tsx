@@ -120,18 +120,14 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
       // Priorité 3 : USD par défaut
       const detectedCurrency = country.currency || getCurrencyFromCountry(country.countryCode);
       
-      // Charger la devise depuis localStorage ou utiliser la détection
-      const storedCurrency = localStorage.getItem('user_currency');
-      if (storedCurrency) {
-        setCurrencyState(storedCurrency);
-      } else {
-        setCurrencyState(detectedCurrency);
-        localStorage.setItem('user_currency', detectedCurrency);
-      }
+      // ✅ NOUVELLE LOGIQUE : Toujours changer la devise selon le pays
+      // Ne pas utiliser localStorage car on veut que la devise change automatiquement avec le pays
+      setCurrencyState(detectedCurrency);
+      localStorage.setItem('user_currency', detectedCurrency);
       
-      console.log('🌍 [CurrencyContext] Devise détectée:', detectedCurrency, 'pour pays:', country.countryCode, country.currency ? '(depuis API)' : '(depuis mapping)');
+      console.log('💰 [CurrencyContext] Devise changée automatiquement:', detectedCurrency, 'pour pays:', country.countryCode);
     }
-  }, [country, getCurrencyFromCountry]);
+  }, [country?.countryCode, getCurrencyFromCountry]);
 
   // Charger les taux de change au démarrage
   useEffect(() => {
