@@ -248,7 +248,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Link href={`/product/${product.id}`}>
           {/* Image du produit avec galerie */}
           <div 
-            className="h-32 bg-white flex items-center justify-center relative overflow-hidden"
+            className="aspect-square bg-white flex items-center justify-center relative overflow-hidden"
             onMouseEnter={() => allImages.length > 1 && setCurrentImageIndex(1)}
             onMouseLeave={() => setCurrentImageIndex(0)}
           >
@@ -257,7 +257,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 src={allImages[currentImageIndex || 0]}
                 alt={product.name}
                 fill
-                className="object-contain scale-105 transition-all duration-500"
+                className="object-cover transition-all duration-500"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
                 priority={false}
                 unoptimized={allImages[currentImageIndex || 0]?.includes('cjdropshipping.com')}
