@@ -7,14 +7,14 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useCompare } from '../contexts/CompareContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { useGeo } from '../contexts/GeoContext';
 import { useToast } from '../contexts/ToastContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { useCurrency } from '../contexts/CurrencyContext';
-import { Product, apiClient } from '../lib/api';
 import { useProductViewers } from '../hooks/useProductViewers';
-import QuickViewModal from './QuickViewModal';
+import { Product } from '../lib/api';
 import AddToCartModal from './AddToCartModal';
+import QuickViewModal from './QuickViewModal';
 
 // Fonction utilitaire pour nettoyer les URLs d'images
 const getCleanImageUrl = (image: string | string[] | null | undefined): string | null => {
@@ -423,11 +423,14 @@ export default function ProductCard({ product }: ProductCardProps) {
                 ({product.reviews} avis)
               </span>
             </>
-          ) : (
-            <span className="text-[10px] text-[#9CA3AF] italic">
-              Nouveau produit
-            </span>
-          )}
+          ) : null}
+        </div>
+        
+        {/* Nombre de ventes */}
+        <div className="mb-1.5">
+          <span className="text-[10px] text-[#9CA3AF] font-medium">
+            {product.sales || 0} vente{(product.sales || 0) !== 1 ? 's' : ''}
+          </span>
         </div>
         
         {/* Price */}
