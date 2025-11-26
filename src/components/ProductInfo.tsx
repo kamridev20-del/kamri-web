@@ -523,8 +523,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         {/* Prix - utilise displayPrice du variant sélectionné */}
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xl font-bold text-[#4CAF50]">{formatPrice(displayPrice)}</span>
-          {product.originalPrice && (
-            <span className="text-sm text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</span>
+          {/* Badge de réduction (seulement si en promotion) */}
+          {product.originalPrice && product.originalPrice > displayPrice && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#FF5722] to-[#F44336] shadow-md">
+              -{Math.round(((product.originalPrice - displayPrice) / product.originalPrice) * 100)}%
+            </span>
           )}
           {selectedVariant && selectedVariant.sku && (
             <span className="text-xs text-gray-500 ml-2">SKU: {selectedVariant.sku}</span>
