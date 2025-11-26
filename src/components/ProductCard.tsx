@@ -257,7 +257,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 src={allImages[currentImageIndex || 0]}
                 alt={product.name}
                 fill
-                className="object-contain p-2 transition-opacity duration-500"
+                className="object-contain scale-105 transition-all duration-500"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
                 priority={false}
                 unoptimized={allImages[currentImageIndex || 0]?.includes('cjdropshipping.com')}
