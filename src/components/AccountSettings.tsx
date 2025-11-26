@@ -199,8 +199,8 @@ export default function AccountSettings() {
             </select>
           </div>
 
-          {/* Devise */}
-          <div>
+          {/* Devise - Caché mais fonctionnel */}
+          <div className="hidden">
             <label className="block text-sm font-medium text-[#424242] mb-3">Devise</label>
             <select
               value={settings.preferences.currency}

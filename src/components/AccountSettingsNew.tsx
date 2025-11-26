@@ -463,7 +463,8 @@ export default function AccountSettingsNew() {
             </select>
           </div>
 
-          <div>
+          {/* Sélecteur de devise - Caché mais fonctionnel */}
+          <div className="hidden">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Devise
             </label>

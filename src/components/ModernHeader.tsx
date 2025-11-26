@@ -411,8 +411,8 @@ export default function ModernHeader() {
 
             {/* Icônes d'action */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
-              {/* Sélecteur de devise - Desktop seulement */}
-              <div className="hidden sm:block">
+              {/* Sélecteur de devise - Caché visuellement mais fonctionnel */}
+              <div className="hidden">
                 <CurrencySelector />
               </div>
               
