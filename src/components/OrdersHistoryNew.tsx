@@ -316,12 +316,12 @@ export default function OrdersHistoryNew() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Informations de livraison CJ Dropshipping
+                    Informations de livraison
                   </h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     {selectedOrder.cjMapping.cjOrderNumber && (
                       <div>
-                        <p className="text-blue-700 font-medium">Numéro de commande CJ</p>
+                        <p className="text-blue-700 font-medium">Numéro de commande</p>
                         <p className="text-blue-900 font-mono text-xs">{selectedOrder.cjMapping.cjOrderNumber}</p>
                       </div>
                     )}
