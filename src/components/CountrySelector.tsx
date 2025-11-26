@@ -126,7 +126,6 @@ export default function CountrySelector() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-[#424242] hover:text-[#4CAF50] hover:bg-[#E8F5E8] rounded-lg transition-all duration-200"
-        title={`Pays de livraison: ${currentCountry.name}`}
       >
         <Globe className="w-4 h-4" />
         <span className="hidden sm:inline text-lg">{currentCountry.flag}</span>
@@ -136,7 +135,8 @@ export default function CountrySelector() {
       {/* Dropdown au survol - Style Temu */}
       {showHoverDropdown && !isOpen && (
         <div 
-          className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+          className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+          style={{ zIndex: 9999 }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
