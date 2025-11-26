@@ -214,15 +214,15 @@ export default function ProductReviews({
 
                 {/* Images du review */}
                 {review.images && review.images.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 mt-3">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-1 mt-2">
                     {review.images.map((img, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-md overflow-hidden border border-gray-200">
+                      <div key={idx} className="relative w-12 h-12 rounded overflow-hidden border border-gray-200">
                         <Image
                           src={img}
                           alt={`Photo avis ${idx + 1}`}
                           fill
                           className="object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                          sizes="(max-width: 640px) 50vw, 33vw"
+                          sizes="48px"
                         />
                       </div>
                     ))}
