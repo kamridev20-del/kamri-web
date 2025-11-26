@@ -111,22 +111,20 @@ export default function ModernHeader() {
       searchTimeoutRef.current = setTimeout(() => {
         performSearch(searchQuery);
       }, 300);
-    } else if (searchQuery.trim().length === 0) {
-      // Si la barre est vide, charger les recherches populaires
-      searchTimeoutRef.current = setTimeout(() => {
-        loadPopularSearches();
-      }, 100);
-    } else {
+    } else if (searchQuery.trim().length === 1) {
+      // Si moins de 2 caractères (mais pas vide), ne rien afficher
       setSearchResults(null);
       setShowSearchDropdown(false);
     }
+    // ✅ CORRECTION : Ne plus charger automatiquement les recherches populaires
+    // Elles ne s'afficheront que lors du focus (onFocus)
 
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery, performSearch, loadPopularSearches]);
+  }, [searchQuery, performSearch]);
 
   // Fermer le menu quand on clique ailleurs
   useEffect(() => {
