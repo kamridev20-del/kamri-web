@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useGeo } from '../contexts/GeoContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { Globe } from 'lucide-react';
 
 const COUNTRIES = [
@@ -71,8 +72,11 @@ const COUNTRIES = [
 
 export default function CountrySelector() {
   const { country, setCountry, loading } = useGeo();
+  const { currency } = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
+  const [showHoverDropdown, setShowHoverDropdown] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fermer le menu quand on clique ailleurs
   useEffect(() => {
@@ -95,10 +99,32 @@ export default function CountrySelector() {
 
   const currentCountry = COUNTRIES.find(c => c.code === country?.countryCode) || COUNTRIES[0];
 
+  // Gérer le hover avec un délai
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setShowHoverDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setShowHoverDropdown(false);
+    }, 200); // Délai de 200ms avant de fermer
+  };
+
+  // Ouvrir le modal complet
+  const handleOpenFullModal = () => {
+    setShowHoverDropdown(false);
+    setIsOpen(true);
+  };
+
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-[#424242] hover:text-[#4CAF50] hover:bg-[#E8F5E8] rounded-lg transition-all duration-200"
         title={`Pays de livraison: ${currentCountry.name}`}
       >
@@ -106,6 +132,60 @@ export default function CountrySelector() {
         <span className="hidden sm:inline text-lg">{currentCountry.flag}</span>
         <span className="hidden md:inline text-xs font-medium">{currentCountry.code}</span>
       </button>
+
+      {/* Dropdown au survol - Style Temu */}
+      {showHoverDropdown && !isOpen && (
+        <div 
+          className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Section Langue */}
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Langue</p>
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                checked
+                readOnly
+                className="text-[#4CAF50] focus:ring-[#4CAF50]"
+              />
+              <span className="text-sm text-gray-700">Français</span>
+            </div>
+          </div>
+
+          {/* Section Devise */}
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Devise</p>
+            <p className="text-sm text-gray-700">{currency}: €</p>
+          </div>
+
+          {/* Message pays détecté */}
+          <div className="px-4 py-3 bg-[#F0FDF4]">
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">{currentCountry.flag}</span>
+              <div>
+                <p className="text-sm text-gray-700">
+                  Vous faites du shopping sur
+                </p>
+                <p className="text-sm font-semibold text-[#4CAF50]">
+                  KAMRI {currentCountry.name}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bouton changer de pays */}
+          <div className="px-4 py-3">
+            <button
+              onClick={handleOpenFullModal}
+              className="w-full px-4 py-2 bg-white border-2 border-[#4CAF50] text-[#4CAF50] rounded-lg font-semibold hover:bg-[#4CAF50] hover:text-white transition-all duration-200"
+            >
+              Changer de pays/région
+            </button>
+          </div>
+        </div>
+      )}
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto">
