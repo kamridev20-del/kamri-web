@@ -115,6 +115,8 @@ export default function ProductDetailsPage() {
           // Notre API client retourne { data: { data: product, message: '...' } }
           const backendData = (productResponse.data as any)?.data || productResponse.data;
           console.log('📦 [ProductDetail] Product data:', backendData);
+          console.log('🎬 [ProductDetail] productVideo field:', backendData.productVideo);
+          console.log('🎬 [ProductDetail] productVideo type:', typeof backendData.productVideo);
           setProduct(backendData);
           
           // Charger tous les produits pour les produits similaires
@@ -207,43 +209,62 @@ export default function ProductDetailsPage() {
             productName={product.name}
             variantImage={variantImage} // ✅ Passer l'image du variant
             videos={(() => {
+              console.log('🎬 [VideoParser] Début du parsing...');
+              console.log('🎬 [VideoParser] product.productVideo:', product.productVideo);
+              
               // ✅ Parser productVideo depuis différents formats possibles
-              if (!product.productVideo) return [];
+              if (!product.productVideo) {
+                console.log('🎬 [VideoParser] productVideo est NULL ou undefined');
+                return [];
+              }
+              
+              console.log('🎬 [VideoParser] Type:', typeof product.productVideo);
               
               try {
                 // Si c'est une string, essayer de la parser
                 if (typeof product.productVideo === 'string') {
+                  console.log('🎬 [VideoParser] C\'est une string, parsing...');
                   const parsed = JSON.parse(product.productVideo);
+                  console.log('🎬 [VideoParser] Résultat parsing:', parsed);
                   
                   // Si c'est un array, le retourner directement
                   if (Array.isArray(parsed)) {
-                    return parsed.filter(url => url && typeof url === 'string');
+                    console.log('🎬 [VideoParser] C\'est un array:', parsed);
+                    const filtered = parsed.filter(url => url && typeof url === 'string');
+                    console.log('🎬 [VideoParser] Array filtré:', filtered);
+                    return filtered;
                   }
                   
                   // Si c'est un objet avec videoList
                   if (parsed && typeof parsed === 'object' && Array.isArray(parsed.videoList)) {
+                    console.log('🎬 [VideoParser] Objet avec videoList:', parsed.videoList);
                     return parsed.videoList.filter(url => url && typeof url === 'string');
                   }
                   
                   // Si c'est une URL directe
                   if (typeof parsed === 'string' && parsed.trim()) {
+                    console.log('🎬 [VideoParser] URL directe:', parsed);
                     return [parsed];
                   }
                 }
                 
                 // Si c'est déjà un objet avec videoList
                 if (product.productVideo && typeof product.productVideo === 'object') {
+                  console.log('🎬 [VideoParser] C\'est un objet');
                   if (Array.isArray(product.productVideo)) {
+                    console.log('🎬 [VideoParser] C\'est un array d\'objets:', product.productVideo);
                     return product.productVideo.filter(url => url && typeof url === 'string');
                   }
                   if (Array.isArray(product.productVideo.videoList)) {
+                    console.log('🎬 [VideoParser] Objet avec videoList:', product.productVideo.videoList);
                     return product.productVideo.videoList.filter(url => url && typeof url === 'string');
                   }
                 }
                 
+                console.log('🎬 [VideoParser] Aucun format reconnu, retour []');
                 return [];
               } catch (error) {
-                console.log('⚠️ Erreur lors du parsing de productVideo:', error);
+                console.log('⚠️ [VideoParser] Erreur lors du parsing de productVideo:', error);
                 return [];
               }
             })()}

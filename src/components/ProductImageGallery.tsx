@@ -42,12 +42,20 @@ export default function ProductImageGallery({ images, mainImage, productName, va
   const [selectedImage, setSelectedImage] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
+  console.log('🖼️ [ProductImageGallery] Props reçues:');
+  console.log('   - images:', images.length);
+  console.log('   - videos:', videos);
+  console.log('   - videos length:', videos.length);
+  
   // ✅ Combiner vidéos et images : vidéos en premier
   const allMedia: MediaItem[] = [
     ...videos.map(url => ({ type: 'video' as const, url })),
     ...(variantImage ? [{ type: 'image' as const, url: variantImage }] : []),
     ...images.map(url => ({ type: 'image' as const, url }))
   ];
+  
+  console.log('🖼️ [ProductImageGallery] allMedia:', allMedia.length, 'items');
+  console.log('🖼️ [ProductImageGallery] Premier item:', allMedia[0]);
   
   const displayImages = allMedia.filter(m => m.type === 'image').map(m => m.url);
 
