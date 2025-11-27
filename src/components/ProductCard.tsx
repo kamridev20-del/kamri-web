@@ -275,16 +275,14 @@ export default function ProductCard({ product }: ProductCardProps) {
               </svg>
             </div>
             
-            {/* Badge avec animation pour "nouveau" */}
-            {product.badge && (
+            {/* Badge - sauf "nouveau" qui s'affichera dans les indicateurs */}
+            {product.badge && product.badge !== 'nouveau' && (
               <motion.div 
                 className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold z-20"
                 style={{ 
                   backgroundColor: badgeConfig.backgroundColor, 
                   color: badgeConfig.color 
                 }}
-                animate={product.badge === 'nouveau' ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ repeat: product.badge === 'nouveau' ? Infinity : 0, duration: 2 }}
               >
                 {product.badge === 'promo' && discountPercentage > 0 
                   ? formatDiscountPercentage(discountPercentage)
@@ -378,7 +376,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
           
           {/* Étoiles d'avis OU badge NOUVEAU */}
-          {product.reviews && product.reviews > 0 ? (
+          {product.reviews && product.reviews > 0 && product.badge !== 'nouveau' ? (
             <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-semibold bg-[#FFF8E1] text-[#F57F17] gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <svg
