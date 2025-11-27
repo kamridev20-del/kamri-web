@@ -12,7 +12,7 @@ export default function ProductStats({ views, sales, listedNum }: ProductStatsPr
   // Simuler des vues si non disponibles
   const displayViews = views || Math.floor(Math.random() * 500) + 100;
   const displaySales = sales || 0;
-  const isBestseller = (sales || 0) > 50 || (listedNum || 0) > 500;
+  const isBestseller = (sales || 0) > 50; // Bestseller basé uniquement sur les ventes KAMRI
 
   return (
     <div className="flex flex-wrap items-center gap-3 mt-3 text-xs">
