@@ -143,9 +143,6 @@ export default function ProductGrid() {
           <h2 className="text-4xl md:text-5xl font-bold text-[#424242] mb-4 tracking-tight font-['Inter']">
             Nos produits
           </h2>
-          <p className="text-xl text-[#81C784] font-light font-['Inter']">
-            Découvrez notre sélection exclusive
-          </p>
         </div>
         
         {displayedProducts.length === 0 ? (
