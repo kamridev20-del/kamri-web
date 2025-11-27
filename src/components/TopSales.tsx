@@ -6,6 +6,7 @@ import ProductCard from './ProductCard';
 
 export default function TopSales() {
   const [topSales, setTopSales] = useState<any[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,6 +19,9 @@ export default function TopSales() {
           // Notre API client retourne { data: { data: products, message: '...' } }
           const backendData = (response.data as any).data || response.data;
           const products = Array.isArray(backendData) ? backendData : [];
+          
+          // Stocker le nombre total de produits
+          setTotalProducts(products.length);
           
           // Filtrer les produits avec badge 'top-ventes' ou les plus vendus
           const topProducts = products
@@ -57,8 +61,8 @@ export default function TopSales() {
           ))}
         </div>
 
-        {/* Bouton Voir Plus */}
-        {topSales.length > 0 && (
+        {/* Bouton Voir Plus - Affiché uniquement si au moins 50 produits */}
+        {topSales.length > 0 && totalProducts >= 50 && (
           <div className="flex justify-center mt-12">
             <a
               href="/products"

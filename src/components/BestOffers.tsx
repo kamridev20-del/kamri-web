@@ -6,6 +6,7 @@ import ProductCard from './ProductCard';
 
 export default function BestOffers() {
   const [bestOffers, setBestOffers] = useState<any[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,6 +19,9 @@ export default function BestOffers() {
           // Notre API client retourne { data: { data: products, message: '...' } }
           const backendData = (response.data as any).data || response.data;
           const products = Array.isArray(backendData) ? backendData : [];
+          
+          // Stocker le nombre total de produits
+          setTotalProducts(products.length);
           
           // Filtrer les produits avec les meilleures offres (badge promo ou prix réduit)
           const offers = products
@@ -56,8 +60,8 @@ export default function BestOffers() {
           ))}
         </div>
 
-        {/* Bouton Voir Plus */}
-        {bestOffers.length > 0 && (
+        {/* Bouton Voir Plus - Affiché uniquement si au moins 50 produits */}
+        {bestOffers.length > 0 && totalProducts >= 50 && (
           <div className="flex justify-center mt-12">
             <a
               href="/promotions"
