@@ -259,21 +259,26 @@ export default function ProductDetailsPage() {
           </div>
         </div>
         
-        {/* Tabs pour Description et Avis - Limité à la moitié de l'écran */}
-        <div className="max-w-4xl">
-          <ProductTabs
-            description={product.description}
-            specifications={product.specifications}
-            deliveryCycle={product.deliveryCycle}
-            reviews={product.reviews}
-            rating={product.rating}
-            cjProductId={(product as any).cjMapping?.cjProductId || null}
-            productId={product.id}
-          />
+        {/* Section Description/Avis + FAQ en 2 colonnes */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Tabs pour Description et Avis */}
+          <div>
+            <ProductTabs
+              description={product.description}
+              specifications={product.specifications}
+              deliveryCycle={product.deliveryCycle}
+              reviews={product.reviews}
+              rating={product.rating}
+              cjProductId={(product as any).cjMapping?.cjProductId || null}
+              productId={product.id}
+            />
+          </div>
+          
+          {/* FAQ */}
+          <div>
+            <ProductFAQ />
+          </div>
         </div>
-        
-        {/* FAQ */}
-        <ProductFAQ />
         
         {/* Produits similaires */}
         {similarProducts.length > 0 && (
