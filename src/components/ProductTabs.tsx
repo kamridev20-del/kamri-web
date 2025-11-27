@@ -34,17 +34,39 @@ function formatDescription(description: string) {
     );
   }
   
-  // Fallback : Afficher le texte brut avec sauts de ligne améliorés
-  // Ajouter des sauts de ligne avant chaque majuscule suivie de minuscules
-  const formattedText = description
-    .replace(/([a-z])([A-Z])/g, '$1\n$2') // Ajouter saut de ligne entre minuscule et majuscule
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Gérer le markdown bold
+  // Fallback : Afficher le texte avec formatage amélioré
+  const lines = description
+    .split(/\n+/) // Séparer par retours à la ligne existants
+    .filter(line => line.trim()); // Supprimer lignes vides
   
+  // Si pas de retours à la ligne, essayer de détecter les phrases
+  if (lines.length === 1) {
+    const sentences = description
+      .replace(/([.!?:])\s+([A-Z])/g, '$1\n\n$2') // Séparer phrases avec majuscule
+      .replace(/([a-z])([A-Z][a-z])/g, '$1\n$2') // Séparer mots collés
+      .split(/\n+/)
+      .filter(s => s.trim() && s.length > 10); // Garder phrases significatives
+    
+    return (
+      <div className="space-y-2">
+        {sentences.map((sentence, idx) => (
+          <p key={idx} className="text-sm text-[#424242] leading-relaxed">
+            {sentence.trim()}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  
+  // Sinon afficher les lignes telles quelles
   return (
-    <div 
-      className="text-sm text-[#424242] leading-relaxed whitespace-pre-line"
-      dangerouslySetInnerHTML={{ __html: formattedText }}
-    />
+    <div className="space-y-2">
+      {lines.map((line, idx) => (
+        <p key={idx} className="text-sm text-[#424242] leading-relaxed">
+          {line.trim()}
+        </p>
+      ))}
+    </div>
   );
 }
 
