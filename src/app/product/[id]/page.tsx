@@ -9,7 +9,6 @@ import ProductInfo from '../../../components/ProductInfo';
 import SimilarProducts from '../../../components/SimilarProducts';
 import ProductTabs from '../../../components/ProductTabs';
 import ProductBreadcrumbs from '../../../components/ProductBreadcrumbs';
-import ProductTrustBadges from '../../../components/ProductTrustBadges';
 import ProductShareButtons from '../../../components/ProductShareButtons';
 import ProductStats from '../../../components/ProductStats';
 import ProductFAQ from '../../../components/ProductFAQ';
@@ -222,12 +221,6 @@ export default function ProductDetailsPage() {
               views={undefined}
               sales={product.sales}
               listedNum={product.listedNum}
-            />
-            
-            {/* Trust Badges */}
-            <ProductTrustBadges 
-              isFreeShipping={product.isFreeShipping}
-              stock={product.stock}
             />
             
             {/* Share Buttons */}
