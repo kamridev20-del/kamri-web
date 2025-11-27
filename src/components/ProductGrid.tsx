@@ -144,7 +144,7 @@ export default function ProductGrid() {
             Nos produits
           </h2>
           <p className="text-xl text-[#81C784] font-light font-['Inter']">
-            Découvrez notre sélection exclusive ({displayedProducts.length} produits sur {safeProducts.length})
+            Découvrez notre sélection exclusive
           </p>
         </div>
         
