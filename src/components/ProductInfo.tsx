@@ -382,9 +382,17 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       
       // ✅ STRATÉGIE DE MATCHING AMÉLIORÉE :
-      // 1. Si on a couleur ET taille, chercher un variant dont la clé/nom contient les deux
-      // 2. Si on a seulement couleur, matcher par couleur
-      // 3. Si on a seulement taille, matcher par taille
+      // 1. Normaliser les couleurs (Gray = Grey)
+      // 2. Si on a couleur ET taille, chercher un variant dont la clé/nom contient les deux
+      // 3. Si pas de match exact, accepter un match partiel (couleur OU taille)
+      
+      // Normaliser les couleurs
+      const normalizeColor = (color: string) => {
+        const normalized = color.toLowerCase().trim();
+        if (normalized === 'grey') return 'gray';
+        if (normalized === 'gray') return 'gray';
+        return normalized;
+      };
       
       let colorMatch = !selectedColor;
       let sizeMatch = !selectedSize;
@@ -393,12 +401,14 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       const searchString = `${variantKey} ${variant.name || ''}`.toLowerCase();
       
       if (selectedColor) {
-        const selectedColorLower = selectedColor.toLowerCase();
+        const selectedColorNormalized = normalizeColor(selectedColor);
+        const variantColorNormalized = normalizeColor(variantColor);
+        
         // Matcher par couleur exacte dans color
-        colorMatch = variantColor.toLowerCase() === selectedColorLower;
+        colorMatch = variantColorNormalized === selectedColorNormalized;
         // Ou si la clé/nom contient la couleur
         if (!colorMatch) {
-          colorMatch = searchString.includes(selectedColorLower);
+          colorMatch = searchString.includes(selectedColorNormalized);
         }
       }
       
@@ -415,13 +425,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       
       console.log(`🔍 Variant "${variant.name}": key="${variantKey}", color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch})`);
       
-      // ✅ STRATÉGIE SPÉCIALE : Si on a couleur ET taille, chercher un variant qui contient les DEUX dans sa clé/nom
+      // ✅ STRATÉGIE SPÉCIALE : Si on a couleur ET taille
       if (selectedColor && selectedSize) {
-        const selectedColorLower = selectedColor.toLowerCase();
+        const selectedColorNormalized = normalizeColor(selectedColor);
         const selectedSizeLower = selectedSize.toLowerCase();
         
-        // Vérifier si la clé/nom contient les deux mots-clés
-        const containsBoth = searchString.includes(selectedColorLower) && 
+        // 1. Chercher un variant qui contient les DEUX dans sa clé/nom
+        const containsBoth = searchString.includes(selectedColorNormalized) && 
                             (searchString.includes(selectedSizeLower) || searchString.includes(selectedSize.toUpperCase().toLowerCase()));
         
         if (containsBoth) {
@@ -429,7 +439,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           return true;
         }
         
-        // Sinon, exiger que les deux correspondent individuellement
+        // 2. Si pas de match exact, accepter si la couleur correspond (la taille peut être optionnelle pour certains produits)
+        if (colorMatch) {
+          console.log(`✅ Match par couleur: "${variantKey}" correspond à "${selectedColor}"`);
+          return true;
+        }
+        
+        // 3. Sinon, exiger que les deux correspondent individuellement
         return colorMatch && sizeMatch;
       } else if (selectedColor) {
         return colorMatch;
