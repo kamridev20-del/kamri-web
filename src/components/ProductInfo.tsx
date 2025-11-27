@@ -467,43 +467,40 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Badge "Non livrable" */}
       {isShippable === false && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-center gap-2 text-red-800">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <p className="text-sm font-semibold">Ce produit n'est pas livrable en {country?.countryName || 'votre région'}</p>
+            <p className="text-xs font-semibold">Ce produit n'est pas livrable en {country?.countryName || 'votre région'}</p>
           </div>
         </div>
       )}
 
-      {/* Badge */}
-      {product.badge && badgeConfig && (
-        <div 
-          className="inline-block px-2 py-0.5 rounded-full text-xs font-bold"
-          style={{ 
-            backgroundColor: badgeConfig.backgroundColor, 
-            color: badgeConfig.color 
-          }}
-        >
-          {product.badge === 'promo' && discountPercentage > 0 
-            ? formatDiscountPercentage(discountPercentage)
-            : `${badgeConfig.icon} ${badgeConfig.text}`
-          }
-        </div>
-      )}
-
-      {/* Informations de base */}
-      <div>
-        {/* Nom de marque/fournisseur masqué */}
-        <h1 className="text-lg font-bold text-[#424242] mb-2">{product.name}</h1>
+      {/* ✅ ZONE 1: Badge + Titre + Rating sur même ligne */}
+      <div className="flex items-center justify-between gap-2 mb-1">
+        {/* Badge */}
+        {product.badge && badgeConfig && (
+          <div 
+            className="inline-flex px-2 py-0.5 rounded-full text-xs font-bold"
+            style={{ 
+              backgroundColor: badgeConfig.backgroundColor, 
+              color: badgeConfig.color 
+            }}
+          >
+            {product.badge === 'promo' && discountPercentage > 0 
+              ? formatDiscountPercentage(discountPercentage)
+              : `${badgeConfig.icon} ${badgeConfig.text}`
+            }
+          </div>
+        )}
         
-        {/* Rating */}
+        {/* Rating à droite */}
         {product.rating > 0 && product.reviews > 0 && (
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-1">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <svg
@@ -516,40 +513,103 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 </svg>
               ))}
             </div>
-            <span className="text-[10px] text-[#81C784]">({product.reviews} avis)</span>
+            <span className="text-[10px] text-[#81C784] font-medium">{product.rating.toFixed(1)} ({product.reviews})</span>
           </div>
         )}
+      </div>
 
-        {/* Prix - utilise displayPrice du variant sélectionné */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-xl font-bold text-[#4CAF50]">{formatPrice(displayPrice)}</span>
-          {/* Badge de réduction (seulement si en promotion) */}
+      {/* Titre */}
+      <h1 className="text-base font-bold text-[#424242] leading-tight">{product.name}</h1>
+
+      {/* ✅ ZONE 2: Card Prix + Bénéfices */}
+      <div className="bg-gradient-to-br from-[#E8F5E9] to-[#F1F8E9] rounded-xl p-3 border border-[#4CAF50]/20">
+        <div className="flex items-baseline justify-between mb-2">
+          <span className="text-2xl font-bold text-[#2E7D32]">{formatPrice(displayPrice)}</span>
           {product.originalPrice && product.originalPrice > displayPrice && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#FF5722] to-[#F44336] shadow-md">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#FF5722] to-[#F44336]">
               -{Math.round(((product.originalPrice - displayPrice) / product.originalPrice) * 100)}%
             </span>
           )}
         </div>
-
-        {/* Description retirée - maintenant dans les onglets */}
+        <div className="flex items-center gap-1.5 text-xs text-[#2E7D32]">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="font-medium">Livraison gratuite</span>
+        </div>
+        {product.deliveryCycle && (
+          <div className="flex items-center gap-1.5 text-xs text-[#616161] mt-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span>Arrivée: {product.deliveryCycle} jours</span>
+          </div>
+        )}
       </div>
 
-      {/* Couleurs - extraites des variants CJ */}
+      {/* ✅ BADGES DE CONFIANCE - Cards iconiques */}
+      <div className="grid grid-cols-4 gap-1.5">
+        <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+          <svg className="w-4 h-4 text-[#4CAF50] mb-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span className="text-[9px] font-semibold text-gray-700">Stock</span>
+        </div>
+        <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+          <svg className="w-4 h-4 text-[#2196F3] mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          </svg>
+          <span className="text-[9px] font-semibold text-gray-700">Retour</span>
+        </div>
+        <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+          <svg className="w-4 h-4 text-[#FFC107] mb-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span className="text-[9px] font-semibold text-gray-700">1 an</span>
+        </div>
+        <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+          <svg className="w-4 h-4 text-[#9C27B0] mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span className="text-[9px] font-semibold text-gray-700">Sécu</span>
+        </div>
+      </div>
+
+      {/* ✅ Couleurs - Cards avec images */}
       {availableColors.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-[#424242] mb-1.5">Couleur</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <h3 className="text-xs font-semibold text-[#424242] mb-1.5">Couleur</h3>
+          <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData) => (
               <button
                 key={colorData.name}
                 onClick={() => setSelectedColor(colorData.name)}
-                className={`px-2.5 py-1 text-xs rounded-full border-2 transition-all duration-200 ${
+                className={`relative flex flex-col items-center p-1.5 rounded-lg border-2 transition-all duration-200 ${
                   selectedColor === colorData.name
-                    ? 'border-[#4CAF50] bg-[#4CAF50] text-white'
-                    : 'border-gray-300 bg-white text-[#424242] hover:border-[#81C784]'
+                    ? 'border-[#4CAF50] bg-[#E8F5E9]'
+                    : 'border-gray-300 bg-white hover:border-[#81C784]'
                 }`}
               >
-                {colorData.name}
+                {colorData.image ? (
+                  <img 
+                    src={colorData.image} 
+                    alt={colorData.name}
+                    className="w-10 h-10 object-cover rounded-md mb-1"
+                  />
+                ) : (
+                  <div 
+                    className="w-10 h-10 rounded-md mb-1"
+                    style={{ backgroundColor: colorData.name.toLowerCase() }}
+                  />
+                )}
+                <span className="text-[9px] font-medium text-gray-700">{colorData.name}</span>
+                {selectedColor === colorData.name && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#4CAF50] rounded-full flex items-center justify-center">
+                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
               </button>
             ))}
           </div>
@@ -606,97 +666,82 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         </div>
       )}
 
-      {/* Quantité */}
-      <div>
-        <h3 className="text-base font-semibold text-[#424242] mb-2">Quantité</h3>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-8 h-8 rounded-full bg-[#E8F5E8] flex items-center justify-center hover:bg-[#4CAF50] hover:text-white transition-all duration-200"
+      {/* ✅ ZONE D'ACTION - Quantité intégrée + Boutons groupés */}
+      <div className="space-y-2">
+        {/* Quantité + Ajouter au panier */}
+        <div className="flex items-stretch gap-2">
+          {/* Quantité */}
+          <div className="flex items-center bg-gray-100 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              className="px-3 py-2 hover:bg-gray-200 transition-colors"
+            >
+              <svg className="h-4 w-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+              </svg>
+            </button>
+            <span className="px-3 py-2 text-sm font-semibold text-[#424242] min-w-[2rem] text-center">{quantity}</span>
+            <button
+              onClick={() => setQuantity(quantity + 1)}
+              className="px-3 py-2 hover:bg-gray-200 transition-colors"
+            >
+              <svg className="h-4 w-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+          </div>
+          
+          {/* Ajouter au panier */}
+          <button 
+            onClick={handleAddToCart}
+            disabled={isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping}
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 ${
+              isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-[#4CAF50] text-white hover:bg-[#2E7D32] hover:shadow-lg'
+            }`}
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </button>
-          <span className="text-lg font-semibold text-[#424242] min-w-[2.5rem] text-center">{quantity}</span>
-          <button
-            onClick={() => setQuantity(quantity + 1)}
-            className="w-8 h-8 rounded-full bg-[#E8F5E8] flex items-center justify-center hover:bg-[#4CAF50] hover:text-white transition-all duration-200"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            {isCheckingShipping || isAddingToCart ? (
+              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span>Ajouter au panier</span>
+              </>
+            )}
           </button>
         </div>
-      </div>
-
-      {/* Boutons d'action */}
-      <div className="flex gap-3">
+        
+        {/* Acheter maintenant */}
         <button 
           onClick={handleAddToCart}
           disabled={isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold flex items-center justify-center transition-all duration-200 ${
-            isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-[#4CAF50] text-white hover:bg-[#2E7D32] hover:shadow-lg transform hover:scale-105'
-          }`}
-          title={
-            isShippable === false 
-              ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}` 
-              : isCheckingShipping 
-                ? 'Vérification...' 
-                : isAddingToCart 
-                  ? 'Ajout en cours...' 
-                  : displayStock <= 0 
-                    ? 'Rupture de stock' 
-                    : 'Ajouter au panier'
-          }
-        >
-          {isCheckingShipping ? (
-            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          ) : isAddingToCart ? (
-            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          ) : isShippable === false ? (
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-          )}
-        </button>
-        <button 
-          onClick={handleAddToCart}
-          disabled={isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping}
-          className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold border-2 transition-all duration-200 ${
+          className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold border-2 transition-all duration-200 ${
             isAddingToCart || displayStock <= 0 || (availableVariants.length > 0 && !selectedVariant) || isShippable === false || isCheckingShipping
               ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-              : 'bg-white text-[#4CAF50] border-[#4CAF50] hover:bg-[#4CAF50] hover:text-white transform hover:scale-105'
+              : 'bg-white text-[#4CAF50] border-[#4CAF50] hover:bg-[#4CAF50] hover:text-white'
           }`}
-          title={isShippable === false ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}` : ''}
         >
-          {isShippable === false ? 'Non livrable' : 'Acheter maintenant'}
+          {isShippable === false ? 'Non livrable' : '⚡ Acheter maintenant'}
         </button>
       </div>
 
-      {/* Stock - utilise displayStock du variant sélectionné */}
-      <div className={`flex items-center gap-2 text-sm ${displayStock > 0 ? 'text-[#4CAF50]' : 'text-red-600'}`}>
-        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+      {/* ✅ Stock simplifié */}
+      <div className={`flex items-center justify-center gap-1.5 text-xs ${displayStock > 0 ? 'text-[#4CAF50]' : 'text-red-600'}`}>
+        <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
           {displayStock > 0 ? (
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           ) : (
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           )}
         </svg>
-        <span className="font-medium">
-          {displayStock > 0 ? `${displayStock} en stock` : 'Rupture de stock'}
+        <span className="font-semibold">
+          {displayStock > 0 ? 'En stock' : 'Rupture de stock'}
         </span>
       </div>
       
