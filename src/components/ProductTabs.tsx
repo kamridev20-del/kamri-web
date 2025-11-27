@@ -15,7 +15,7 @@ function formatDescription(description: string) {
   
   if (matches.length >= 3) { // Au moins 3 attributs détectés
     return (
-      <div className="grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {matches.map((match, idx) => {
           const key = match[1].trim();
           const value = match[2].trim();
@@ -24,9 +24,9 @@ function formatDescription(description: string) {
           if (!key || !value || key.length < 2 || value.length < 1) return null;
           
           return (
-            <div key={idx} className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg">
-              <span className="text-xs font-semibold text-[#4CAF50] min-w-[140px]">{key}</span>
-              <span className="text-xs text-[#424242] flex-1">{value}</span>
+            <div key={idx} className="flex flex-col gap-1 p-2 bg-gray-50 rounded-lg">
+              <span className="text-xs font-semibold text-[#4CAF50]">{key}</span>
+              <span className="text-xs text-[#424242]">{value}</span>
             </div>
           );
         }).filter(Boolean)}
