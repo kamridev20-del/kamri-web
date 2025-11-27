@@ -66,6 +66,7 @@ interface Product {
   listedNum?: number;
   deliveryCycle?: string;
   isFreeShipping?: boolean;
+  productVideo?: string | any; // ✅ Vidéo du produit (peut être string JSON ou objet)
   // ✅ AJOUT : Support des variants CJ
   productVariants?: ProductVariant[];
   variants?: string; // JSON string des variants CJ
@@ -205,6 +206,47 @@ export default function ProductDetailsPage() {
             mainImage={product.image || '/images/modelo.png'}
             productName={product.name}
             variantImage={variantImage} // ✅ Passer l'image du variant
+            videos={(() => {
+              // ✅ Parser productVideo depuis différents formats possibles
+              if (!product.productVideo) return [];
+              
+              try {
+                // Si c'est une string, essayer de la parser
+                if (typeof product.productVideo === 'string') {
+                  const parsed = JSON.parse(product.productVideo);
+                  
+                  // Si c'est un array, le retourner directement
+                  if (Array.isArray(parsed)) {
+                    return parsed.filter(url => url && typeof url === 'string');
+                  }
+                  
+                  // Si c'est un objet avec videoList
+                  if (parsed && typeof parsed === 'object' && Array.isArray(parsed.videoList)) {
+                    return parsed.videoList.filter(url => url && typeof url === 'string');
+                  }
+                  
+                  // Si c'est une URL directe
+                  if (typeof parsed === 'string' && parsed.trim()) {
+                    return [parsed];
+                  }
+                }
+                
+                // Si c'est déjà un objet avec videoList
+                if (product.productVideo && typeof product.productVideo === 'object') {
+                  if (Array.isArray(product.productVideo)) {
+                    return product.productVideo.filter(url => url && typeof url === 'string');
+                  }
+                  if (Array.isArray(product.productVideo.videoList)) {
+                    return product.productVideo.videoList.filter(url => url && typeof url === 'string');
+                  }
+                }
+                
+                return [];
+              } catch (error) {
+                console.log('⚠️ Erreur lors du parsing de productVideo:', error);
+                return [];
+              }
+            })()}
           />
           
           {/* Informations produit */}

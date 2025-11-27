@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Star, TrendingUp } from 'lucide-react';
+import { ArrowRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -53,10 +53,10 @@ export default function HomeHero() {
 
   return (
     <section 
-      className="relative min-h-[300px] sm:min-h-[350px] lg:min-h-[400px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
+      className="relative min-h-[600px] sm:min-h-[700px] lg:min-h-[800px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
       aria-label="Section hero - Découvrez les tendances"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -64,7 +64,7 @@ export default function HomeHero() {
           className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center"
         >
           {/* Contenu texte - Colonne gauche */}
-          <div className="hero-content space-y-3 sm:space-y-4 order-2 lg:order-1">
+          <div className="hero-content space-y-6 sm:space-y-8 order-2 lg:order-1">
             {/* Badge promotionnel */}
             <motion.div variants={itemVariants}>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#4CAF50]/10 rounded-full border border-[#4CAF50]/20 mb-4">
@@ -78,7 +78,7 @@ export default function HomeHero() {
             {/* Titre principal */}
             <motion.h1
               variants={itemVariants}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Découvrez les{' '}
@@ -97,33 +97,52 @@ export default function HomeHero() {
             {/* Sous-titre */}
             <motion.p
               variants={itemVariants}
-              className="text-base sm:text-lg md:text-xl text-[#4B6254] font-light leading-relaxed max-w-xl"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#4B6254] font-light leading-relaxed max-w-xl"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Collection exclusive de vêtements et accessoires de qualité supérieure
             </motion.p>
 
+            {/* Points clés */}
+            <motion.ul
+              variants={itemVariants}
+              className="space-y-2 sm:space-y-3 text-sm sm:text-base text-[#4B6254]"
+            >
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
+                <span>Livraison gratuite à partir de 100$</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
+                <span>Retours gratuits sous 30 jours</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
+                <span>Paiement sécurisé</span>
+              </li>
+            </motion.ul>
+
             {/* Statistiques */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-3 sm:gap-4 pt-1"
+              className="flex flex-wrap gap-4 sm:gap-6 pt-2"
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#4CAF50]/10 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#4CAF50]" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#4CAF50]/10 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-[#4CAF50]" />
                 </div>
                 <div>
-                  <div className="text-base sm:text-lg font-bold text-[#1A3C2E]">5000+</div>
-                  <div className="text-xs text-[#4B6254]">Clients satisfaits</div>
+                  <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">5000+</div>
+                  <div className="text-xs sm:text-sm text-[#4B6254]">Clients satisfaits</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#4CAF50]/10 rounded-full flex items-center justify-center">
-                  <Star className="w-4 h-4 sm:w-5 sm:h-5 text-[#4CAF50]" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#4CAF50]/10 rounded-full flex items-center justify-center">
+                  <Star className="w-5 h-5 sm:w-6 sm:h-6 text-[#4CAF50]" />
                 </div>
                 <div>
-                  <div className="text-base sm:text-lg font-bold text-[#1A3C2E]">4.8/5</div>
-                  <div className="text-xs text-[#4B6254]">Note moyenne</div>
+                  <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">4.8/5</div>
+                  <div className="text-xs sm:text-sm text-[#4B6254]">Note moyenne</div>
                 </div>
               </div>
             </motion.div>
@@ -131,15 +150,15 @@ export default function HomeHero() {
             {/* Boutons CTA */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-1"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2"
             >
               <Link
                 href="/products"
-                className="group relative inline-flex items-center justify-center gap-2 bg-[#4CAF50] text-white px-5 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:bg-[#2E7D32] transform hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden"
+                className="group relative inline-flex items-center justify-center gap-2 bg-[#4CAF50] text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:bg-[#2E7D32] transform hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 <span className="relative z-10">Explorer maintenant</span>
-                <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-[#66BB6A] to-[#4CAF50] opacity-0 group-hover:opacity-100"
                   initial={{ x: '-100%' }}
@@ -149,11 +168,26 @@ export default function HomeHero() {
               </Link>
               <Link
                 href="/promotions"
-                className="inline-flex items-center justify-center gap-2 bg-white text-[#4CAF50] px-5 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold rounded-lg border-2 border-[#4CAF50] shadow-sm hover:bg-[#E8F5E8] hover:shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out"
+                className="inline-flex items-center justify-center gap-2 bg-white text-[#4CAF50] px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg border-2 border-[#4CAF50] shadow-sm hover:bg-[#E8F5E8] hover:shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 Voir les promos
               </Link>
+            </motion.div>
+
+            {/* Badges de confiance */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-wrap items-center gap-4 pt-4"
+            >
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4B6254]">
+                <Shield className="w-4 h-4 text-[#4CAF50]" />
+                <span>Paiement sécurisé</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4B6254]">
+                <Truck className="w-4 h-4 text-[#4CAF50]" />
+                <span>Livraison rapide</span>
+              </div>
             </motion.div>
           </div>
 
@@ -162,7 +196,7 @@ export default function HomeHero() {
             variants={imageVariants}
             className="hero-image relative order-1 lg:order-2"
           >
-            <div className="relative w-full h-[200px] sm:h-[250px] lg:h-[300px] xl:h-[350px] overflow-hidden rounded-2xl shadow-2xl group">
+            <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] overflow-hidden rounded-2xl shadow-2xl group">
               {/* Image de modèle avec Next Image */}
               <div className="relative w-full h-full">
                 <Image
