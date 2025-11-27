@@ -135,9 +135,27 @@ export default function ProductReviews({
 
   return (
     <>
+      <style jsx>{`
+        .reviews-scrollable::-webkit-scrollbar {
+          width: 6px;
+        }
+        .reviews-scrollable::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        .reviews-scrollable::-webkit-scrollbar-thumb {
+          background: #4CAF50;
+          border-radius: 10px;
+        }
+        .reviews-scrollable::-webkit-scrollbar-thumb:hover {
+          background: #45a049;
+        }
+      `}</style>
       <div className="space-y-3">
-        {/* Liste des avis */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {/* Liste des avis - Scrollable (2 lignes visibles) */}
+        <div className="reviews-scrollable grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[600px] overflow-y-auto pr-2"
+             style={{ scrollbarWidth: 'thin', scrollbarColor: '#4CAF50 #f1f1f1' }}
+        >
           {displayedReviews.length === 0 ? (
             <div className="col-span-full text-center py-4 text-gray-500">
               <p className="text-xs">Aucun avis disponible.</p>
