@@ -226,8 +226,12 @@ export default function ProductDetailsPage() {
                 if (videoId.startsWith('http://') || videoId.startsWith('https://')) {
                   return videoId;
                 }
-                // Construire l'URL CJ Dropshipping depuis l'ID
-                return `https://cj-prodcut-video.oss-accelerate.aliyuncs.com/${videoId}`;
+                
+                // Essayer plusieurs formats possibles pour les vidéos CJ
+                // Format 1 : Avec extension .mp4
+                const url = `https://cj-prodcut-video.oss-accelerate.aliyuncs.com/${videoId}.mp4`;
+                console.log('🎬 [buildVideoUrl] URL construite:', url);
+                return url;
               };
               
               try {
