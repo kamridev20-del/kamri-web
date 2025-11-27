@@ -382,41 +382,54 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       
       // ✅ STRATÉGIE DE MATCHING AMÉLIORÉE :
-      // 1. Si on a couleur ET taille, chercher une correspondance exacte
+      // 1. Si on a couleur ET taille, chercher un variant dont la clé/nom contient les deux
       // 2. Si on a seulement couleur, matcher par couleur
       // 3. Si on a seulement taille, matcher par taille
-      // 4. Si la clé contient les mots-clés, c'est un match
       
       let colorMatch = !selectedColor;
       let sizeMatch = !selectedSize;
       
+      // Construire une chaîne de recherche combinée (clé + nom)
+      const searchString = `${variantKey} ${variant.name || ''}`.toLowerCase();
+      
       if (selectedColor) {
-        // Matcher par couleur exacte
-        colorMatch = variantColor.toLowerCase() === selectedColor.toLowerCase();
-        // Ou si la clé contient la couleur
-        if (!colorMatch && variantKey) {
-          colorMatch = variantKey.toLowerCase().includes(selectedColor.toLowerCase());
+        const selectedColorLower = selectedColor.toLowerCase();
+        // Matcher par couleur exacte dans color
+        colorMatch = variantColor.toLowerCase() === selectedColorLower;
+        // Ou si la clé/nom contient la couleur
+        if (!colorMatch) {
+          colorMatch = searchString.includes(selectedColorLower);
         }
       }
       
       if (selectedSize) {
+        const selectedSizeUpper = selectedSize.toUpperCase();
+        const selectedSizeLower = selectedSize.toLowerCase();
         // Matcher par taille exacte (insensible à la casse)
-        sizeMatch = variantSize.toUpperCase() === selectedSize.toUpperCase();
-        // Ou si la clé contient la taille
-        if (!sizeMatch && variantKey) {
-          sizeMatch = variantKey.toUpperCase().includes(selectedSize.toUpperCase());
-        }
-        // Ou si le nom du variant contient la taille
-        if (!sizeMatch && variant.name) {
-          sizeMatch = variant.name.toUpperCase().includes(selectedSize.toUpperCase());
+        sizeMatch = variantSize.toUpperCase() === selectedSizeUpper;
+        // Ou si la clé/nom contient la taille
+        if (!sizeMatch) {
+          sizeMatch = searchString.includes(selectedSizeLower) || searchString.includes(selectedSizeUpper.toLowerCase());
         }
       }
       
       console.log(`🔍 Variant "${variant.name}": key="${variantKey}", color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch})`);
       
-      // Si on a les deux, les deux doivent matcher
-      // Si on a seulement un, celui-là doit matcher
+      // ✅ STRATÉGIE SPÉCIALE : Si on a couleur ET taille, chercher un variant qui contient les DEUX dans sa clé/nom
       if (selectedColor && selectedSize) {
+        const selectedColorLower = selectedColor.toLowerCase();
+        const selectedSizeLower = selectedSize.toLowerCase();
+        
+        // Vérifier si la clé/nom contient les deux mots-clés
+        const containsBoth = searchString.includes(selectedColorLower) && 
+                            (searchString.includes(selectedSizeLower) || searchString.includes(selectedSize.toUpperCase().toLowerCase()));
+        
+        if (containsBoth) {
+          console.log(`✅ Match par clé combinée: "${variantKey}" contient "${selectedColor}" et "${selectedSize}"`);
+          return true;
+        }
+        
+        // Sinon, exiger que les deux correspondent individuellement
         return colorMatch && sizeMatch;
       } else if (selectedColor) {
         return colorMatch;
