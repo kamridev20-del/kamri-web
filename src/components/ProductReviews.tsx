@@ -152,8 +152,8 @@ export default function ProductReviews({
         }
       `}</style>
       <div className="space-y-3">
-        {/* Liste des avis - Scrollable (2 lignes visibles) */}
-        <div className="reviews-scrollable grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[600px] overflow-y-auto pr-2"
+        {/* Liste des avis - Scrollable (1 ligne visible) */}
+        <div className="reviews-scrollable grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[250px] overflow-y-auto pr-2"
              style={{ scrollbarWidth: 'thin', scrollbarColor: '#4CAF50 #f1f1f1' }}
         >
           {displayedReviews.length === 0 ? (
