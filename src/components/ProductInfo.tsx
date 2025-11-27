@@ -433,33 +433,49 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
   // ✅ Fonction pour ajouter au panier avec le variant sélectionné
   const handleAddToCart = async () => {
-    if (isAddingToCart) return;
+    console.log('🛒 [ProductInfo] handleAddToCart appelé');
+    console.log('   - availableVariants:', availableVariants.length);
+    console.log('   - selectedVariant:', selectedVariant);
+    console.log('   - displayStock:', displayStock);
+    console.log('   - isShippable:', isShippable);
+    console.log('   - country:', country?.countryCode);
+    
+    if (isAddingToCart) {
+      console.log('⏳ [ProductInfo] Déjà en cours d\'ajout, ignoré');
+      return;
+    }
     
     // Vérifier qu'un variant est sélectionné si des variants existent
     if (availableVariants.length > 0 && !selectedVariant) {
+      console.log('❌ [ProductInfo] Variant non sélectionné');
       toast?.error?.('Veuillez sélectionner une couleur et une taille');
       return;
     }
     
     // Vérifier le stock
     if (displayStock <= 0) {
+      console.log('❌ [ProductInfo] Stock insuffisant:', displayStock);
       toast?.error?.('Ce produit est en rupture de stock');
       return;
     }
     
     // Vérifier la livraison avant d'ajouter
     if (country?.countryCode && isShippable === false) {
+      console.log('❌ [ProductInfo] Produit non livrable en', country.countryCode);
       toast?.error?.(`Ce produit n'est pas livrable en ${country.countryName}`);
       return;
     }
     
+    console.log('✅ [ProductInfo] Toutes les vérifications passées, ajout au panier...');
     setIsAddingToCart(true);
     try {
       // ✅ Envoyer le variantId si disponible
+      console.log('📤 [ProductInfo] Appel addToCart:', { productId: product.id, quantity, variantId: selectedVariant?.id });
       await addToCart(product.id, quantity, selectedVariant?.id);
+      console.log('✅ [ProductInfo] Produit ajouté avec succès');
       toast?.success?.(`${quantity} article${quantity > 1 ? 's' : ''} ajouté${quantity > 1 ? 's' : ''} au panier`);
     } catch (error) {
-      console.error('Erreur ajout au panier:', error);
+      console.error('❌ [ProductInfo] Erreur ajout au panier:', error);
       toast?.error?.('Erreur lors de l\'ajout au panier');
     } finally {
       setIsAddingToCart(false);
