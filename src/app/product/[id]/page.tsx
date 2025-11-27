@@ -115,8 +115,6 @@ export default function ProductDetailsPage() {
           // Notre API client retourne { data: { data: product, message: '...' } }
           const backendData = (productResponse.data as any)?.data || productResponse.data;
           console.log('📦 [ProductDetail] Product data:', backendData);
-          console.log('🎬 [ProductDetail] productVideo field:', backendData.productVideo);
-          console.log('🎬 [ProductDetail] productVideo type:', typeof backendData.productVideo);
           setProduct(backendData);
           
           // Charger tous les produits pour les produits similaires
@@ -208,79 +206,7 @@ export default function ProductDetailsPage() {
             mainImage={product.image || '/images/modelo.png'}
             productName={product.name}
             variantImage={variantImage} // ✅ Passer l'image du variant
-            videos={(() => {
-              console.log('🎬 [VideoParser] Début du parsing...');
-              console.log('🎬 [VideoParser] product.productVideo:', product.productVideo);
-              
-              // ✅ Parser productVideo depuis différents formats possibles
-              if (!product.productVideo) {
-                console.log('🎬 [VideoParser] productVideo est NULL ou undefined');
-                return [];
-              }
-              
-              console.log('🎬 [VideoParser] Type:', typeof product.productVideo);
-              
-              // ✅ Fonction pour convertir un ID vidéo en URL complète
-              const buildVideoUrl = (videoId: string): string => {
-                // Si c'est déjà une URL complète, la retourner telle quelle
-                if (videoId.startsWith('http://') || videoId.startsWith('https://')) {
-                  return videoId;
-                }
-                
-                // Format CJ Dropshipping (similaire aux images)
-                const url = `https://cf.cjdropshipping.com/video/${videoId}.mp4`;
-                console.log('🎬 [buildVideoUrl] URL construite:', url);
-                return url;
-              };
-              
-              try {
-                let videoIds: string[] = [];
-                
-                // Si c'est une string, essayer de la parser
-                if (typeof product.productVideo === 'string') {
-                  console.log('🎬 [VideoParser] C\'est une string, parsing...');
-                  const parsed = JSON.parse(product.productVideo);
-                  console.log('🎬 [VideoParser] Résultat parsing:', parsed);
-                  
-                  // Si c'est un array d'IDs
-                  if (Array.isArray(parsed)) {
-                    console.log('🎬 [VideoParser] C\'est un array:', parsed);
-                    videoIds = parsed.filter(id => id && typeof id === 'string');
-                  }
-                  // Si c'est un objet avec videoList
-                  else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.videoList)) {
-                    console.log('🎬 [VideoParser] Objet avec videoList:', parsed.videoList);
-                    videoIds = parsed.videoList.filter(id => id && typeof id === 'string');
-                  }
-                  // Si c'est un ID unique
-                  else if (typeof parsed === 'string' && parsed.trim()) {
-                    console.log('🎬 [VideoParser] ID unique:', parsed);
-                    videoIds = [parsed];
-                  }
-                }
-                // Si c'est déjà un objet
-                else if (product.productVideo && typeof product.productVideo === 'object') {
-                  console.log('🎬 [VideoParser] C\'est un objet');
-                  if (Array.isArray(product.productVideo)) {
-                    console.log('🎬 [VideoParser] C\'est un array:', product.productVideo);
-                    videoIds = product.productVideo.filter(id => id && typeof id === 'string');
-                  }
-                  else if (Array.isArray(product.productVideo.videoList)) {
-                    console.log('🎬 [VideoParser] Objet avec videoList:', product.productVideo.videoList);
-                    videoIds = product.productVideo.videoList.filter(id => id && typeof id === 'string');
-                  }
-                }
-                
-                // Convertir les IDs en URLs complètes
-                const videoUrls = videoIds.map(buildVideoUrl);
-                console.log('🎬 [VideoParser] URLs construites:', videoUrls);
-                
-                return videoUrls;
-              } catch (error) {
-                console.log('⚠️ [VideoParser] Erreur lors du parsing de productVideo:', error);
-                return [];
-              }
-            })()}
+            videos={[]} // Vidéos désactivées - IDs CJ non convertibles en URLs
           />
           
           {/* Informations produit */}
