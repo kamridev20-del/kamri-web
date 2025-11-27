@@ -390,9 +390,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               </svg>
             ))}
             <span className="ml-0.5">
-              ({product.rating ? product.rating.toFixed(1) : '0.0'})
-              {product.reviews && product.reviews > 0 && (
-                <span className="ml-0.5 text-[#81C784]">• {product.reviews}</span>
+              {product.rating ? product.rating.toFixed(1) : '0.0'}
+              {product.reviews && product.reviews > 0 ? (
+                <span className="ml-0.5 text-[#81C784]">({product.reviews})</span>
+              ) : (
+                <span className="ml-0.5 text-gray-400">(0)</span>
               )}
             </span>
           </span>
