@@ -153,11 +153,33 @@ export default function ProductGrid() {
             <p className="text-base text-gray-500">Aucun produit disponible pour le moment</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {displayedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+              {displayedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {/* Bouton Voir Plus - Affiché uniquement si au moins 50 produits */}
+            {safeProducts.length >= 50 && (
+              <div className="flex justify-center mt-12">
+                <a
+                  href="/products"
+                  className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#4CAF50] to-[#66BB6A] text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
+                >
+                  <span>Voir tous les produits</span>
+                  <svg 
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </a>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
