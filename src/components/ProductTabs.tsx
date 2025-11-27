@@ -5,13 +5,18 @@ import ProductReviews from './ProductReviews';
 
 // ✅ Fonction pour formatter la description de manière structurée
 function formatDescription(description: string) {
+  // Nettoyer le markdown avant tout traitement
+  let cleanedDescription = description
+    .replace(/#{1,6}\s*/g, '') // Supprimer les ## titre markdown
+    .replace(/\*\*/g, '') // Supprimer les ** bold markdown
+    .replace(/^\s*-\s+/gm, '• ') // Remplacer - par des bullets •
+    .replace(/\n{3,}/g, '\n\n') // Réduire multiples sauts de ligne
+    .trim();
+  
   // Améliorer le pattern pour capturer TOUS les attributs
   // Pattern amélioré : capture "Mot(s) clé: valeur" jusqu'au prochain pattern ou fin
   const attributePattern = /([A-Z][A-Za-z\s\-\/]*?):\s*([^:\n]+?)(?=\s+[A-Z][A-Za-z\s\-\/]*?:|$)/gi;
-  const matches = [...description.matchAll(attributePattern)];
-  
-  // Debug: afficher le nombre de matches trouvés
-  console.log('Matches found:', matches.length, matches);
+  const matches = [...cleanedDescription.matchAll(attributePattern)];
   
   if (matches.length >= 3) { // Au moins 3 attributs détectés
     return (
@@ -35,13 +40,13 @@ function formatDescription(description: string) {
   }
   
   // Fallback : Afficher le texte avec formatage amélioré
-  const lines = description
+  const lines = cleanedDescription
     .split(/\n+/) // Séparer par retours à la ligne existants
     .filter(line => line.trim()); // Supprimer lignes vides
   
   // Si pas de retours à la ligne, essayer de détecter les phrases
   if (lines.length === 1) {
-    const sentences = description
+    const sentences = cleanedDescription
       .replace(/([.!?:])\s+([A-Z])/g, '$1\n\n$2') // Séparer phrases avec majuscule
       .replace(/([a-z])([A-Z][a-z])/g, '$1\n$2') // Séparer mots collés
       .split(/\n+/)
@@ -49,11 +54,19 @@ function formatDescription(description: string) {
     
     return (
       <div className="space-y-2">
-        {sentences.map((sentence, idx) => (
-          <p key={idx} className="text-sm text-[#424242] leading-relaxed">
-            {sentence.trim()}
-          </p>
-        ))}
+        {sentences.map((sentence, idx) => {
+          const trimmedSentence = sentence.trim();
+          const isBullet = /^[•⚠️📏💡🎯✅❌]/.test(trimmedSentence);
+          
+          return (
+            <p 
+              key={idx} 
+              className={`text-sm text-[#424242] leading-relaxed ${isBullet ? 'ml-2' : ''}`}
+            >
+              {trimmedSentence}
+            </p>
+          );
+        })}
       </div>
     );
   }
@@ -61,11 +74,20 @@ function formatDescription(description: string) {
   // Sinon afficher les lignes telles quelles
   return (
     <div className="space-y-2">
-      {lines.map((line, idx) => (
-        <p key={idx} className="text-sm text-[#424242] leading-relaxed">
-          {line.trim()}
-        </p>
-      ))}
+      {lines.map((line, idx) => {
+        const trimmedLine = line.trim();
+        // Détecter si c'est une ligne de liste (commence par • ou emoji)
+        const isBullet = /^[•⚠️📏💡🎯✅❌]/.test(trimmedLine);
+        
+        return (
+          <p 
+            key={idx} 
+            className={`text-sm text-[#424242] leading-relaxed ${isBullet ? 'ml-2' : ''}`}
+          >
+            {trimmedLine}
+          </p>
+        );
+      })}
     </div>
   );
 }
