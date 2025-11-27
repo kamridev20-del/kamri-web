@@ -502,7 +502,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         <h1 className="text-lg font-bold text-[#424242] mb-2">{product.name}</h1>
         
         {/* Rating */}
-        {product.rating && product.reviews && (
+        {product.rating > 0 && product.reviews > 0 && (
           <div className="flex items-center gap-1.5 mb-2">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (

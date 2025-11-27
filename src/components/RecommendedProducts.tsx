@@ -124,7 +124,7 @@ export default function RecommendedProducts({ products = [], title = 'Vous pourr
                 </h3>
                 
                 {/* Rating */}
-                {product.rating && product.reviews && (
+                {product.rating > 0 && product.reviews > 0 && (
                   <div className="flex items-center gap-0.5 mb-1.5">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (

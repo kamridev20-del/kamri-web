@@ -147,7 +147,7 @@ export default function SimilarProducts({ products }: SimilarProductsProps) {
                 <h3 className="text-sm font-semibold text-[#424242] mb-1.5 line-clamp-2">{product.name}</h3>
                 
                 {/* Rating */}
-                {product.rating && product.reviews && (
+                {product.rating > 0 && product.reviews > 0 && (
                   <div className="flex items-center gap-1 mb-2">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
