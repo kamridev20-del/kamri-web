@@ -312,7 +312,15 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   useEffect(() => {
     console.log('🔍 Recherche variant pour:', { selectedColor, selectedSize, totalVariants: availableVariants.length });
     
+    // ✅ Si pas de couleur ni taille, mais qu'il n'y a qu'un seul variant (ex: "Default"), le sélectionner automatiquement
     if (!selectedColor && !selectedSize) {
+      if (availableVariants.length === 1) {
+        const singleVariant = availableVariants[0];
+        console.log('✅ Variant unique détecté, sélection automatique:', singleVariant);
+        setSelectedVariant(singleVariant);
+        onVariantChange?.(singleVariant, singleVariant.image);
+        return;
+      }
       setSelectedVariant(null);
       onVariantChange?.(null, null);
       return;
@@ -446,10 +454,19 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     }
     
     // Vérifier qu'un variant est sélectionné si des variants existent
-    if (availableVariants.length > 0 && !selectedVariant) {
-      console.log('❌ [ProductInfo] Variant non sélectionné');
+    // Exception : si un seul variant existe (ex: "Default"), il est sélectionné automatiquement
+    if (availableVariants.length > 1 && !selectedVariant) {
+      console.log('❌ [ProductInfo] Variant non sélectionné (plusieurs variants disponibles)');
       toast?.error?.('Veuillez sélectionner une couleur et une taille');
       return;
+    }
+    
+    // Si un seul variant existe mais n'est pas sélectionné, le sélectionner automatiquement
+    if (availableVariants.length === 1 && !selectedVariant) {
+      console.log('✅ [ProductInfo] Sélection automatique du variant unique');
+      const singleVariant = availableVariants[0];
+      setSelectedVariant(singleVariant);
+      onVariantChange?.(singleVariant, singleVariant.image);
     }
     
     // Vérifier le stock
@@ -469,9 +486,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     console.log('✅ [ProductInfo] Toutes les vérifications passées, ajout au panier...');
     setIsAddingToCart(true);
     try {
+      // ✅ Utiliser le variant sélectionné ou le variant unique s'il n'y en a qu'un
+      const variantToUse = selectedVariant || (availableVariants.length === 1 ? availableVariants[0] : null);
+      
       // ✅ Envoyer le variantId si disponible
-      console.log('📤 [ProductInfo] Appel addToCart:', { productId: product.id, quantity, variantId: selectedVariant?.id });
-      await addToCart(product.id, quantity, selectedVariant?.id);
+      console.log('📤 [ProductInfo] Appel addToCart:', { productId: product.id, quantity, variantId: variantToUse?.id });
+      await addToCart(product.id, quantity, variantToUse?.id);
       console.log('✅ [ProductInfo] Produit ajouté avec succès');
       toast?.success?.(`${quantity} article${quantity > 1 ? 's' : ''} ajouté${quantity > 1 ? 's' : ''} au panier`);
     } catch (error) {
