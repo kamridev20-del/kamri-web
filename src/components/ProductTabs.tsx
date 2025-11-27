@@ -5,104 +5,46 @@ import ProductReviews from './ProductReviews';
 
 // ✅ Fonction pour formatter la description de manière structurée
 function formatDescription(description: string) {
-  // Patterns de sections principales
-  const sectionTitles = [
-    'Description du produit',
-    'Matériel',
-    'Material',
-    'Produit Attributs',
-    'Product Attributes',
-    'Paquet Taille',
-    'Package Size',
-    'Overview',
-    'Product information',
-    'Product Information',
-    'Packing list',
-    'Packing List',
-    'Product Image',
-    'Features',
-    'Specifications'
-  ];
-
-  // Parser les attributs du type "Type: value"
-  const parseAttributes = (text: string) => {
-    // Détecter les patterns comme "Type: value" ou "Material: value"
-    const attributePattern = /([A-Za-z\s]+):\s*([^\n\r:]+?)(?=\s*[A-Z][a-z]+:|$)/g;
-    const matches = [...text.matchAll(attributePattern)];
-    
-    if (matches.length > 0) {
-      return (
-        <div className="grid grid-cols-1 gap-2">
-          {matches.map((match, idx) => (
+  // Améliorer le pattern pour capturer TOUS les attributs
+  // Pattern amélioré : capture "Mot(s) clé: valeur" jusqu'au prochain pattern ou fin
+  const attributePattern = /([A-Z][A-Za-z\s\-\/]*?):\s*([^:\n]+?)(?=\s+[A-Z][A-Za-z\s\-\/]*?:|$)/gi;
+  const matches = [...description.matchAll(attributePattern)];
+  
+  // Debug: afficher le nombre de matches trouvés
+  console.log('Matches found:', matches.length, matches);
+  
+  if (matches.length >= 3) { // Au moins 3 attributs détectés
+    return (
+      <div className="grid grid-cols-1 gap-2">
+        {matches.map((match, idx) => {
+          const key = match[1].trim();
+          const value = match[2].trim();
+          
+          // Ignorer si la clé ou valeur est vide ou trop courte
+          if (!key || !value || key.length < 2 || value.length < 1) return null;
+          
+          return (
             <div key={idx} className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg">
-              <span className="text-xs font-semibold text-[#4CAF50] min-w-[120px]">{match[1].trim()}</span>
-              <span className="text-xs text-[#424242]">{match[2].trim()}</span>
+              <span className="text-xs font-semibold text-[#4CAF50] min-w-[140px]">{key}</span>
+              <span className="text-xs text-[#424242] flex-1">{value}</span>
             </div>
-          ))}
-        </div>
-      );
-    }
-    
-    // Sinon afficher tel quel
-    return <p className="text-sm text-[#424242] leading-relaxed whitespace-pre-line">{text}</p>;
-  };
-
-  // Diviser en sections
-  let sections: { title?: string; content: string }[] = [];
-  let currentSection = { title: undefined as string | undefined, content: '' };
-
-  const lines = description.split('\n');
-  
-  for (const line of lines) {
-    const trimmedLine = line.trim();
-    
-    // Vérifier si c'est un titre de section
-    const isTitle = sectionTitles.some(title => 
-      trimmedLine.toLowerCase() === title.toLowerCase() ||
-      trimmedLine.toLowerCase().startsWith(title.toLowerCase() + ':')
+          );
+        }).filter(Boolean)}
+      </div>
     );
-    
-    if (isTitle && trimmedLine) {
-      // Sauvegarder la section précédente
-      if (currentSection.content.trim()) {
-        sections.push(currentSection);
-      }
-      // Commencer une nouvelle section
-      currentSection = { 
-        title: trimmedLine.replace(':', ''), 
-        content: '' 
-      };
-    } else if (trimmedLine) {
-      currentSection.content += (currentSection.content ? '\n' : '') + trimmedLine;
-    }
   }
   
-  // Ajouter la dernière section
-  if (currentSection.content.trim() || currentSection.title) {
-    sections.push(currentSection);
-  }
-
-  // Si aucune section détectée, traiter comme texte simple avec parsing d'attributs
-  if (sections.length === 0 || (sections.length === 1 && !sections[0].title)) {
-    return parseAttributes(description);
-  }
-
-  // Render des sections
+  // Fallback : Afficher le texte brut avec sauts de ligne améliorés
+  // Ajouter des sauts de ligne avant chaque majuscule suivie de minuscules
+  const formattedText = description
+    .replace(/([a-z])([A-Z])/g, '$1\n$2') // Ajouter saut de ligne entre minuscule et majuscule
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Gérer le markdown bold
+  
   return (
-    <>
-      {sections.map((section, idx) => (
-        <div key={idx} className="mb-4">
-          {section.title && (
-            <h3 className="text-sm font-bold text-[#2E7D32] mb-2 pb-1 border-b border-gray-200">
-              {section.title}
-            </h3>
-          )}
-          <div>
-            {parseAttributes(section.content)}
-          </div>
-        </div>
-      ))}
-    </>
+    <div 
+      className="text-sm text-[#424242] leading-relaxed whitespace-pre-line"
+      dangerouslySetInnerHTML={{ __html: formattedText }}
+    />
   );
 }
 
