@@ -97,7 +97,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // Extraire toutes les images
   const allImages = useMemo(() => getAllImages(product.image), [product.image]);
-  const isBestseller = (product.sales || 0) > 50 || (product.listedNum || 0) > 500;
+  const isBestseller = (product.sales || 0) > 50; // Bestseller basé uniquement sur les ventes KAMRI
     
   // Vérifier la livraison uniquement si nécessaire (lazy check)
   // Ne pas vérifier automatiquement pour éviter trop de requêtes
