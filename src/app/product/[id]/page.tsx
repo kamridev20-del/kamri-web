@@ -259,16 +259,18 @@ export default function ProductDetailsPage() {
           </div>
         </div>
         
-        {/* Tabs pour Description, Spécifications, Livraison, Avis */}
-        <ProductTabs
-          description={product.description}
-          specifications={product.specifications}
-          deliveryCycle={product.deliveryCycle}
-          reviews={product.reviews}
-          rating={product.rating}
-          cjProductId={(product as any).cjMapping?.cjProductId || null}
-          productId={product.id}
-        />
+        {/* Tabs pour Description et Avis - Limité à la moitié de l'écran */}
+        <div className="max-w-4xl">
+          <ProductTabs
+            description={product.description}
+            specifications={product.specifications}
+            deliveryCycle={product.deliveryCycle}
+            reviews={product.reviews}
+            rating={product.rating}
+            cjProductId={(product as any).cjMapping?.cjProductId || null}
+            productId={product.id}
+          />
+        </div>
         
         {/* FAQ */}
         <ProductFAQ />
