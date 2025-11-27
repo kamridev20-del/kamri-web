@@ -375,8 +375,32 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
           
-          {/* Étoiles d'avis OU badge NOUVEAU */}
-          {product.reviews && product.reviews > 0 && product.badge !== 'nouveau' ? (
+          {/* Badge NOUVEAU + Étoiles d'avis */}
+          {product.badge === 'nouveau' ? (
+            <>
+              {/* Badge NOUVEAU */}
+              <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[9px] font-semibold bg-[#FF9800] text-white">
+                🆕 NOUVEAU
+              </span>
+              {/* Étoiles + avis */}
+              <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-semibold bg-[#FFF8E1] text-[#F57F17] gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className={`w-2 h-2 ${i < Math.floor(product.rating || 0) ? 'text-yellow-500' : 'text-gray-300'}`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                ))}
+                <span className="ml-0.5">
+                  {product.rating ? product.rating.toFixed(1) : '0.0'} <span className="text-[#81C784]">({product.reviews || 0})</span>
+                </span>
+              </span>
+            </>
+          ) : product.reviews && product.reviews > 0 ? (
+            /* Étoiles d'avis uniquement */
             <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-semibold bg-[#FFF8E1] text-[#F57F17] gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <svg
@@ -393,6 +417,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             </span>
           ) : (
+            /* Badge NOUVEAU uniquement (pas d'avis et pas de badge BDD) */
             <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[9px] font-semibold bg-[#FF9800] text-white">
               🆕 NOUVEAU
             </span>
