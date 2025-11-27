@@ -157,16 +157,16 @@ export default function ProductReviews({
         </div>
 
         {/* Liste des 5 premiers avis */}
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {displayedReviews.length === 0 ? (
-            <div className="text-center py-4 text-gray-500">
+            <div className="col-span-full text-center py-4 text-gray-500">
               <p className="text-xs">Aucun avis disponible.</p>
             </div>
           ) : (
             displayedReviews.map((review) => {
             const rating = review.rating || parseInt(review.score) || 0;
             return (
-              <div key={review.commentId || review.id} className="bg-white border border-gray-200 rounded-lg p-3">
+              <div key={review.commentId || review.id} className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col h-full">
                 <div className="flex items-start justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
                     <div className="w-7 h-7 bg-[#4CAF50] rounded-full flex items-center justify-center text-white text-[10px] font-semibold">
