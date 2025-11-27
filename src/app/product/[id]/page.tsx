@@ -216,6 +216,34 @@ export default function ProductDetailsPage() {
               }}
             />
             
+            {/* ✅ BADGES DE CONFIANCE - Cards iconiques */}
+            <div className="grid grid-cols-4 gap-1.5 my-3">
+              <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+                <svg className="w-4 h-4 text-[#4CAF50] mb-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="text-[9px] font-semibold text-gray-700">Stock</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+                <svg className="w-4 h-4 text-[#2196F3] mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                <span className="text-[9px] font-semibold text-gray-700">Retour</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+                <svg className="w-4 h-4 text-[#FFC107] mb-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="text-[9px] font-semibold text-gray-700">1 an</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-1.5 bg-white rounded-lg border border-gray-200">
+                <svg className="w-4 h-4 text-[#9C27B0] mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span className="text-[9px] font-semibold text-gray-700">Sécu</span>
+              </div>
+            </div>
+            
             {/* Stats (vues, ventes) */}
             <ProductStats 
               views={undefined}
