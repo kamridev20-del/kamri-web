@@ -329,6 +329,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     const matchingVariant = availableVariants.find(variant => {
       let variantColor = '';
       let variantSize = '';
+      let variantKey = '';
       
       // Utiliser la MÊME logique d'extraction que pour availableColors et availableSizes
       if (variant.properties) {
@@ -339,6 +340,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               const props = JSON.parse(variant.properties);
               
               if (typeof props === 'string') {
+                variantKey = props;
                 // Pattern : "Purple-S", "Black Zone2-S"
                 const colorMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
                 variantColor = colorMatch ? colorMatch[1].trim() : props.split(/[-\s]/)[0];
@@ -347,13 +349,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               } else if (props.value1 || props.value2) {
                 variantColor = props.value1 || '';
                 variantSize = props.value2 || '';
+                variantKey = props.key || '';
               } else if (props.key) {
-                variantColor = String(props.key).split(/[-\s]/)[0];
-                const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
+                variantKey = String(props.key);
+                variantColor = variantKey.split(/[-\s]/)[0];
+                const sizeMatch = variantKey.match(/[-\s]([A-Z0-9]+)$/i);
                 variantSize = sizeMatch ? sizeMatch[1] : '';
               }
             } catch {
               // Ce n'est pas du JSON, c'est une string directe
+              variantKey = variant.properties;
               const colorMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
               variantColor = colorMatch ? colorMatch[1].trim() : variant.properties.split(/[-\s]/)[0];
               const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
@@ -364,6 +369,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             const props = variant.properties;
             variantColor = props.value1 || '';
             variantSize = props.value2 || '';
+            variantKey = props.key || '';
             if (props.key) {
               variantColor = variantColor || String(props.key).split(/[-\s]/)[0];
               const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
@@ -375,12 +381,50 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         }
       }
       
-      const colorMatch = !selectedColor || variantColor.toLowerCase() === selectedColor.toLowerCase();
-      const sizeMatch = !selectedSize || variantSize.toUpperCase() === selectedSize.toUpperCase();
+      // ✅ STRATÉGIE DE MATCHING AMÉLIORÉE :
+      // 1. Si on a couleur ET taille, chercher une correspondance exacte
+      // 2. Si on a seulement couleur, matcher par couleur
+      // 3. Si on a seulement taille, matcher par taille
+      // 4. Si la clé contient les mots-clés, c'est un match
       
-      console.log(`🔍 Variant "${variant.name}": color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch})`);
+      let colorMatch = !selectedColor;
+      let sizeMatch = !selectedSize;
       
-      return colorMatch && sizeMatch;
+      if (selectedColor) {
+        // Matcher par couleur exacte
+        colorMatch = variantColor.toLowerCase() === selectedColor.toLowerCase();
+        // Ou si la clé contient la couleur
+        if (!colorMatch && variantKey) {
+          colorMatch = variantKey.toLowerCase().includes(selectedColor.toLowerCase());
+        }
+      }
+      
+      if (selectedSize) {
+        // Matcher par taille exacte (insensible à la casse)
+        sizeMatch = variantSize.toUpperCase() === selectedSize.toUpperCase();
+        // Ou si la clé contient la taille
+        if (!sizeMatch && variantKey) {
+          sizeMatch = variantKey.toUpperCase().includes(selectedSize.toUpperCase());
+        }
+        // Ou si le nom du variant contient la taille
+        if (!sizeMatch && variant.name) {
+          sizeMatch = variant.name.toUpperCase().includes(selectedSize.toUpperCase());
+        }
+      }
+      
+      console.log(`🔍 Variant "${variant.name}": key="${variantKey}", color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch})`);
+      
+      // Si on a les deux, les deux doivent matcher
+      // Si on a seulement un, celui-là doit matcher
+      if (selectedColor && selectedSize) {
+        return colorMatch && sizeMatch;
+      } else if (selectedColor) {
+        return colorMatch;
+      } else if (selectedSize) {
+        return sizeMatch;
+      }
+      
+      return false;
     });
     
     if (matchingVariant) {
