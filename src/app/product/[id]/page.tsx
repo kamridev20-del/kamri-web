@@ -227,9 +227,8 @@ export default function ProductDetailsPage() {
                   return videoId;
                 }
                 
-                // Essayer plusieurs formats possibles pour les vidéos CJ
-                // Format 1 : Avec extension .mp4
-                const url = `https://cj-prodcut-video.oss-accelerate.aliyuncs.com/${videoId}.mp4`;
+                // Format CJ Dropshipping (similaire aux images)
+                const url = `https://cf.cjdropshipping.com/video/${videoId}.mp4`;
                 console.log('🎬 [buildVideoUrl] URL construite:', url);
                 return url;
               };
