@@ -212,6 +212,56 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   const availableSizes = useMemo(() => {
     const sizesSet = new Set<string>();
     
+    // Liste des tailles valides (lettres standard)
+    const validSizeLetters = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+    
+    // Fonction pour vérifier si une chaîne est une taille valide
+    const isValidSize = (sizeStr: string): boolean => {
+      const upper = sizeStr.toUpperCase().trim();
+      const lower = upper.toLowerCase();
+      
+      // Exclure d'abord les couleurs communes et mots non-tailles (liste exhaustive)
+      const invalidSizes = [
+        'GREEN', 'BLUE', 'RED', 'BLACK', 'WHITE', 'GRAY', 'GREY', 'YELLOW', 'PINK', 'PURPLE', 'ORANGE',
+        'BROWN', 'BEIGE', 'NAVY', 'MAROON', 'ROSE', 'SKY', 'STARRY', 'SQUARE', 'ROUND', 'FILTER',
+        'PCS', '2PCS', '5PCS', '10PCS', 'FILTER2PCS', 'GREEN2PCS', 'GRAY2PCS', 'WHITE2PCS',
+        'SET1', 'SET2', 'SET3', 'SET4', 'SET5', 'SET6', 'SET7', 'SET8', 'SET9',
+        'WOMEN', 'MEN', 'KIDS', 'UNISEX', 'DEEP', 'ZONE', 'ZONE2'
+      ];
+      
+      if (invalidSizes.includes(upper)) {
+        return false;
+      }
+      
+      // Si ça contient des mots de couleur ou des mots non-tailles, exclure
+      const colorKeywords = ['green', 'blue', 'red', 'black', 'white', 'gray', 'grey', 'yellow', 'pink', 'purple', 'orange', 'brown', 'beige', 'navy', 'maroon', 'rose', 'sky', 'starry', 'deep'];
+      const nonSizeKeywords = ['filter', 'pcs', 'set', 'women', 'men', 'kids', 'unisex', 'square', 'round', 'zone'];
+      
+      if (colorKeywords.some(keyword => lower.includes(keyword)) || 
+          nonSizeKeywords.some(keyword => lower.includes(keyword))) {
+        return false;
+      }
+      
+      // Tailles lettres standard
+      if (validSizeLetters.includes(upper)) {
+        return true;
+      }
+      
+      // Tailles numériques (chaussures, vêtements) : 30-50 pour chaussures
+      const numSize = parseInt(upper, 10);
+      if (!isNaN(numSize) && numSize >= 30 && numSize <= 50) {
+        return true;
+      }
+      
+      // Tailles numériques pour enfants/petites tailles (mais pas 0-9 seuls car trop ambigus)
+      if (!isNaN(numSize) && numSize >= 10 && numSize <= 20) {
+        return true;
+      }
+      
+      // Par défaut, ne pas accepter si on n'est pas sûr que c'est une taille
+      return false;
+    };
+    
     availableVariants.forEach(variant => {
       let size = '';
       
@@ -248,7 +298,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             }
           } else {
             // C'est un objet
-            const props = variant.properties;
+            const props = variant.properties as any;
             if (props.value2) {
               size = props.value2;
             } else if (props.key) {
@@ -263,7 +313,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         }
       }
       
-      if (size) {
+      // Vérifier si c'est une taille valide avant de l'ajouter
+      if (size && isValidSize(size)) {
         sizesSet.add(size.toUpperCase());
       }
     });
