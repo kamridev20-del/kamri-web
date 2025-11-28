@@ -583,7 +583,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     result.forEach((colorData, idx) => {
       // Nettoyer le nom pour la comparaison
       const cleanedName = cleanColorNameUtil(colorData.name);
-      const normalizedName = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ');
+      // Normalisation stricte : minuscules, trim, espaces multiples normalisés
+      const normalizedName = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
       
       if (!seenNames.has(normalizedName)) {
         seenNames.add(normalizedName);
@@ -592,13 +593,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           ...colorData,
           name: cleanedName
         });
-        if (idx < 5) {
-          console.log(`✅ [availableColors] Ajouté style unique [${idx}]:`, cleanedName);
+        if (idx < 10) {
+          console.log(`✅ [availableColors] Ajouté style unique [${idx}]: "${cleanedName}" (normalized: "${normalizedName}")`);
         }
       } else {
-        if (idx < 5) {
-          console.log(`⚠️ [availableColors] Doublon ignoré [${idx}]:`, cleanedName, '(déjà présent)');
-        }
+        console.log(`⚠️ [availableColors] Doublon ignoré [${idx}]: "${cleanedName}" (normalized: "${normalizedName}" - déjà présent)`);
       }
     });
     
