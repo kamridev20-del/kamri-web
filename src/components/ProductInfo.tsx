@@ -480,7 +480,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           return; // Skip ce variant
         }
         
-        const styleKey = cleanStyle.toLowerCase().trim();
+        // Normaliser le styleKey pour garantir l'unicité (tout en minuscules, sans espaces multiples)
+        const styleKey = cleanStyle.toLowerCase().trim().replace(/\s+/g, ' ');
+        
+        // Debug pour les premiers variants
+        if (idx < 3) {
+          console.log(`🔍 [availableColors] Variant ${idx} - styleKey:`, styleKey, 'cleanStyle:', cleanStyle);
+        }
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
         if (hasGender) {
@@ -554,18 +560,37 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     const result = Array.from(colorsMap.values());
     
-    // Debug: vérifier les noms stockés
-    if (result.length > 0) {
-      console.log('🔍 [availableColors] Résultat final - Noms stockés:', result.slice(0, 3).map(c => c.name));
+    // Filtrer les doublons : si plusieurs entrées ont le même nom (après nettoyage), ne garder que la première
+    const uniqueResult: typeof result = [];
+    const seenNames = new Set<string>();
+    
+    result.forEach((colorData) => {
+      const normalizedName = cleanColorNameUtil(colorData.name).toLowerCase().trim();
+      if (!seenNames.has(normalizedName)) {
+        seenNames.add(normalizedName);
+        // S'assurer que le nom est bien nettoyé
+        const cleanedName = cleanColorNameUtil(colorData.name);
+        uniqueResult.push({
+          ...colorData,
+          name: cleanedName
+        });
+      }
+    });
+    
+    // Debug: vérifier les noms stockés et les doublons
+    if (uniqueResult.length > 0) {
+      console.log('🔍 [availableColors] Résultat final - Total styles uniques:', uniqueResult.length);
+      console.log('🔍 [availableColors] Noms stockés:', uniqueResult.map(c => ({ name: c.name, count: c.count })));
+      
       // Vérifier si des noms contiennent encore des tailles
-      result.forEach((colorData, idx) => {
+      uniqueResult.forEach((colorData, idx) => {
         if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(colorData.name)) {
           console.error(`❌ ERREUR: availableColors[${idx}].name contient encore une taille:`, colorData.name);
         }
       });
     }
     
-    return result;
+    return uniqueResult;
   }, [availableVariants]);
 
   // ✅ Extraire les tailles uniques depuis les variants
@@ -1190,18 +1215,21 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             {availableSizes.length === 0 ? 'Variante' : hasGenderInVariants ? 'Style' : 'Couleur'}
           </h3>
           <div className="flex flex-wrap gap-2">
-            {availableColors.map((colorData) => (
+            {availableColors.map((colorData, index) => {
+              const cleanName = cleanColorName(colorData.name);
+              const isSelected = selectedColor === cleanName;
+              
+              return (
               <button
-                key={colorData.name}
+                key={`${cleanName}-${index}`}
                 onClick={() => {
-                  const cleanName = cleanColorName(colorData.name);
                   if (cleanName !== colorData.name) {
                     console.warn('⚠️ [Clic couleur] Nom nettoyé:', colorData.name, '→', cleanName);
                   }
                   setSelectedColor(cleanName);
                 }}
                 className={`relative flex flex-col items-center p-1.5 rounded-lg border-2 transition-all duration-200 ${
-                  selectedColor === cleanColorName(colorData.name)
+                  isSelected
                     ? 'border-[#4CAF50] bg-[#E8F5E9]'
                     : 'border-gray-300 bg-white hover:border-[#81C784]'
                 }`}
@@ -1218,8 +1246,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                     style={{ backgroundColor: colorData.name.toLowerCase() }}
                   />
                 )}
-                <span className="text-[9px] font-medium text-gray-700">{cleanColorName(colorData.name)}</span>
-                {selectedColor === cleanColorName(colorData.name) && (
+                <span className="text-[9px] font-medium text-gray-700">{cleanName}</span>
+                {isSelected && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#4CAF50] rounded-full flex items-center justify-center">
                     <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -1227,7 +1255,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                   </div>
                 )}
               </button>
-            ))}
+            );
+            })}
           </div>
         </div>
       )}
