@@ -318,6 +318,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
   // ✅ Extraire les couleurs uniques depuis les variants
   const availableColors = useMemo(() => {
+    console.log('🚀 [availableColors] useMemo déclenché - Total variants:', availableVariants.length);
     console.log('🔍 DEBUG: Total variants disponibles:', availableVariants.length);
     console.log('🔍 DEBUG: Premiers variants:', availableVariants.slice(0, 3));
     
@@ -570,8 +571,10 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     const result = Array.from(colorsMap.values());
     
-    console.log('🔍 [availableColors] Avant filtrage - Total entrées dans colorsMap:', result.length);
-    console.log('🔍 [availableColors] Entrées brutes:', result.map(c => ({ name: c.name, count: c.count })));
+    console.log('📊 [availableColors] Avant filtrage - Total entrées dans colorsMap:', result.length);
+    if (result.length > 0) {
+      console.log('📊 [availableColors] Entrées brutes (premiers 10):', result.slice(0, 10).map(c => ({ name: c.name, count: c.count })));
+    }
     
     // Filtrer les doublons : si plusieurs entrées ont le même nom (après nettoyage), ne garder que la première
     const uniqueResult: typeof result = [];
