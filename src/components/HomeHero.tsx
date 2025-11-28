@@ -93,12 +93,12 @@ export default function HomeHero() {
 
   return (
     <section 
-      className="relative min-h-[350px] sm:min-h-[400px] lg:min-h-[450px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
+      className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[360px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
       aria-label="Section hero - Découvrez les tendances"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 relative">
         {/* Carrousel hero complet */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -107,17 +107,17 @@ export default function HomeHero() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 items-center"
           >
             {/* Contenu texte - Colonne gauche */}
-            <div className="hero-content space-y-3 sm:space-y-4 lg:space-y-5 order-2 lg:order-1">
+            <div className="hero-content space-y-2 sm:space-y-3 lg:space-y-4 order-2 lg:order-1">
               {/* Badge promotionnel */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#4CAF50]/10 rounded-full border border-[#4CAF50]/20 mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#4CAF50]/10 rounded-full border border-[#4CAF50]/20 mb-2">
                   <Sparkles className="w-4 h-4 text-[#4CAF50]" />
                   <span className="text-sm sm:text-base font-semibold text-[#4CAF50]">
                     {currentSlide.badge}
@@ -130,7 +130,7 @@ export default function HomeHero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {currentSlide.title}{' '}
@@ -151,7 +151,7 @@ export default function HomeHero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#4B6254] font-light leading-relaxed max-w-xl"
+                className="text-sm sm:text-base md:text-lg lg:text-xl text-[#4B6254] font-light leading-relaxed max-w-xl"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {currentSlide.subtitle}
@@ -260,7 +260,7 @@ export default function HomeHero() {
               transition={{ delay: 0.3, duration: 0.8 }}
               className="hero-image relative order-1 lg:order-2"
             >
-              <div className="relative w-full h-[250px] sm:h-[280px] lg:h-[320px] xl:h-[360px] overflow-hidden rounded-2xl shadow-2xl group">
+              <div className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl group">
                 <div className="relative w-full h-full">
                   <Image
                     src={currentSlide.image}
