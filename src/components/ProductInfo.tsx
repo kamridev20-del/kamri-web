@@ -576,8 +576,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           });
         }
         
-        // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
-        if (hasGender) {
+        // 🔥 CORRECTION : Si on a des genres OU des vraies tailles, accepter tous les styles
+        // (pour les vêtements avec tailles S/M/L/XL, on veut afficher toutes les couleurs)
+        if (hasGender || hasRealSizes) {
           // Vérifier si existe
           const existing = colorsMap.get(styleKey);
           if (existing) {
@@ -603,7 +604,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             }
           }
         } else {
-          // Sinon, filtrer par couleurs connues (comportement original)
+          // Sinon, filtrer par couleurs connues (comportement original pour produits sans tailles)
           const colorLower = style.toLowerCase();
           const knownColors = ['black', 'white', 'brown', 'gray', 'grey', 'blue', 'red', 'green', 'yellow', 'pink', 'purple', 'orange', 'khaki', 'beige', 'navy', 'tan', 'burgundy', 'wine', 'ivory', 'cream', 'gold', 'silver', 'platinum'];
           
