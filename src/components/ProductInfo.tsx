@@ -1057,34 +1057,41 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         console.log('✅ Match exact trouvé:', matchingVariant.name);
       } else {
         // PASS 2 : Si pas de match exact, chercher le meilleur match partiel
-        const scoredVariants = availableVariants.map(variant => ({
-          variant,
-          ...calculateMatchScore(variant)
-        })).filter(({ colorMatch, sizeMatch }) => colorMatch || sizeMatch);
-        
-        // Trier par score décroissant, puis prioriser les matches EXACTS (couleur ET taille)
-        scoredVariants.sort((a, b) => {
-          // D'abord par score
-          if (b.score !== a.score) {
-            return b.score - a.score;
-          }
-          // Si même score, prioriser celui qui a les DEUX matches (couleur ET taille)
-          const aBothMatch = a.colorMatch && a.sizeMatch;
-          const bBothMatch = b.colorMatch && b.sizeMatch;
-          if (aBothMatch && !bBothMatch) return -1;
-          if (bBothMatch && !aBothMatch) return 1;
-          // Si aucun n'a les deux, prioriser celui qui a un match de couleur
-          if (a.colorMatch && !b.colorMatch) return -1;
-          if (b.colorMatch && !a.colorMatch) return 1;
-          // Si même score et même type de match, prioriser celui qui a un match de taille
-          if (a.sizeMatch && !b.sizeMatch) return -1;
-          if (b.sizeMatch && !a.sizeMatch) return 1;
-          return 0;
+        // 🔥 PRIORITÉ 1 : Chercher un variant avec couleur ET taille qui correspondent
+        const bothMatch = availableVariants.find(variant => {
+          const { colorMatch, sizeMatch } = calculateMatchScore(variant);
+          return colorMatch && sizeMatch;
         });
         
-        if (scoredVariants.length > 0) {
-          matchingVariant = scoredVariants[0].variant;
-          console.log(`✅ Match partiel accepté (score: ${scoredVariants[0].score}, couleur: ${scoredVariants[0].colorMatch}, taille: ${scoredVariants[0].sizeMatch}):`, matchingVariant.name);
+        if (bothMatch) {
+          matchingVariant = bothMatch;
+          console.log('✅ Match partiel avec couleur ET taille:', bothMatch.name);
+        } else {
+          // 🔥 PRIORITÉ 2 : Si pas de match avec les deux, chercher avec la taille uniquement
+          // (on veut au moins la bonne taille, même si la couleur ne correspond pas exactement)
+          const sizeOnlyMatch = availableVariants.find(variant => {
+            const { sizeMatch } = calculateMatchScore(variant);
+            return sizeMatch;
+          });
+          
+          if (sizeOnlyMatch) {
+            matchingVariant = sizeOnlyMatch;
+            console.log('✅ Match partiel avec taille uniquement:', sizeOnlyMatch.name);
+          } else {
+            // 🔥 PRIORITÉ 3 : En dernier recours, accepter un match de couleur uniquement
+            const scoredVariants = availableVariants.map(variant => ({
+              variant,
+              ...calculateMatchScore(variant)
+            })).filter(({ colorMatch }) => colorMatch);
+            
+            // Trier par score décroissant
+            scoredVariants.sort((a, b) => b.score - a.score);
+            
+            if (scoredVariants.length > 0) {
+              matchingVariant = scoredVariants[0].variant;
+              console.log(`✅ Match partiel accepté (score: ${scoredVariants[0].score}, couleur: ${scoredVariants[0].colorMatch}, taille: ${scoredVariants[0].sizeMatch}):`, matchingVariant.name);
+            }
+          }
         }
       }
     } else if (selectedColor && !selectedSize) {
