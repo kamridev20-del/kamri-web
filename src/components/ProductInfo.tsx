@@ -373,6 +373,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                     const matchNumeric = keyToCheck.match(sizeNumeric);
                     if (matchNumeric) {
                       size = matchNumeric[1];
+                    } else {
+                      // 🔥 NOUVEAU : Pattern 3b: Format numérique 1000-9999 à la fin (Puriv-3000, Puriv-4000)
+                      const formatNumeric = /[- ]([1-9][0-9]{3})$/;
+                      const matchFormat = keyToCheck.match(formatNumeric);
+                      if (matchFormat) {
+                        size = matchFormat[1];
+                      }
                     }
                   }
                 }
