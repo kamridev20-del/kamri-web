@@ -199,19 +199,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     if (!variantKey) return '';
     
-    // 🔥 NOUVEAU : Extraire UNIQUEMENT la couleur (sans la taille)
-    if (hasGender && variantKey) {
-      // Pour les chaussures avec genre, retirer la taille numérique à la fin
-      const beforeClean = variantKey;
-      variantKey = variantKey.replace(/[- ](3[0-9]|4[0-9]|5[0])$/g, '').trim();
-      variantKey = variantKey.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-      console.log('🔑 [Extract] Après nettoyage (hasGender):', { before: beforeClean, after: variantKey });
-      return variantKey;
-    }
-    
-    // 🔥 Pour les vêtements (pas de genre), extraire UNIQUEMENT la couleur
+    // 🔥 CRITIQUE : Extraire UNIQUEMENT la couleur (sans la taille)
+    // Utiliser extractColorFromVariantKey pour TOUS les cas (chaussures ET vêtements)
     const colorOnly = extractColorFromVariantKey(variantKey);
-    console.log('🔑 [Extract] Couleur extraite:', { before: variantKey, after: colorOnly });
+    console.log('🔑 [Extract] Couleur extraite:', { 
+      before: variantKey, 
+      after: colorOnly 
+    });
     return colorOnly;
   }, []);
 
@@ -439,11 +433,21 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         
         // 🔍 LOG DÉTAILLÉ POUR LES 5 PREMIERS selon recommandation expert
         if (idx < 5) {
+          const propertiesKey = (() => {
+            try {
+              const p = typeof variant.properties === 'string' 
+                ? JSON.parse(variant.properties) 
+                : variant.properties;
+              return p?.key || 'N/A';
+            } catch { return 'ERROR'; }
+          })();
+          
           console.log(`🎨 [${idx}] Traitement:`, {
-            original: style,
-            cleaned: cleanStyle,
-            styleKey: styleKey,
-            variantImage: variant.image?.substring(0, 50)
+            variantName: variant.name,
+            propertiesKey: propertiesKey,
+            extractedStyle: style,
+            cleanedStyle: cleanStyle,
+            styleKey: styleKey
           });
         }
         
@@ -513,6 +517,24 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     });
     
     return uniqueResult;
+  }, [availableVariants]);
+
+  // 🧪 TEST : Afficher les propriétés du premier variant
+  useEffect(() => {
+    if (availableVariants && availableVariants.length > 0) {
+      console.log('🧪 [TEST] Premier variant:', {
+        name: availableVariants[0].name,
+        properties: availableVariants[0].properties,
+        parsed: (() => {
+          try {
+            const p = typeof availableVariants[0].properties === 'string' 
+              ? JSON.parse(availableVariants[0].properties) 
+              : availableVariants[0].properties;
+            return p?.key;
+          } catch { return 'ERROR'; }
+        })()
+      });
+    }
   }, [availableVariants]);
 
   // ✅ Extraire les tailles uniques depuis les variants
