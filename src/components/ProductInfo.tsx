@@ -145,152 +145,40 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   }, [product]);
 
   // ✅ Fonction utilitaire pour extraire le style (couleur + genre) sans la taille
+  // 🔥 CORRECTION : Utiliser properties.key au lieu de variant.name selon recommandation expert
   const extractStyleFromVariant = useCallback((variant: ProductVariant, hasGender: boolean): string => {
-    let variantKey = '';
-    let variantName = variant.name || '';
+    console.log('🔑 [Extract] INPUT variant:', { name: variant.name, properties: variant.properties });
     
-    // 1. Extraire variantKey depuis properties (structure backend: { key: "...", property: "...", ... })
-    if (variant.properties) {
-      try {
-        if (typeof variant.properties === 'string') {
-          try {
-            const props = JSON.parse(variant.properties);
-            // Le backend stocke: { key: "Deep Rose Black Women-36", property: "...", ... }
-            if (typeof props === 'string') {
-              variantKey = props;
-            } else if (props && typeof props === 'object' && props.key) {
-              variantKey = String(props.key);
-            }
-          } catch {
-            // Si ce n'est pas du JSON, c'est peut-être directement la clé
-            variantKey = variant.properties;
-          }
-        } else {
-          // Si c'est déjà un objet
-          const props = variant.properties as any;
-          variantKey = props.key || '';
-        }
-      } catch (e) {
-        console.warn('Erreur extraction variantKey:', e, variant.properties);
-      }
+    // Utiliser properties.key au lieu de variant.name
+    if (!variant.properties) {
+      console.log('🔑 [Extract] Pas de properties, retour vide');
+      return '';
     }
     
-    // 🔑 LOGS DE DÉBOGAGE selon recommandation expert
-    console.log('🔑 [Extract] INPUT:', variantKey);
-    
-    // 2. Si on a un variantKey avec genre, extraire le style SANS la taille
-    // Structure backend: variantKey = "Deep Rose Black Women-36" ou "Dark Gray Men-36"
-    if (variantKey && hasGender) {
-      // Méthode principale: chercher un pattern "-36" ou " 36" à la fin et le retirer
-      // Pattern: cherche un tiret ou espace suivi d'un nombre 30-50 à la fin
-      const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/;
-      
-      if (sizePattern.test(variantKey)) {
-        // Retirer la taille à la fin (tiret/espace + nombre)
-        let style = variantKey.replace(sizePattern, '').trim();
-        
-        // 🔑 LOG APRÈS REGEX selon recommandation expert
-        console.log('🔑 [Extract] APRÈS REGEX:', style);
-        
-        // Nettoyage final: s'assurer qu'aucune taille ne reste ailleurs
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-        // Nettoyer les espaces multiples
-        style = style.replace(/\s+/g, ' ');
-        
-        if (style) {
-          console.log('🔑 [Extract] OUTPUT:', style);
-          return style;
-        }
-      }
-      
-      // Méthode alternative: split et vérifier la dernière partie
-      const parts = variantKey.split(/[- ]+/);
-      if (parts.length > 1) {
-        const lastPart = parts[parts.length - 1].trim();
-        const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
-        
-        if (isNumericSize) {
-          // La dernière partie est une taille, prendre tout le reste comme style
-          let style = parts.slice(0, -1).join(' ').trim();
-          style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-          if (style) {
-            console.log('✅ [extractStyle] Style extrait (split):', style, 'depuis variantKey:', variantKey);
-            return style;
-          }
-        }
-      }
-      
-      // Si aucune taille n'est trouvée avec les méthodes précédentes, essayer une dernière fois
-      // Peut-être que le format est différent, essayons de retirer toute séquence numérique à la fin
-      const lastNumberMatch = variantKey.match(/(.+?)[- ]*(\d+)$/);
-      if (lastNumberMatch) {
-        const possibleSize = parseInt(lastNumberMatch[2], 10);
-        if (possibleSize >= 30 && possibleSize <= 50) {
-          let style = lastNumberMatch[1].trim();
-          style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-          if (style) {
-            console.log('✅ [extractStyle] Style extrait (dernière méthode):', style, 'depuis variantKey:', variantKey);
-            return style;
-          }
-        }
-      }
-      
-      // Dernier recours: si on arrive ici, il n'y a probablement pas de taille
-      // Mais on ne doit JAMAIS retourner le variantKey complet s'il contient un nombre qui pourrait être une taille
-      const hasPotentialSize = /\d+/.test(variantKey);
-      if (hasPotentialSize) {
-        console.warn('⚠️ [extractStyle] VariantKey contient des nombres mais aucune taille détectée:', variantKey);
-        // Retirer quand même les nombres à la fin par sécurité
-        const cleaned = variantKey.replace(/[- ]*\d+$/, '').trim();
-        console.log('🔑 [Extract] FALLBACK:', cleaned || variantKey);
-        return cleaned || variantKey; // Retourner le cleaned ou le variantKey si cleaned est vide
-      }
-      
-      console.log('🔑 [Extract] FALLBACK:', variantKey);
-      return variantKey;
+    let props: any = {};
+    try {
+      props = typeof variant.properties === 'string' 
+        ? JSON.parse(variant.properties) 
+        : variant.properties;
+    } catch (e) {
+      console.log('🔑 [Extract] Erreur parsing properties:', e);
+      return '';
     }
     
-    // 3. Fallback: extraire depuis le nom du variant
-    if (variantName && hasGender) {
+    let variantKey = props.key || '';
+    console.log('🔑 [Extract] variantKey extrait:', variantKey);
+    
+    // Retirer la taille si hasGender
+    if (hasGender && variantKey) {
+      const beforeClean = variantKey;
       // Retirer la taille à la fin
-      let nameToProcess = variantName.replace(/[- ]\s*(3[0-9]|4[0-9]|5[0])$/i, '').trim();
-      
-      // Chercher la partie avec genre
-      const nameMatch = nameToProcess.match(/([A-Za-z\s]+(?:Men|Women|Man|Woman))(?:\s|$)/i);
-      if (nameMatch) {
-        let style = nameMatch[1].trim();
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-        if (style) return style;
-      }
-      
-      // Chercher par index du genre
-      const nameParts = nameToProcess.split(' ');
-      const genderIndex = nameParts.findIndex(p => /^(Men|Women|Man|Woman)$/i.test(p));
-      if (genderIndex > 0) {
-        let style = nameParts.slice(0, genderIndex + 1).join(' ');
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-        if (style) return style;
-      }
+      variantKey = variantKey.replace(/[- ](3[0-9]|4[0-9]|5[0])$/g, '').trim();
+      // Retirer toute taille restante
+      variantKey = variantKey.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+      console.log('🔑 [Extract] Après nettoyage:', { before: beforeClean, after: variantKey });
     }
     
-    // 4. Si pas de genre, extraire juste la couleur depuis variantKey
-    if (variantKey && !hasGender) {
-      const zoneMatch = variantKey.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-      if (zoneMatch) {
-        return zoneMatch[1].trim();
-      }
-      return variantKey.split(/[-\s]/)[0];
-    }
-    
-    // 5. Dernier recours: première partie du nom
-    if (variantName) {
-      const nameMatch = variantName.match(/^([A-Za-z]+)/);
-      if (nameMatch) {
-        return nameMatch[1];
-      }
-    }
-    
-    return '';
+    return variantKey;
   }, []);
 
   // ✅ Détecter si les variants contiennent des genres (pour afficher "Style" au lieu de "Couleur")
