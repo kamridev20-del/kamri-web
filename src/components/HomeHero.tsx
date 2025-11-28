@@ -15,7 +15,7 @@ const HERO_SLIDES = [
     titleHighlight: 'tendances',
     titleEnd: 'du moment',
     subtitle: 'Collection exclusive de vêtements et accessoires de qualité supérieure',
-    image: '/images/modelo.png',
+    image: '/images/hero-slide-1.jpg',
     imageAlt: 'Modèle KAMRI portant des vêtements de la collection',
     ctaPrimary: { text: 'Explorer maintenant', href: '/products' },
     ctaSecondary: { text: 'Voir les promos', href: '/promotions' },
@@ -27,7 +27,7 @@ const HERO_SLIDES = [
     titleHighlight: 'nouvelle saison',
     titleEnd: '',
     subtitle: 'Du style graffiti au style graphique',
-    image: '/images/modelo.png', // Remplacez par votre 2ème image
+    image: '/images/hero-slide-2.jpg',
     imageAlt: 'Collection printemps 2025',
     ctaPrimary: { text: 'Je personnalise', href: '/products' },
     ctaSecondary: { text: 'Je découvre', href: '/products' },
@@ -39,7 +39,7 @@ const HERO_SLIDES = [
     titleHighlight: 'élégance',
     titleEnd: 'au quotidien',
     subtitle: 'Découvrez notre sélection de produits tendance',
-    image: '/images/modelo.png', // Remplacez par votre 3ème image
+    image: '/images/hero-slide-3.jpg',
     imageAlt: 'Nouveautés tendances',
     ctaPrimary: { text: 'Découvrir', href: '/products' },
     ctaSecondary: { text: 'En savoir plus', href: '/about' },
