@@ -1238,21 +1238,23 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           </h3>
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData, index) => {
-              const cleanName = cleanColorName(colorData.name);
+              // Le nom devrait déjà être nettoyé dans availableColors, mais on nettoie quand même pour être sûr
+              const cleanName = cleanColorNameUtil(colorData.name);
               // Normaliser pour la comparaison (même logique que le filtrage)
-              const normalizedSelected = selectedColor ? cleanColorNameUtil(selectedColor).toLowerCase().trim().replace(/\s+/g, ' ') : '';
-              const normalizedCurrent = cleanName.toLowerCase().trim().replace(/\s+/g, ' ');
+              const normalizedSelected = selectedColor ? cleanColorNameUtil(selectedColor).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim() : '';
+              const normalizedCurrent = cleanName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
               const isSelected = normalizedSelected === normalizedCurrent && normalizedSelected !== '';
               
               // Debug pour les premiers éléments
-              if (index < 3) {
+              if (index < 5) {
                 console.log(`🔍 [Render] Carte [${index}]:`, {
                   colorDataName: colorData.name,
                   cleanName: cleanName,
                   normalizedCurrent: normalizedCurrent,
                   selectedColor: selectedColor,
                   normalizedSelected: normalizedSelected,
-                  isSelected: isSelected
+                  isSelected: isSelected,
+                  totalCards: availableColors.length
                 });
               }
               
