@@ -1211,7 +1211,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       {availableColors.length > 0 && (
         <div>
           <h3 className="text-xs font-semibold text-[#424242] mb-1.5">
-            {availableSizes.length === 0 ? 'Variante' : hasGenderInVariants ? 'Style' : 'Couleur'}
+            {availableSizes.length === 0 
+              ? 'Variante' + (selectedColor ? ` (${selectedColor})` : '')
+              : hasGenderInVariants 
+                ? 'Style' + (selectedColor ? ` (${selectedColor})` : '')
+                : 'Couleur' + (selectedColor ? ` (${selectedColor})` : '')
+            }
           </h3>
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData, index) => {
@@ -1279,7 +1284,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       {/* Tailles - extraites des variants CJ */}
       {availableSizes.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-[#424242] mb-1.5">Taille</h3>
+          <h3 className="text-sm font-semibold text-[#424242] mb-1.5">
+            Taille{selectedSize ? ` (${selectedSize})` : ''}
+          </h3>
           <div className="flex flex-wrap gap-1.5">
             {availableSizes.map((size) => (
               <button
