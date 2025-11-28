@@ -792,10 +792,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                   if (numericSizeMatch) {
                     size = numericSizeMatch[1];
                   } else {
-                    // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
-                    const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
-                if (sizeMatch) {
-                  size = sizeMatch[1];
+                    // 🔥 NOUVEAU : Pattern 2b: Format numérique 1000-9999 à la fin (Puriv-3000, Puriv-4000)
+                    const formatNumericMatch = keyStr.match(/[- ]([1-9][0-9]{3})$/);
+                    if (formatNumericMatch) {
+                      size = formatNumericMatch[1];
+                    } else {
+                      // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
+                      const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
+                      if (sizeMatch) {
+                        size = sizeMatch[1];
+                      }
                     }
                   }
                 }
