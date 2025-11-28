@@ -61,13 +61,20 @@ export default function HomeHero() {
 
   // Auto-play du carrousel hero
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying) {
+      return;
+    }
 
     const interval = setInterval(() => {
-      setCurrentSlideIndex((prevIndex) => (prevIndex + 1) % HERO_SLIDES.length);
+      setCurrentSlideIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % HERO_SLIDES.length;
+        return nextIndex;
+      });
     }, 5000); // Change de slide toutes les 5 secondes
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [isAutoPlaying]);
 
   const goToSlide = (index: number) => {
@@ -98,8 +105,6 @@ export default function HomeHero() {
     <section 
       className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[360px] w-full overflow-hidden shadow-lg"
       aria-label="Section hero - Découvrez les tendances"
-      onMouseEnter={() => setIsAutoPlaying(false)}
-      onMouseLeave={() => setIsAutoPlaying(true)}
     >
       {/* Carrousel de backgrounds */}
       <div className="absolute inset-0 z-0">
