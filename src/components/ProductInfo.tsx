@@ -890,18 +890,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       return { variantColor, variantSize, variantKey };
     };
     
-    // Fonction pour nettoyer le selectedColor de toute taille restante
-    const cleanSelectedColor = (color: string | null): string => {
-      if (!color) return '';
-      // Retirer toute taille numérique (30-50) du selectedColor
-      let cleaned = color.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-      // Retirer aussi les tirets/espaces avec nombres à la fin
-      cleaned = cleaned.replace(/[- ]*\d+$/, '').trim();
-      // Nettoyer les espaces multiples
-      cleaned = cleaned.replace(/\s+/g, ' ');
-      return cleaned;
-    };
-    
     // Fonction pour calculer le score de matching d'un variant
     const calculateMatchScore = (variant: ProductVariant) => {
       const { variantColor, variantSize, variantKey } = extractVariantInfo(variant);
@@ -913,11 +901,22 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       let sizeMatch = false;
       
       if (selectedColor) {
-        // Nettoyer selectedColor pour retirer toute taille restante
-        const cleanedSelectedColor = cleanSelectedColor(selectedColor);
+        // Utiliser cleanColorNameUtil pour nettoyer selectedColor (même logique que partout ailleurs)
+        const cleanedSelectedColor = cleanColorNameUtil(selectedColor);
         const selectedColorNormalized = normalizeColor(cleanedSelectedColor);
         const variantColorNormalized = normalizeColor(variantColor);
         const selectedColorLower = cleanedSelectedColor.toLowerCase();
+        
+        // Debug pour les premiers variants
+        if (availableVariants.indexOf(variant) < 3) {
+          console.log(`🔍 [calculateMatchScore] Variant ${availableVariants.indexOf(variant)}:`, {
+            selectedColor: selectedColor,
+            cleanedSelectedColor: cleanedSelectedColor,
+            variantColor: variantColor,
+            selectedColorNormalized: selectedColorNormalized,
+            variantColorNormalized: variantColorNormalized
+          });
+        }
         
         // Match exact du style/couleur extrait
         if (variantColorNormalized === selectedColorNormalized) {
