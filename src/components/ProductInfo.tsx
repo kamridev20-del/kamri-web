@@ -204,10 +204,32 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       return '';
     }
     
+    // 🔥 NOUVEAU : Si value1 existe, l'utiliser directement (cas où key est un JSON array)
+    if (props.value1) {
+      console.log('🔑 [Extract] Utilisation de value1:', props.value1);
+      return props.value1.trim();
+    }
+    
     let variantKey = props.key || '';
     console.log('🔑 [Extract] variantKey brut:', variantKey);
     
     if (!variantKey) return '';
+    
+    // 🔥 NOUVEAU : Si variantKey est un JSON array stringifié, le parser
+    if (typeof variantKey === 'string' && variantKey.startsWith('[') && variantKey.endsWith(']')) {
+      try {
+        const parsedArray = JSON.parse(variantKey);
+        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+          // Le premier élément est généralement la couleur
+          const colorFromArray = String(parsedArray[0]).trim();
+          console.log('🔑 [Extract] Couleur extraite depuis JSON array:', colorFromArray);
+          return colorFromArray;
+        }
+      } catch (e) {
+        // Si le parsing échoue, continuer avec extractColorFromVariantKey
+        console.log('🔑 [Extract] Erreur parsing JSON array, utilisation extractColorFromVariantKey');
+      }
+    }
     
     // 🔥 CRITIQUE : Extraire UNIQUEMENT la couleur (sans la taille)
     // Utiliser extractColorFromVariantKey pour TOUS les cas (chaussures ET vêtements)
