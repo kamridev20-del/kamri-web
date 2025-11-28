@@ -324,7 +324,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
   // ✅ Extraire les couleurs uniques depuis les variants
   const availableColors = useMemo(() => {
-    console.log('🚀 [availableColors] DÉBUT - Traitement de', availableVariants.length, 'variants');
+    // 🔥 LOG FORCÉ AU DÉBUT pour s'assurer qu'on voit l'exécution
+    console.log('🚀🚀🚀 [availableColors] DÉBUT - Traitement de', availableVariants.length, 'variants');
+    console.log('🚀🚀🚀 [availableColors] hasGender:', hasGender);
     
     const colorsMap = new Map<string, { name: string; image: string; count: number; variantKey?: string }>();
     
