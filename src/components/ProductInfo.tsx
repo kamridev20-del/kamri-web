@@ -1304,7 +1304,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             })}
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Tailles - extraites des variants CJ */}
       {availableSizes.length > 0 && (
