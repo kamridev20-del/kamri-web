@@ -301,6 +301,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     console.log('🔬 [availableColors] Nombre de tailles uniques:', sizesFound.length);
     
     // D'abord, vérifier s'il y a des vraies tailles
+    // 🔥 CORRECTION : Détecter les tailles au DÉBUT de properties.key (S-Black, M-Black) ET à la fin
     const hasRealSizes = availableVariants.some(variant => {
       let size = '';
       if (variant.properties) {
@@ -308,19 +309,62 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           if (typeof variant.properties === 'string') {
             try {
               const props = JSON.parse(variant.properties);
+              let keyToCheck = '';
+              
               if (typeof props === 'string') {
-                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
-                if (sizeMatch) size = sizeMatch[1];
+                keyToCheck = props;
+              } else if (props.key) {
+                // 🔥 NOUVEAU : Vérifier dans props.key (S-Black, M-Black, etc.)
+                keyToCheck = String(props.key);
               } else if (props.value2) {
                 size = props.value2;
               }
+              
+              // Si on a un key, chercher la taille au DÉBUT ou à la FIN
+              if (keyToCheck) {
+                // Pattern 1: Taille au DÉBUT (S-Black, S Black, M-Orange, XL Army Green)
+                const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+                const matchStart = keyToCheck.match(sizeAtStart);
+                if (matchStart) {
+                  size = matchStart[1];
+                } else {
+                  // Pattern 2: Taille à la FIN (Black S, Black-S, Orange XL)
+                  const sizeAtEnd = /[\s-]+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+                  const matchEnd = keyToCheck.match(sizeAtEnd);
+                  if (matchEnd) {
+                    size = matchEnd[1];
+                  } else {
+                    // Pattern 3: Taille numérique à la fin (Black-36, Women-37)
+                    const sizeNumeric = /[- ](3[0-9]|4[0-9]|5[0])$/;
+                    const matchNumeric = keyToCheck.match(sizeNumeric);
+                    if (matchNumeric) {
+                      size = matchNumeric[1];
+                    }
+                  }
+                }
+              }
             } catch {
+              // Fallback: chercher à la fin comme avant
               const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
               if (sizeMatch) size = sizeMatch[1];
             }
           } else {
             const props = variant.properties as any;
-            if (props.value2) size = props.value2;
+            // 🔥 NOUVEAU : Vérifier aussi dans props.key
+            if (props.key) {
+              const keyToCheck = String(props.key);
+              const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+              const matchStart = keyToCheck.match(sizeAtStart);
+              if (matchStart) {
+                size = matchStart[1];
+              } else {
+                const sizeAtEnd = /[\s-]+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+                const matchEnd = keyToCheck.match(sizeAtEnd);
+                if (matchEnd) size = matchEnd[1];
+              }
+            } else if (props.value2) {
+              size = props.value2;
+            }
           }
         } catch (e) {
           // Ignore
