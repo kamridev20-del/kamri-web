@@ -464,7 +464,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             }
           }
         }
-        } // Fermeture du else pour le nettoyage
       }
     });
     
