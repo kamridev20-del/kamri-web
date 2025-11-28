@@ -692,42 +692,20 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         }
       }
       
-      // Si on a un variantKey, extraire le style et la taille correctement
-      if (variantKey) {
-        // Vérifier si le variant contient un genre
-        const hasGender = /(Men|Women|Man|Woman)/i.test(variantKey);
-        
-        if (hasGender) {
-          // Pour les chaussures: extraire le style complet (couleur + genre) sans la taille
-          const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
-          if (sizePattern.test(variantKey)) {
-            variantColor = variantKey.replace(sizePattern, '').trim();
-            const sizeMatch = variantKey.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
-            variantSize = sizeMatch ? sizeMatch[1] : '';
-          } else {
-            // Fallback
-            const parts = variantKey.split(/[- ]/);
-            const lastPart = parts[parts.length - 1];
-            const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
-            if (isNumericSize && parts.length > 1) {
-              variantColor = parts.slice(0, -1).join(' ');
-              variantSize = lastPart;
-            } else {
-              variantColor = variantKey;
-            }
-          }
+      // Utiliser la fonction utilitaire pour extraire le style (cohérence avec availableColors)
+      if (!variantColor) {
+        variantColor = extractStyleFromVariant(variant, hasGenderInVariants);
+      }
+      
+      // Si on n'a pas de taille depuis value2, l'extraire depuis variantKey
+      if (!variantSize && variantKey) {
+        // Priorité aux tailles numériques (30-50) à la fin
+        const numericSizeMatch = variantKey.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+        if (numericSizeMatch) {
+          variantSize = numericSizeMatch[1];
         } else {
-          // Pas de genre, extraire comme avant
-          const colorMatch = variantKey.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-          variantColor = colorMatch ? colorMatch[1].trim() : variantKey.split(/[-\s]/)[0];
-          // Priorité aux tailles numériques (30-50) à la fin
-          const numericSizeMatch = variantKey.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
-          if (numericSizeMatch) {
-            variantSize = numericSizeMatch[1];
-          } else {
-            const sizeMatch = variantKey.match(/[- ]([A-Z0-9]+)$/i);
-            variantSize = sizeMatch ? sizeMatch[1] : '';
-          }
+          const sizeMatch = variantKey.match(/[- ]([A-Z0-9]+)$/i);
+          variantSize = sizeMatch ? sizeMatch[1] : '';
         }
       }
       
