@@ -328,22 +328,37 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       if (variantKey && hasGender) {
         // Pattern: "Beige Maroon Women-36" → "Beige Maroon Women"
         // Pattern: "Black Men-36" → "Black Men"
-        // Pattern: "Beige Maroon Women 36" → "Beige Maroon Women"
+        // Pattern: "Dark Gray Men-36" → "Dark Gray Men"
         // Exclure la taille numérique à la fin (30-50) qui suit un tiret ou un espace
+        
+        // Méthode 1: Regex pour retirer la taille à la fin
         const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
         if (sizePattern.test(variantKey)) {
-          // Retirer la taille à la fin
+          // Retirer la taille à la fin (tiret/espace + nombre)
           style = variantKey.replace(sizePattern, '').trim();
         } else {
-          // Fallback: prendre tout sauf la dernière partie si c'est un nombre
-          const parts = variantKey.split(/[- ]/);
-          const lastPart = parts[parts.length - 1];
-          const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
-          if (isNumericSize && parts.length > 1) {
-            style = parts.slice(0, -1).join(' ');
+          // Méthode 2: Split et vérifier la dernière partie
+          const parts = variantKey.split(/[- ]+/);
+          if (parts.length > 1) {
+            const lastPart = parts[parts.length - 1].trim();
+            const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
+            if (isNumericSize) {
+              // La dernière partie est une taille, prendre tout le reste
+              style = parts.slice(0, -1).join(' ').trim();
+            } else {
+              // Pas de taille détectée, prendre tout
+              style = variantKey;
+            }
           } else {
             style = variantKey;
           }
+        }
+        
+        // Debug: vérifier qu'on n'a pas de taille dans le style
+        if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(style)) {
+          console.warn('⚠️ Taille détectée dans le style extrait:', { variantKey, style });
+          // Retirer toute taille restante
+          style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
         }
       } else if (variantKey) {
         // Pas de genre, extraire juste la couleur (comme avant)
@@ -354,17 +369,39 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       // Fallback : extraire du nom
       if (!style && variant.name) {
         if (hasGender) {
-          // Extraire le style complet du nom (couleur + genre)
-          const nameMatch = variant.name.match(/([A-Za-z\s]+(?:Men|Women|Man|Woman))/i);
+          // Extraire le style complet du nom (couleur + genre) en excluant la taille
+          // Pattern: "Low-top Mountain Climbing Shoes Hiking Boots Men Dark Gray Men-36" → "Dark Gray Men"
+          // D'abord, chercher la partie avec genre
+          let nameToProcess = variant.name;
+          
+          // Retirer la taille à la fin si elle existe
+          const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
+          if (sizePattern.test(nameToProcess)) {
+            nameToProcess = nameToProcess.replace(sizePattern, '').trim();
+          }
+          
+          // Chercher la partie avec genre (Men/Women)
+          const nameMatch = nameToProcess.match(/([A-Za-z\s]+(?:Men|Women|Man|Woman))(?:\s|$)/i);
           if (nameMatch) {
             style = nameMatch[1].trim();
+            // S'assurer qu'on n'a pas de taille dans le style
+            style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
           } else {
-            const nameParts = variant.name.split(' ');
+            const nameParts = nameToProcess.split(' ');
             const genderIndex = nameParts.findIndex(p => /^(Men|Women|Man|Woman)$/i.test(p));
             if (genderIndex > 0) {
               style = nameParts.slice(0, genderIndex + 1).join(' ');
+              // S'assurer qu'on n'a pas de taille dans le style
+              style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
             } else {
-              style = nameParts[0] || variant.name;
+              // Dernier recours: prendre les derniers mots avant un nombre
+              const parts = nameToProcess.split(/\s+/);
+              const sizeIndex = parts.findIndex(p => /^(3[0-9]|4[0-9]|5[0])$/.test(p));
+              if (sizeIndex > 0) {
+                style = parts.slice(0, sizeIndex).join(' ');
+              } else {
+                style = parts[0] || nameToProcess;
+              }
             }
           }
         } else {
@@ -388,6 +425,14 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             const capitalizedStyle = style.split(' ').map(word => 
               word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
+            
+            // Debug: vérifier que le style ne contient pas de taille
+            if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(capitalizedStyle)) {
+              console.warn('⚠️ Style contient encore une taille:', { 
+                original: variantKey || variant.name, 
+                extracted: capitalizedStyle 
+              });
+            }
             
             colorsMap.set(styleKey, {
               name: capitalizedStyle,
