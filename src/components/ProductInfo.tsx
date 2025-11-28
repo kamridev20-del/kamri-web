@@ -122,51 +122,73 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     let variantKey = '';
     let variantName = variant.name || '';
     
-    // 1. Extraire variantKey depuis properties
+    // 1. Extraire variantKey depuis properties (structure backend: { key: "...", property: "...", ... })
     if (variant.properties) {
       try {
         if (typeof variant.properties === 'string') {
           try {
             const props = JSON.parse(variant.properties);
+            // Le backend stocke: { key: "Deep Rose Black Women-36", property: "...", ... }
             if (typeof props === 'string') {
               variantKey = props;
-            } else if (props.key) {
+            } else if (props && typeof props === 'object' && props.key) {
               variantKey = String(props.key);
             }
           } catch {
+            // Si ce n'est pas du JSON, c'est peut-être directement la clé
             variantKey = variant.properties;
           }
         } else {
+          // Si c'est déjà un objet
           const props = variant.properties as any;
           variantKey = props.key || '';
         }
       } catch (e) {
-        // Ignore
+        console.warn('Erreur extraction variantKey:', e, variant.properties);
       }
     }
     
-    // 2. Si on a un variantKey avec genre, extraire le style
+    // Debug: afficher la structure reçue
+    if (variantKey) {
+      console.log('🔍 [extractStyle] variantKey extrait:', variantKey, 'hasGender:', hasGender);
+    }
+    
+    // 2. Si on a un variantKey avec genre, extraire le style SANS la taille
     if (variantKey && hasGender) {
-      // Retirer la taille numérique à la fin (30-50)
-      const sizePattern = /[- ]\s*(3[0-9]|4[0-9]|5[0])$/i;
-      if (sizePattern.test(variantKey)) {
-        let style = variantKey.replace(sizePattern, '').trim();
-        // Nettoyage final
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-        if (style) return style;
-      } else {
-        // Split et vérifier la dernière partie
-        const parts = variantKey.split(/[- ]+/);
-        if (parts.length > 1) {
-          const lastPart = parts[parts.length - 1].trim();
-          const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
-          if (isNumericSize) {
-            let style = parts.slice(0, -1).join(' ').trim();
-            style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-            if (style) return style;
+      // Méthode simple et directe: split par tiret/espace et retirer la dernière partie si c'est un nombre 30-50
+      const parts = variantKey.split(/[- ]+/);
+      
+      // Vérifier si la dernière partie est une taille numérique (30-50)
+      if (parts.length > 1) {
+        const lastPart = parts[parts.length - 1].trim();
+        const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
+        
+        if (isNumericSize) {
+          // La dernière partie est une taille, prendre tout le reste comme style
+          let style = parts.slice(0, -1).join(' ').trim();
+          // Nettoyage final pour s'assurer qu'aucune taille ne reste
+          style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+          if (style) {
+            console.log('✅ [extractStyle] Style extrait:', style, 'depuis:', variantKey);
+            return style;
           }
         }
       }
+      
+      // Si pas de taille détectée à la fin, essayer avec regex
+      const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
+      if (sizePattern.test(variantKey)) {
+        let style = variantKey.replace(sizePattern, '').trim();
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        if (style) {
+          console.log('✅ [extractStyle] Style extrait (regex):', style, 'depuis:', variantKey);
+          return style;
+        }
+      }
+      
+      // Si aucune taille n'est trouvée, retourner le variantKey tel quel (mais c'est suspect)
+      console.warn('⚠️ [extractStyle] Aucune taille détectée dans:', variantKey);
+      return variantKey;
     }
     
     // 3. Fallback: extraire depuis le nom du variant
@@ -402,8 +424,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             
             // Vérification finale: s'assurer qu'aucune taille n'est présente
             if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(capitalizedStyle)) {
-              console.error('❌ ERREUR: Style contient encore une taille après tous les nettoyages:', { 
-                original: variantKey || variant.name, 
+              console.error('❌ ERREUR: Style contient encore une taille après extraction:', { 
+                variantName: variant.name,
+                properties: variant.properties,
                 extracted: capitalizedStyle 
               });
               // Retirer une dernière fois
