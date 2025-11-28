@@ -717,6 +717,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         return true;
       }
       
+      // 🔥 NOUVEAU : Formats numériques (moulinets de pêche, etc.) : 1000-9999
+      // Ex: 3000, 4000, 5000, 6000 pour les formats de moulinets
+      if (!isNaN(numSize) && numSize >= 1000 && numSize <= 9999) {
+        return true;
+      }
+      
       // Par défaut, ne pas accepter si on n'est pas sûr que c'est une taille
       return false;
     };
