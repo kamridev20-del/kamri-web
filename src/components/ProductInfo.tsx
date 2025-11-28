@@ -194,6 +194,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         // Retirer la taille à la fin (tiret/espace + nombre)
         let style = variantKey.replace(sizePattern, '').trim();
         
+        // 🔑 LOG APRÈS REGEX selon recommandation expert
+        console.log('🔑 [Extract] APRÈS REGEX:', style);
+        
         // Nettoyage final: s'assurer qu'aucune taille ne reste ailleurs
         style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
         // Nettoyer les espaces multiples
