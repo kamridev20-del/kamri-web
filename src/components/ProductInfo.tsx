@@ -122,8 +122,107 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     console.log('🔍 DEBUG: Total variants disponibles:', availableVariants.length);
     console.log('🔍 DEBUG: Premiers variants:', availableVariants.slice(0, 3));
     
-    const colorsMap = new Map<string, { name: string; image: string; count: number }>();
+    const colorsMap = new Map<string, { name: string; image: string; count: number; variantKey?: string }>();
     
+    // D'abord, vérifier s'il y a des vraies tailles
+    const hasRealSizes = availableVariants.some(variant => {
+      let size = '';
+      if (variant.properties) {
+        try {
+          if (typeof variant.properties === 'string') {
+            try {
+              const props = JSON.parse(variant.properties);
+              if (typeof props === 'string') {
+                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
+                if (sizeMatch) size = sizeMatch[1];
+              } else if (props.value2) {
+                size = props.value2;
+              }
+            } catch {
+              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
+              if (sizeMatch) size = sizeMatch[1];
+            }
+          } else {
+            const props = variant.properties as any;
+            if (props.value2) size = props.value2;
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+      // Vérifier si c'est une vraie taille (numérique 30-50 ou lettres standard)
+      if (size) {
+        const upper = size.toUpperCase();
+        const validSizeLetters = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        if (validSizeLetters.includes(upper)) return true;
+        const numSize = parseInt(upper, 10);
+        if (!isNaN(numSize) && numSize >= 30 && numSize <= 50) return true;
+      }
+      return false;
+    });
+    
+    // Si pas de vraies tailles, afficher tous les variants comme options (comme CJ)
+    if (!hasRealSizes) {
+      availableVariants.forEach((variant) => {
+        let variantLabel = '';
+        let variantKey = '';
+        
+        // Extraire depuis properties
+        if (variant.properties) {
+          try {
+            if (typeof variant.properties === 'string') {
+              try {
+                const props = JSON.parse(variant.properties);
+                if (typeof props === 'string') {
+                  variantKey = props;
+                  variantLabel = props;
+                } else if (props.key) {
+                  variantKey = String(props.key);
+                  variantLabel = variantKey;
+                } else if (props.value1) {
+                  variantLabel = props.value1;
+                }
+              } catch {
+                variantKey = variant.properties;
+                variantLabel = variant.properties;
+              }
+            } else {
+              const props = variant.properties as any;
+              variantKey = props.key || '';
+              variantLabel = variantKey || props.value1 || '';
+            }
+          } catch (e) {
+            // Ignore
+          }
+        }
+        
+        // Fallback : utiliser le nom du variant
+        if (!variantLabel && variant.name) {
+          // Extraire la partie pertinente du nom (après le nom du produit)
+          const nameParts = variant.name.split(' ').filter(part => 
+            part.length > 0 && 
+            !part.match(/^(Smoke|Removal|Air|Purification|Ashtray|Anion|Practical|Automatic|Purifier|Portable|Gadgets|For|Car)$/i)
+          );
+          variantLabel = nameParts.join(' ') || variant.name;
+        }
+        
+        if (variantLabel) {
+          const labelKey = variantLabel.toLowerCase().trim();
+          if (!colorsMap.has(labelKey)) {
+            colorsMap.set(labelKey, {
+              name: variantLabel,
+              image: variant.image || '',
+              count: 1,
+              variantKey: variantKey
+            });
+          }
+        }
+      });
+      
+      return Array.from(colorsMap.values());
+    }
+    
+    // Sinon, logique normale d'extraction des couleurs
     availableVariants.forEach((variant, idx) => {
       let color = '';
       
@@ -166,7 +265,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             }
           } else {
             // C'est un objet
-            const props = variant.properties;
+            const props = variant.properties as any;
             if (props.value1) {
               color = props.value1;
             } else if (props.key) {
@@ -457,8 +556,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         const selectedColorNormalized = normalizeColor(selectedColor);
         const variantColorNormalized = normalizeColor(variantColor);
         
+        // Match exact du nom complet du variant (pour les produits sans vraies tailles)
+        // Si la couleur sélectionnée correspond exactement au nom/variantKey, c'est un match parfait
+        if (variantKey.toLowerCase() === selectedColor.toLowerCase() || 
+            variantNameLower === selectedColor.toLowerCase() ||
+            variantNameLower.includes(selectedColor.toLowerCase()) && selectedColor.length > 3) {
+          colorMatch = true;
+          score += 20; // Score très élevé pour match exact du variant complet
+        }
         // Match exact de couleur
-        if (variantColorNormalized === selectedColorNormalized) {
+        else if (variantColorNormalized === selectedColorNormalized) {
           colorMatch = true;
           score += 10; // Score élevé pour match exact
         } else if (searchString.includes(selectedColorNormalized) || variantNameLower.includes(selectedColorNormalized)) {
@@ -531,18 +638,27 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           console.log(`✅ Match partiel accepté (score: ${scoredVariants[0].score}, couleur: ${scoredVariants[0].colorMatch}, taille: ${scoredVariants[0].sizeMatch}):`, matchingVariant.name);
         }
       }
-    } else {
-      // Si seulement couleur ou taille, utiliser find() simple
+    } else if (selectedColor && !selectedSize) {
+      // Si seulement couleur sélectionnée (produits sans vraies tailles)
+      // Chercher le variant qui correspond exactement au nom sélectionné
       matchingVariant = availableVariants.find(variant => {
-        const { colorMatch, sizeMatch } = calculateMatchScore(variant);
-        if (selectedColor && selectedSize) {
-          return colorMatch && sizeMatch;
-        } else if (selectedColor) {
-          return colorMatch;
-        } else if (selectedSize) {
-          return sizeMatch;
+        const { score, colorMatch } = calculateMatchScore(variant);
+        // Si le score est très élevé (20+), c'est un match exact du variant complet
+        if (score >= 20) {
+          return true;
         }
-        return false;
+        // Sinon, accepter si la couleur correspond
+        return colorMatch;
+      }) || null;
+      
+      if (matchingVariant) {
+        console.log('✅ Variant trouvé par couleur seule:', matchingVariant.name);
+      }
+    } else if (selectedSize && !selectedColor) {
+      // Si seulement taille sélectionnée
+      matchingVariant = availableVariants.find(variant => {
+        const { sizeMatch } = calculateMatchScore(variant);
+        return sizeMatch;
       }) || null;
     }
     
@@ -749,7 +865,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       {/* ✅ Couleurs - Cards avec images */}
       {availableColors.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold text-[#424242] mb-1.5">Couleur</h3>
+          <h3 className="text-xs font-semibold text-[#424242] mb-1.5">
+            {availableSizes.length === 0 ? 'Variante' : 'Couleur'}
+          </h3>
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData) => (
               <button
