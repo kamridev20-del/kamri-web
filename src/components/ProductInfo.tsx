@@ -481,7 +481,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           return; // Skip ce variant
         }
         
-        // Normaliser le styleKey pour garantir l'unicité (tout en minuscules, sans espaces multiples, sans tirets/underscores)
+        // Capitaliser chaque mot du style pour l'affichage
+        const capitalizedStyle = cleanStyle.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+        
+        // Normaliser le styleKey APRÈS nettoyage pour garantir l'unicité (tout en minuscules, sans espaces multiples, sans tirets/underscores)
         const styleKey = cleanStyle.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
         
         // Debug pour les premiers variants
@@ -503,49 +508,22 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               console.log(`✅ [availableColors] Style existant trouvé, count incrémenté:`, styleKey, '→', existing.name, 'count:', existing.count);
             }
           } else {
-            // Capitaliser chaque mot du style
+            // Utiliser directement cleanStyle (déjà nettoyé) et le capitaliser pour l'affichage
             const capitalizedStyle = cleanStyle.split(' ').map(word => 
               word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
             
-            // Vérification finale absolue: s'assurer qu'aucune taille n'est présente
-            if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(capitalizedStyle)) {
-              console.error('❌ ERREUR CRITIQUE: Style contient encore une taille après TOUS les nettoyages:', { 
-                variantName: variant.name,
-                properties: variant.properties,
-                styleOriginal: style,
-                styleCleaned: cleanStyle,
-                capitalizedStyle: capitalizedStyle
-              });
-              // Dernier nettoyage désespéré avec cleanColorNameUtil
-              const finalCleaned = cleanColorNameUtil(capitalizedStyle);
-              if (finalCleaned) {
-                // S'assurer que le styleKey correspond au nom nettoyé
-                const finalStyleKey = finalCleaned.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
-                colorsMap.set(finalStyleKey, {
-                  name: finalCleaned,
-                  image: variant.image || '',
-                  count: 1
-                });
-                console.log(`✅ [availableColors] Style sauvegardé (après nettoyage d'urgence): styleKey="${finalStyleKey}", name="${finalCleaned}"`);
-              }
-            } else {
-              // Vérification finale: s'assurer qu'aucune taille n'est présente dans capitalizedStyle
-              // Utiliser cleanColorNameUtil pour garantir un nettoyage complet
-              const finalCheck = cleanColorNameUtil(capitalizedStyle);
-              if (finalCheck !== capitalizedStyle) {
-                console.warn('⚠️ [availableColors] Taille détectée dans capitalizedStyle, nettoyage final:', capitalizedStyle, '→', finalCheck);
-              }
-              // S'assurer que le styleKey correspond au nom nettoyé
-              const finalStyleKey = finalCheck.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
-              colorsMap.set(finalStyleKey, {
-                name: finalCheck,
-                image: variant.image || '',
-                count: 1
-              });
-              if (idx < 5) {
-                console.log(`✅ [availableColors] Nouveau style sauvegardé: styleKey="${finalStyleKey}", name="${finalCheck}"`);
-              }
+            // Utiliser cleanColorNameUtil une dernière fois pour garantir qu'aucune taille ne reste
+            const finalName = cleanColorNameUtil(capitalizedStyle);
+            
+            // Le styleKey est déjà calculé et normalisé, l'utiliser directement
+            colorsMap.set(styleKey, {
+              name: finalName,
+              image: variant.image || '',
+              count: 1
+            });
+            if (idx < 5) {
+              console.log(`✅ [availableColors] Nouveau style sauvegardé: styleKey="${styleKey}", name="${finalName}"`);
             }
           }
         } else {
