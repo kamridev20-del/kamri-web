@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-react';
+import { ArrowRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -374,22 +374,6 @@ export default function HomeHero() {
             />
           </div>
         </div>
-
-        {/* Flèches de navigation pour le carrousel hero */}
-        <button
-          onClick={goToPrevious}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 shadow-lg transition-all duration-300 hover:scale-110 z-20 hidden lg:flex items-center justify-center"
-          aria-label="Slide précédent"
-        >
-          <ChevronLeft className="w-6 h-6 text-[#1A3C2E]" />
-        </button>
-        <button
-          onClick={goToNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 shadow-lg transition-all duration-300 hover:scale-110 z-20 hidden lg:flex items-center justify-center"
-          aria-label="Slide suivant"
-        >
-          <ChevronRight className="w-6 h-6 text-[#1A3C2E]" />
-        </button>
 
         {/* Indicateurs de points (dots) pour le carrousel hero */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
