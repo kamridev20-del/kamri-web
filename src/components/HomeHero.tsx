@@ -287,15 +287,15 @@ export default function HomeHero() {
 
           {/* Image - Colonne droite (dans le carrousel) */}
           <div className="hero-image relative order-1 lg:order-2">
-            <div className="relative overflow-hidden">
-              <AnimatePresence initial={false}>
+            <div className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl">
+              <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={`img-${currentImageSlide.id}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
-                  className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl group"
+                  transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute inset-0 group"
                 >
                   <div className="relative w-full h-full">
                     <Image
@@ -312,36 +312,36 @@ export default function HomeHero() {
                     )}
                   </div>
 
-                {/* Overlay décoratif */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: imageLoaded ? 1 : 0 }}
-                  transition={{ duration: 0.5 }}
-                />
+                  {/* Overlay décoratif */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: imageLoaded ? 1 : 0 }}
+                    transition={{ duration: 0.5 }}
+                  />
 
-                {/* Effet de brillance au survol */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.6 }}
-                />
+                  {/* Effet de brillance au survol */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6 }}
+                  />
 
-                {/* Badge flottant */}
-                <motion.div
-                  className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg z-10"
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-[#4CAF50] rounded-full animate-pulse" />
-                    <span className="text-xs sm:text-sm font-semibold text-[#1A3C2E]">
-                      -30% sur tout
-                    </span>
-                  </div>
-                </motion.div>
+                  {/* Badge flottant */}
+                  <motion.div
+                    className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg z-10"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-[#4CAF50] rounded-full animate-pulse" />
+                      <span className="text-xs sm:text-sm font-semibold text-[#1A3C2E]">
+                        -30% sur tout
+                      </span>
+                    </div>
+                  </motion.div>
                 </motion.div>
               </AnimatePresence>
             </div>
