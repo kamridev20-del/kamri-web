@@ -1226,7 +1226,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       </div>
 
       {/* ✅ Couleurs/Styles - Cards avec images */}
-      {availableColors.length > 0 && (
+      {availableColors.length > 0 && (() => {
+        // Log pour debug (en dehors du JSX)
+        if (availableColors.length > 0) {
+          console.log(`🎨 [Render] Rendu de ${availableColors.length} cartes de style. Noms:`, availableColors.map(c => c.name));
+        }
+        return (
         <div>
           <h3 className="text-xs font-semibold text-[#424242] mb-1.5">
             {availableSizes.length === 0 
@@ -1236,7 +1241,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 : 'Couleur' + (selectedColor ? ` (${selectedColor})` : '')
             }
           </h3>
-          {console.log(`🎨 [Render] Rendu de ${availableColors.length} cartes de style. Noms:`, availableColors.map(c => c.name))}
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData, index) => {
               // Le nom devrait déjà être nettoyé dans availableColors, mais on nettoie quand même pour être sûr
