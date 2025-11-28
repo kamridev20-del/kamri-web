@@ -490,11 +490,21 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
         if (hasGender) {
+          // Debug: vérifier si le styleKey existe déjà
+          if (idx < 5) {
+            console.log(`🔍 [availableColors] Variant ${idx} - styleKey: "${styleKey}", cleanStyle: "${cleanStyle}"`);
+            if (colorsMap.has(styleKey)) {
+              console.log(`  → StyleKey existe déjà dans colorsMap`);
+            } else {
+              console.log(`  → Nouveau styleKey, sera ajouté`);
+            }
+          }
+          
           const existing = colorsMap.get(styleKey);
           if (existing) {
             existing.count++;
             if (idx < 3) {
-              console.log(`✅ [availableColors] Style existant trouvé, count incrémenté:`, styleKey, '→', existing.name);
+              console.log(`✅ [availableColors] Style existant trouvé, count incrémenté:`, styleKey, '→', existing.name, 'count:', existing.count);
             }
           } else {
             // Capitaliser chaque mot du style
