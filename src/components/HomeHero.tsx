@@ -1,18 +1,69 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ArrowLeft, Shield, Sparkles, Star, TrendingUp, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+// Images du carrousel (vous pouvez remplacer ces URLs par vos vraies images)
+const CAROUSEL_IMAGES = [
+  {
+    src: '/images/modelo.png',
+    alt: 'Modèle KAMRI portant des vêtements de la collection',
+  },
+  {
+    src: '/images/modelo.png', // Remplacez par votre 2ème image
+    alt: 'Collection printemps 2025',
+  },
+  {
+    src: '/images/modelo.png', // Remplacez par votre 3ème image
+    alt: 'Nouveautés tendances',
+  },
+];
+
 export default function HomeHero() {
   const [isVisible, setIsVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  // Auto-play du carrousel
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % CAROUSEL_IMAGES.length);
+    }, 5000); // Change d'image toutes les 5 secondes
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+    setIsAutoPlaying(false); // Pause auto-play quand l'utilisateur clique
+    setTimeout(() => setIsAutoPlaying(true), 10000); // Reprend après 10 secondes
+  };
+
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? CAROUSEL_IMAGES.length - 1 : prevIndex - 1
+    );
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => 
+      (prevIndex + 1) % CAROUSEL_IMAGES.length
+    );
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
 
   // Animation variants
   const containerVariants = {
@@ -53,7 +104,7 @@ export default function HomeHero() {
 
   return (
     <section 
-      className="relative min-h-[600px] sm:min-h-[700px] lg:min-h-[800px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
+      className="relative min-h-[450px] sm:min-h-[500px] lg:min-h-[550px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
       aria-label="Section hero - Découvrez les tendances"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
@@ -191,32 +242,46 @@ export default function HomeHero() {
             </motion.div>
           </div>
 
-          {/* Image - Colonne droite */}
+          {/* Carrousel d'images - Colonne droite */}
           <motion.div
             variants={imageVariants}
             className="hero-image relative order-1 lg:order-2"
           >
-            <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] overflow-hidden rounded-2xl shadow-2xl group">
-              {/* Image de modèle avec Next Image */}
+            <div 
+              className="relative w-full h-[300px] sm:h-[350px] lg:h-[400px] xl:h-[450px] overflow-hidden rounded-2xl shadow-2xl group"
+              onMouseEnter={() => setIsAutoPlaying(false)}
+              onMouseLeave={() => setIsAutoPlaying(true)}
+            >
+              {/* Carrousel d'images */}
               <div className="relative w-full h-full">
-                <Image
-                  src="/images/modelo.png"
-                  alt="Modèle KAMRI portant des vêtements de la collection"
-                  fill
-                  className={`object-contain transition-transform duration-700 group-hover:scale-105 ${
-                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                  priority
-                  onLoad={() => setImageLoaded(true)}
-                />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentIndex}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={CAROUSEL_IMAGES[currentIndex].src}
+                      alt={CAROUSEL_IMAGES[currentIndex].alt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                      priority={currentIndex === 0}
+                      onLoad={() => setImageLoaded(true)}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+
                 {/* Placeholder blur */}
                 {!imageLoaded && (
                   <div className="absolute inset-0 bg-gradient-to-br from-[#EAF3EE] to-[#FFFFFF] animate-pulse" />
                 )}
               </div>
 
-              {/* Overlay décoratif avec animation */}
+              {/* Overlay décoratif */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"
                 initial={{ opacity: 0 }}
@@ -234,7 +299,7 @@ export default function HomeHero() {
 
               {/* Badge flottant */}
               <motion.div
-                className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg"
+                className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg z-10"
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
@@ -246,6 +311,38 @@ export default function HomeHero() {
                   </span>
                 </div>
               </motion.div>
+
+              {/* Flèches de navigation */}
+              <button
+                onClick={goToPrevious}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 shadow-lg transition-all duration-300 hover:scale-110 z-10"
+                aria-label="Image précédente"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[#1A3C2E]" />
+              </button>
+              <button
+                onClick={goToNext}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 shadow-lg transition-all duration-300 hover:scale-110 z-10"
+                aria-label="Image suivante"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#1A3C2E]" />
+              </button>
+
+              {/* Indicateurs de points (dots) */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                {CAROUSEL_IMAGES.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`transition-all duration-300 rounded-full ${
+                      index === currentIndex
+                        ? 'w-8 h-2 bg-white'
+                        : 'w-2 h-2 bg-white/50 hover:bg-white/75'
+                    }`}
+                    aria-label={`Aller à l'image ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Formes géométriques décoratives */}
