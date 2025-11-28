@@ -118,7 +118,15 @@ function extractColorFromVariantKey(variantKey: string): string {
     return matchEnd[1].trim();
   }
   
-  // Si pas de taille détectée, retourner tel quel (fallback)
+  // Pattern 3: Taille numérique avec tiret (Women's Black-36, Deep Rose Black Women-37)
+  const sizeNumeric = /^(.+)[- ](3[0-9]|4[0-9]|5[0])$/;
+  const matchNumeric = variantKey.match(sizeNumeric);
+  
+  if (matchNumeric) {
+    return matchNumeric[1].trim();
+  }
+  
+  // Fallback: retourner tel quel si aucun pattern détecté
   return variantKey.trim();
 }
 
