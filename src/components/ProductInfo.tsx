@@ -523,7 +523,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               count: 1
             });
             if (idx < 5) {
-              console.log(`✅ [availableColors] Nouveau style sauvegardé: styleKey="${styleKey}", name="${finalName}"`);
+              console.log(`✅ [availableColors] Nouveau style sauvegardé [${idx}]: styleKey="${styleKey}", name="${finalName}", originalStyle="${style}", cleanStyle="${cleanStyle}"`);
+            }
+            
+            // Vérifier si le nom contient encore une taille
+            if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(finalName)) {
+              console.error(`❌ [availableColors] ERREUR: Le nom stocké contient encore une taille! styleKey="${styleKey}", name="${finalName}", originalStyle="${style}"`);
             }
           }
         } else {
