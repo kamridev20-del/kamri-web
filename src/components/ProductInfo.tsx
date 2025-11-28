@@ -94,13 +94,15 @@ function cleanColorNameUtil(name: string): string {
 }
 
 // ✅ Fonction pour extraire UNIQUEMENT la couleur/style depuis properties.key
-// Ex: "S Black" → "Black", "XL Orange" → "Orange", "M Army Green" → "Army Green"
+// Ex: "S Black" → "Black", "S-Black" → "Black", "XL Orange" → "Orange", "M Army Green" → "Army Green"
+// 🔥 CORRECTION : Accepter ESPACE OU TIRET entre la taille et la couleur
 function extractColorFromVariantKey(variantKey: string): string {
   if (!variantKey) return '';
   
-  // Pattern pour détecter les tailles au DÉBUT (S, M, L, XL, XXL, etc.)
-  // Ex: "S Black" → "Black", "XL Orange" → "Orange", "M Army Green" → "Army Green"
-  const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)\s+(.+)$/i;
+  // 🔥 CORRECTION : Accepter ESPACE OU TIRET entre la taille et la couleur
+  // Pattern 1: Taille au DÉBUT avec ESPACE ou TIRET (S Black, S-Black, XL Orange, M-Orange, M Army Green)
+  const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+(.+)$/i;
+  //                                                                    ^^^^^^^ Accepte ESPACE OU TIRET
   const match = variantKey.match(sizeAtStart);
   
   if (match) {
@@ -108,9 +110,9 @@ function extractColorFromVariantKey(variantKey: string): string {
     return match[2].trim();
   }
   
-  // Pattern pour détecter les tailles à la FIN
-  // Ex: "Black S" → "Black", "Orange XL" → "Orange"
-  const sizeAtEnd = /^(.+)\s+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+  // Pattern 2: Taille à la FIN avec ESPACE ou TIRET (Black S, Black-S, Orange XL, Orange-XL)
+  const sizeAtEnd = /^(.+)[\s-]+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+  //                       ^^^^^^^ Accepte ESPACE OU TIRET
   const matchEnd = variantKey.match(sizeAtEnd);
   
   if (matchEnd) {
