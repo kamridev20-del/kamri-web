@@ -66,6 +66,30 @@ interface ProductInfoProps {
   onVariantChange?: (variant: ProductVariant | null, image: string | null) => void;
 }
 
+// ✅ Fonction utilitaire pour nettoyer un nom de couleur/style de toute taille
+// Définie en dehors du composant pour être accessible dans les useMemo
+function cleanColorNameUtil(name: string): string {
+  if (!name) return '';
+  let cleaned = name;
+  
+  // 1. Retirer toute taille numérique (30-50) avec le tiret/espace qui précède
+  cleaned = cleaned.replace(/[- ]+(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+  
+  // 2. Retirer aussi les tirets/espaces avec nombres à la fin (pour les cas comme "Style-36")
+  cleaned = cleaned.replace(/[- ]+\d+$/, '').trim();
+  
+  // 3. Retirer les tirets orphelins à la fin (cas comme "Style-")
+  cleaned = cleaned.replace(/[- ]+$/, '').trim();
+  
+  // 4. Retirer toute taille numérique isolée restante (30-50)
+  cleaned = cleaned.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+  
+  // 5. Nettoyer les espaces multiples
+  cleaned = cleaned.replace(/\s+/g, ' ');
+  
+  return cleaned;
+}
+
 export default function ProductInfo({ product, onVariantChange }: ProductInfoProps) {
   const { addToCart } = useCart();
   const toast = useToast();
@@ -435,7 +459,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       
       // Utiliser la fonction utilitaire pour extraire le style
-      const style = extractStyleFromVariant(variant, hasGender);
+      let style = extractStyleFromVariant(variant, hasGender);
       
       // Debug: vérifier ce qui est extrait
       if (idx < 3) {
@@ -447,8 +471,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       
       if (style) {
-        // Nettoyage final strict: s'assurer qu'aucune taille n'est présente
-        let cleanStyle = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        // Utiliser la fonction utilitaire pour garantir un nettoyage complet
+        let cleanStyle = cleanColorNameUtil(style);
         
         // Si le style est vide après nettoyage, skip ce variant
         if (!cleanStyle) {
@@ -707,27 +731,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     });
   }, [availableVariants]);
 
-  // ✅ Fonction utilitaire pour nettoyer un nom de couleur/style de toute taille
+  // ✅ Fonction pour nettoyer un nom de couleur/style (utilise la fonction utilitaire)
   const cleanColorName = useCallback((name: string): string => {
-    if (!name) return '';
-    let cleaned = name;
-    
-    // 1. Retirer toute taille numérique (30-50) avec le tiret/espace qui précède
-    cleaned = cleaned.replace(/[- ]+(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-    
-    // 2. Retirer aussi les tirets/espaces avec nombres à la fin (pour les cas comme "Style-36")
-    cleaned = cleaned.replace(/[- ]+\d+$/, '').trim();
-    
-    // 3. Retirer les tirets orphelins à la fin (cas comme "Style-")
-    cleaned = cleaned.replace(/[- ]+$/, '').trim();
-    
-    // 4. Retirer toute taille numérique isolée restante (30-50)
-    cleaned = cleaned.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-    
-    // 5. Nettoyer les espaces multiples
-    cleaned = cleaned.replace(/\s+/g, ' ');
-    
-    return cleaned;
+    return cleanColorNameUtil(name);
   }, []);
 
   // ✅ Sélectionner automatiquement la première couleur et taille disponibles
@@ -1212,8 +1218,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                     style={{ backgroundColor: colorData.name.toLowerCase() }}
                   />
                 )}
-                <span className="text-[9px] font-medium text-gray-700">{colorData.name}</span>
-                {selectedColor === colorData.name && (
+                <span className="text-[9px] font-medium text-gray-700">{cleanColorName(colorData.name)}</span>
+                {selectedColor === cleanColorName(colorData.name) && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#4CAF50] rounded-full flex items-center justify-center">
                     <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
