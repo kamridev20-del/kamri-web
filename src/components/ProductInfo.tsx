@@ -146,8 +146,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
   // ✅ Fonction utilitaire pour extraire le style (couleur + genre) sans la taille
   // 🔥 CORRECTION : Utiliser properties.key au lieu de variant.name selon recommandation expert
-  const extractStyleFromVariant = useCallback((variant: ProductVariant, hasGender: boolean): string => {
-    console.log('🔑 [Extract] INPUT variant:', { name: variant.name, properties: variant.properties });
+  const extractStyleFromVariant = useCallback((variant: ProductVariant, hasGender: boolean, hasRealSizes: boolean = false): string => {
+    console.log('🔑 [Extract] INPUT variant:', { name: variant.name, properties: variant.properties, hasGender, hasRealSizes });
     
     // Utiliser properties.key au lieu de variant.name
     if (!variant.properties) {
@@ -168,16 +168,39 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     let variantKey = props.key || '';
     console.log('🔑 [Extract] variantKey extrait:', variantKey);
     
-    // Retirer la taille si hasGender
-    if (hasGender && variantKey) {
-      const beforeClean = variantKey;
-      // Retirer la taille à la fin
+    if (!variantKey) return '';
+    
+    const beforeClean = variantKey;
+    
+    // 🔥 CAS 1 : Si hasGender (chaussures avec "Deep Rose Black Women-36")
+    if (hasGender) {
+      // Retirer la taille numérique à la fin (30-50)
       variantKey = variantKey.replace(/[- ](3[0-9]|4[0-9]|5[0])$/g, '').trim();
-      // Retirer toute taille restante
       variantKey = variantKey.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-      console.log('🔑 [Extract] Après nettoyage:', { before: beforeClean, after: variantKey });
+      console.log('🔑 [Extract] Après nettoyage (hasGender):', { before: beforeClean, after: variantKey });
+      return variantKey;
     }
     
+    // 🔥 CAS 2 : Si hasRealSizes mais pas hasGender (vêtements avec "S Black", "M Army Green")
+    if (hasRealSizes && !hasGender) {
+      // Liste des tailles valides (lettres)
+      const validSizeLetters = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL', '4XL', '5XL', '6XL', 'XI'];
+      
+      // Retirer la taille du début du variantKey (ex: "S Black" → "Black")
+      // Pattern: taille au début suivie d'un espace ou tiret
+      const sizePattern = new RegExp(`^(${validSizeLetters.join('|')})[- ]+`, 'i');
+      variantKey = variantKey.replace(sizePattern, '').trim();
+      
+      // Aussi retirer les tailles numériques (30-50) si présentes
+      variantKey = variantKey.replace(/[- ](3[0-9]|4[0-9]|5[0])$/g, '').trim();
+      variantKey = variantKey.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+      
+      console.log('🔑 [Extract] Après nettoyage (hasRealSizes):', { before: beforeClean, after: variantKey });
+      return variantKey;
+    }
+    
+    // 🔥 CAS 3 : Sinon, retourner tel quel (pour les produits sans tailles)
+    console.log('🔑 [Extract] Pas de nettoyage nécessaire');
     return variantKey;
   }, []);
 
