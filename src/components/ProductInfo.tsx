@@ -1232,10 +1232,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
       {/* ✅ Couleurs/Styles - Cards avec images */}
       {availableColors.length > 0 && (() => {
-        // Log pour debug (en dehors du JSX)
-        if (availableColors.length > 0) {
-          console.log(`🎨 [Render] Rendu de ${availableColors.length} cartes de style. Noms:`, availableColors.map(c => c.name));
-        }
+        // Log pour debug (en dehors du JSX) - FORCER l'affichage
+        console.log(`🎨 [Render] Rendu de ${availableColors.length} cartes de style. Noms:`, availableColors.map(c => c.name));
+        console.log(`🎨 [Render] Premiers 10 noms:`, availableColors.slice(0, 10).map(c => ({ name: c.name, normalized: cleanColorNameUtil(c.name).toLowerCase().trim() })));
         return (
         <div>
           <h3 className="text-xs font-semibold text-[#424242] mb-1.5">
