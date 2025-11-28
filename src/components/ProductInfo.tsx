@@ -528,7 +528,20 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
     });
     
-    return Array.from(colorsMap.values());
+    const result = Array.from(colorsMap.values());
+    
+    // Debug: vérifier les noms stockés
+    if (result.length > 0) {
+      console.log('🔍 [availableColors] Résultat final - Noms stockés:', result.slice(0, 3).map(c => c.name));
+      // Vérifier si des noms contiennent encore des tailles
+      result.forEach((colorData, idx) => {
+        if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(colorData.name)) {
+          console.error(`❌ ERREUR: availableColors[${idx}].name contient encore une taille:`, colorData.name);
+        }
+      });
+    }
+    
+    return result;
   }, [availableVariants]);
 
   // ✅ Extraire les tailles uniques depuis les variants
@@ -694,13 +707,31 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     });
   }, [availableVariants]);
 
+  // ✅ Fonction utilitaire pour nettoyer un nom de couleur/style de toute taille
+  const cleanColorName = useCallback((name: string): string => {
+    if (!name) return '';
+    // Retirer toute taille numérique (30-50)
+    let cleaned = name.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+    // Retirer aussi les tirets/espaces avec nombres à la fin
+    cleaned = cleaned.replace(/[- ]*\d+$/, '').trim();
+    // Nettoyer les espaces multiples
+    cleaned = cleaned.replace(/\s+/g, ' ');
+    return cleaned;
+  }, []);
+
   // ✅ Sélectionner automatiquement la première couleur et taille disponibles
   useEffect(() => {
     if (availableColors.length > 0 && !selectedColor) {
-      console.log('🎨 Auto-sélection de la première couleur:', availableColors[0].name);
-      setSelectedColor(availableColors[0].name);
+      const cleanName = cleanColorName(availableColors[0].name);
+      
+      if (cleanName !== availableColors[0].name) {
+        console.warn('⚠️ [Auto-sélection] Nom nettoyé:', availableColors[0].name, '→', cleanName);
+      }
+      
+      console.log('🎨 Auto-sélection de la première couleur:', cleanName);
+      setSelectedColor(cleanName);
     }
-  }, [availableColors]);
+  }, [availableColors, cleanColorName]);
 
   useEffect(() => {
     if (availableSizes.length > 0 && !selectedSize) {
@@ -1145,9 +1176,15 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             {availableColors.map((colorData) => (
               <button
                 key={colorData.name}
-                onClick={() => setSelectedColor(colorData.name)}
+                onClick={() => {
+                  const cleanName = cleanColorName(colorData.name);
+                  if (cleanName !== colorData.name) {
+                    console.warn('⚠️ [Clic couleur] Nom nettoyé:', colorData.name, '→', cleanName);
+                  }
+                  setSelectedColor(cleanName);
+                }}
                 className={`relative flex flex-col items-center p-1.5 rounded-lg border-2 transition-all duration-200 ${
-                  selectedColor === colorData.name
+                  selectedColor === cleanColorName(colorData.name)
                     ? 'border-[#4CAF50] bg-[#E8F5E9]'
                     : 'border-gray-300 bg-white hover:border-[#81C784]'
                 }`}
