@@ -117,6 +117,35 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     return [];
   }, [product]);
 
+  // ✅ Détecter si les variants contiennent des genres (pour afficher "Style" au lieu de "Couleur")
+  const hasGenderInVariants = useMemo(() => {
+    return availableVariants.some(variant => {
+      let key = '';
+      if (variant.properties) {
+        try {
+          if (typeof variant.properties === 'string') {
+            try {
+              const props = JSON.parse(variant.properties);
+              if (typeof props === 'string') {
+                key = props;
+              } else if (props.key) {
+                key = String(props.key);
+              }
+            } catch {
+              key = variant.properties;
+            }
+          } else {
+            const props = variant.properties as any;
+            key = props.key || '';
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+      return /(Men|Women|Man|Woman)/i.test(key || variant.name || '');
+    });
+  }, [availableVariants]);
+
   // ✅ Extraire les couleurs uniques depuis les variants
   const availableColors = useMemo(() => {
     console.log('🔍 DEBUG: Total variants disponibles:', availableVariants.length);
@@ -222,9 +251,37 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       return Array.from(colorsMap.values());
     }
     
-    // Sinon, logique normale d'extraction des couleurs
+    // Sinon, logique normale d'extraction des couleurs/styles
+    // Détecter si les variants contiennent des genres (dans ce useMemo pour éviter les problèmes de dépendances)
+    const hasGender = availableVariants.some(variant => {
+      let key = '';
+      if (variant.properties) {
+        try {
+          if (typeof variant.properties === 'string') {
+            try {
+              const props = JSON.parse(variant.properties);
+              if (typeof props === 'string') {
+                key = props;
+              } else if (props.key) {
+                key = String(props.key);
+              }
+            } catch {
+              key = variant.properties;
+            }
+          } else {
+            const props = variant.properties as any;
+            key = props.key || '';
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+      return /(Men|Women|Man|Woman)/i.test(key || variant.name || '');
+    });
+    
     availableVariants.forEach((variant, idx) => {
-      let color = '';
+      let style = '';
+      let variantKey = '';
       
       if (idx < 2) {
         console.log(`🔍 DEBUG Variant ${idx}:`, {
@@ -244,32 +301,22 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               const props = JSON.parse(variant.properties);
               
               if (typeof props === 'string') {
-                // C'était une string JSON comme '"Purple-S"'
-                const zoneMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-                color = zoneMatch ? zoneMatch[1].trim() : props.split(/[-\s]/)[0];
-              } else if (props.value1) {
-                color = props.value1;
+                variantKey = props;
               } else if (props.key) {
-                color = String(props.key).split(/[-\s]/)[0];
+                variantKey = String(props.key);
+              } else if (props.value1) {
+                style = props.value1;
               }
             } catch {
               // Ce n'est pas du JSON, c'est une string directe
-              // Format: "Purple-S", "Black-M", "Black Zone2-S"
-              const zoneMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-              if (zoneMatch) {
-                color = zoneMatch[1].trim();
-              } else {
-                // Fallback simple
-                color = variant.properties.split(/[-\s]/)[0];
-              }
+              variantKey = variant.properties;
             }
           } else {
             // C'est un objet
             const props = variant.properties as any;
+            variantKey = props.key || '';
             if (props.value1) {
-              color = props.value1;
-            } else if (props.key) {
-              color = String(props.key).split(/[-\s]/)[0];
+              style = props.value1;
             }
           }
         } catch (e) {
@@ -277,28 +324,91 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         }
       }
       
+      // Si on a un variantKey et qu'il y a des genres, extraire le style complet (couleur + genre) en excluant la taille
+      if (variantKey && hasGender) {
+        // Pattern: "Beige Maroon Women-36" → "Beige Maroon Women"
+        // Pattern: "Black Men-36" → "Black Men"
+        // Exclure la taille numérique à la fin (30-50)
+        const styleMatch = variantKey.match(/^(.+?)(?:[- ](?:3[0-9]|4[0-9]|5[0]))?$/i);
+        if (styleMatch) {
+          style = styleMatch[1].trim();
+        } else {
+          // Fallback: prendre tout sauf la dernière partie si c'est un nombre
+          const parts = variantKey.split(/[- ]/);
+          const lastPart = parts[parts.length - 1];
+          const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
+          if (isNumericSize && parts.length > 1) {
+            style = parts.slice(0, -1).join(' ');
+          } else {
+            style = variantKey;
+          }
+        }
+      } else if (variantKey) {
+        // Pas de genre, extraire juste la couleur (comme avant)
+        const zoneMatch = variantKey.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+        style = zoneMatch ? zoneMatch[1].trim() : variantKey.split(/[-\s]/)[0];
+      }
+      
       // Fallback : extraire du nom
-      if (!color && variant.name) {
-        const nameMatch = variant.name.match(/^([A-Za-z]+)/);
-        if (nameMatch) {
-          color = nameMatch[1];
+      if (!style && variant.name) {
+        if (hasGender) {
+          // Extraire le style complet du nom (couleur + genre)
+          const nameMatch = variant.name.match(/([A-Za-z\s]+(?:Men|Women|Man|Woman))/i);
+          if (nameMatch) {
+            style = nameMatch[1].trim();
+          } else {
+            const nameParts = variant.name.split(' ');
+            const genderIndex = nameParts.findIndex(p => /^(Men|Women|Man|Woman)$/i.test(p));
+            if (genderIndex > 0) {
+              style = nameParts.slice(0, genderIndex + 1).join(' ');
+            } else {
+              style = nameParts[0] || variant.name;
+            }
+          }
+        } else {
+          const nameMatch = variant.name.match(/^([A-Za-z]+)/);
+          if (nameMatch) {
+            style = nameMatch[1];
+          }
         }
       }
       
-      if (color) {
-        const colorLower = color.toLowerCase();
-        const knownColors = ['black', 'white', 'brown', 'gray', 'grey', 'blue', 'red', 'green', 'yellow', 'pink', 'purple', 'orange', 'khaki', 'beige', 'navy', 'tan', 'burgundy', 'wine', 'ivory', 'cream', 'gold', 'silver', 'platinum'];
+      if (style) {
+        const styleKey = style.toLowerCase().trim();
         
-        if (knownColors.includes(colorLower)) {
-          const existing = colorsMap.get(colorLower);
+        // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
+        if (hasGender) {
+          const existing = colorsMap.get(styleKey);
           if (existing) {
             existing.count++;
           } else {
-            colorsMap.set(colorLower, {
-              name: color.charAt(0).toUpperCase() + color.slice(1).toLowerCase(),
+            // Capitaliser chaque mot du style
+            const capitalizedStyle = style.split(' ').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            
+            colorsMap.set(styleKey, {
+              name: capitalizedStyle,
               image: variant.image || '',
               count: 1
             });
+          }
+        } else {
+          // Sinon, filtrer par couleurs connues (comportement original)
+          const colorLower = style.toLowerCase();
+          const knownColors = ['black', 'white', 'brown', 'gray', 'grey', 'blue', 'red', 'green', 'yellow', 'pink', 'purple', 'orange', 'khaki', 'beige', 'navy', 'tan', 'burgundy', 'wine', 'ivory', 'cream', 'gold', 'silver', 'platinum'];
+          
+          if (knownColors.includes(colorLower)) {
+            const existing = colorsMap.get(colorLower);
+            if (existing) {
+              existing.count++;
+            } else {
+              colorsMap.set(colorLower, {
+                name: style.charAt(0).toUpperCase() + style.slice(1).toLowerCase(),
+                image: variant.image || '',
+                count: 1
+              });
+            }
           }
         }
       }
@@ -862,11 +972,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         )}
       </div>
 
-      {/* ✅ Couleurs - Cards avec images */}
+      {/* ✅ Couleurs/Styles - Cards avec images */}
       {availableColors.length > 0 && (
         <div>
           <h3 className="text-xs font-semibold text-[#424242] mb-1.5">
-            {availableSizes.length === 0 ? 'Variante' : 'Couleur'}
+            {availableSizes.length === 0 ? 'Variante' : hasGenderInVariants ? 'Style' : 'Couleur'}
           </h3>
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData) => (
