@@ -51,7 +51,8 @@ const HERO_SLIDES = [
 
 export default function HomeHero() {
   const [isVisible, setIsVisible] = useState(false);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
@@ -59,47 +60,81 @@ export default function HomeHero() {
     setIsVisible(true);
   }, []);
 
-  // Auto-play du carrousel hero
+  // Auto-play du carrousel background (change toutes les 15 secondes)
   useEffect(() => {
     if (!isAutoPlaying) {
       return;
     }
 
     const interval = setInterval(() => {
-      setCurrentSlideIndex((prevIndex) => {
+      setCurrentBackgroundIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % HERO_SLIDES.length;
         return nextIndex;
       });
-    }, 5000); // Change de slide toutes les 5 secondes
+    }, 15000); // Change toutes les 15 secondes
 
     return () => {
       clearInterval(interval);
     };
   }, [isAutoPlaying]);
 
+  // Auto-play du carrousel image (change toutes les 15 secondes, mais décalé de 7.5 secondes)
+  useEffect(() => {
+    if (!isAutoPlaying) {
+      return;
+    }
+
+    let interval: NodeJS.Timeout | null = null;
+
+    // Démarrer après 7.5 secondes pour être décalé du background
+    const initialTimeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => {
+          const nextIndex = (prevIndex + 1) % HERO_SLIDES.length;
+          return nextIndex;
+        });
+      }, 15000); // Change toutes les 15 secondes
+    }, 7500); // Démarrer après 7.5 secondes
+
+    return () => {
+      clearTimeout(initialTimeout);
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isAutoPlaying]);
+
   const goToSlide = (index: number) => {
-    setCurrentSlideIndex(index);
+    setCurrentBackgroundIndex(index);
+    setCurrentImageIndex(index);
     setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
+    setTimeout(() => setIsAutoPlaying(true), 20000);
   };
 
   const goToPrevious = () => {
-    setCurrentSlideIndex((prevIndex) => 
+    setCurrentBackgroundIndex((prevIndex) => 
+      prevIndex === 0 ? HERO_SLIDES.length - 1 : prevIndex - 1
+    );
+    setCurrentImageIndex((prevIndex) => 
       prevIndex === 0 ? HERO_SLIDES.length - 1 : prevIndex - 1
     );
     setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
+    setTimeout(() => setIsAutoPlaying(true), 20000);
   };
 
   const goToNext = () => {
-    setCurrentSlideIndex((prevIndex) => 
+    setCurrentBackgroundIndex((prevIndex) => 
+      (prevIndex + 1) % HERO_SLIDES.length
+    );
+    setCurrentImageIndex((prevIndex) => 
       (prevIndex + 1) % HERO_SLIDES.length
     );
     setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
+    setTimeout(() => setIsAutoPlaying(true), 20000);
   };
 
-  const currentSlide = HERO_SLIDES[currentSlideIndex];
+  const currentBackgroundSlide = HERO_SLIDES[currentBackgroundIndex];
+  const currentImageSlide = HERO_SLIDES[currentImageIndex];
 
   return (
     <section 
@@ -110,7 +145,7 @@ export default function HomeHero() {
       <div className="absolute inset-0 z-0">
         <AnimatePresence initial={false}>
           <motion.div
-            key={`bg-${currentSlide.id}`}
+            key={`bg-${currentBackgroundSlide.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -118,11 +153,11 @@ export default function HomeHero() {
             className="absolute inset-0"
           >
             <Image
-              src={currentSlide.background}
+              src={currentBackgroundSlide.background}
               alt=""
               fill
               className="object-cover"
-              priority={currentSlideIndex === 0}
+              priority={currentBackgroundIndex === 0}
               quality={90}
             />
             {/* Overlay pour assurer la lisibilité du texte */}
@@ -255,7 +290,7 @@ export default function HomeHero() {
             <div className="relative overflow-hidden">
               <AnimatePresence initial={false}>
                 <motion.div
-                  key={`img-${currentSlide.id}`}
+                  key={`img-${currentImageSlide.id}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -264,12 +299,12 @@ export default function HomeHero() {
                 >
                   <div className="relative w-full h-full">
                     <Image
-                      src={currentSlide.image}
-                      alt={currentSlide.imageAlt}
+                      src={currentImageSlide.image}
+                      alt={currentImageSlide.imageAlt}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                      priority={currentSlideIndex === 0}
+                      priority={currentImageIndex === 0}
                       onLoad={() => setImageLoaded(true)}
                     />
                     {!imageLoaded && (
@@ -363,7 +398,7 @@ export default function HomeHero() {
               key={index}
               onClick={() => goToSlide(index)}
               className={`transition-all duration-300 rounded-full ${
-                index === currentSlideIndex
+                index === currentImageIndex
                   ? 'w-8 h-2 bg-[#4CAF50]'
                   : 'w-2 h-2 bg-[#4CAF50]/50 hover:bg-[#4CAF50]/75'
               }`}
