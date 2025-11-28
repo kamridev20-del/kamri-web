@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-// Slides du carrousel hero complet (texte + image)
+// Slides du carrousel hero complet (texte + image + background)
 const HERO_SLIDES = [
   {
     id: 1,
@@ -17,6 +17,7 @@ const HERO_SLIDES = [
     subtitle: 'Collection exclusive de vêtements et accessoires de qualité supérieure',
     image: '/images/hero-slide-1.jpg',
     imageAlt: 'Modèle KAMRI portant des vêtements de la collection',
+    background: '/images/hero-slide-1.jpg', // Image de background pour ce slide
     ctaPrimary: { text: 'Explorer maintenant', href: '/products' },
     ctaSecondary: { text: 'Voir les promos', href: '/promotions' },
   },
@@ -29,6 +30,7 @@ const HERO_SLIDES = [
     subtitle: 'Du style graffiti au style graphique',
     image: '/images/hero-slide-2.jpg',
     imageAlt: 'Collection printemps 2025',
+    background: '/images/hero-slide-2.jpg', // Image de background pour ce slide
     ctaPrimary: { text: 'Je personnalise', href: '/products' },
     ctaSecondary: { text: 'Je découvre', href: '/products' },
   },
@@ -41,6 +43,7 @@ const HERO_SLIDES = [
     subtitle: 'Découvrez notre sélection de produits tendance',
     image: '/images/hero-slide-3.jpg',
     imageAlt: 'Nouveautés tendances',
+    background: '/images/hero-slide-3.jpg', // Image de background pour ce slide
     ctaPrimary: { text: 'Découvrir', href: '/products' },
     ctaSecondary: { text: 'En savoir plus', href: '/about' },
   },
@@ -93,12 +96,38 @@ export default function HomeHero() {
 
   return (
     <section 
-      className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[360px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
+      className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[360px] w-full overflow-hidden shadow-lg"
       aria-label="Section hero - Découvrez les tendances"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 relative">
+      {/* Carrousel de backgrounds */}
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={`bg-${currentSlide.id}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={currentSlide.background}
+              alt=""
+              fill
+              className="object-cover"
+              priority={currentSlideIndex === 0}
+              quality={90}
+            />
+            {/* Overlay pour assurer la lisibilité du texte */}
+            <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-black/30" />
+            {/* Fallback dégradé si l'image ne charge pas */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] opacity-50" />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 relative z-10">
         {/* Carrousel hero complet */}
         <div className="relative overflow-hidden">
           <AnimatePresence initial={false}>
