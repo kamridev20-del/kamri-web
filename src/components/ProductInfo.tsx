@@ -508,7 +508,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               console.log(`✅ [availableColors] Style existant trouvé, count incrémenté:`, styleKey, '→', existing.name, 'count:', existing.count);
             }
           } else {
-            // Utiliser directement cleanStyle (déjà nettoyé) et le capitaliser pour l'affichage
+            // NETTOYER le styleKey pour garantir qu'aucune taille ne reste
+            // Le styleKey doit être basé sur le style nettoyé, SANS la taille
+            const cleanedStyleKey = cleanColorNameUtil(cleanStyle).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
+            
+            // Capitaliser pour l'affichage
             const capitalizedStyle = cleanStyle.split(' ').map(word => 
               word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
@@ -516,19 +520,24 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             // Utiliser cleanColorNameUtil une dernière fois pour garantir qu'aucune taille ne reste
             const finalName = cleanColorNameUtil(capitalizedStyle);
             
-            // Le styleKey est déjà calculé et normalisé, l'utiliser directement
-            colorsMap.set(styleKey, {
+            // Vérifier que le nom ne contient pas de taille
+            if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(finalName)) {
+              console.error(`❌ [availableColors] ERREUR AVANT STOCKAGE: Le nom contient encore une taille! originalStyle="${style}", cleanStyle="${cleanStyle}", finalName="${finalName}"`);
+              // Forcer le nettoyage supplémentaire
+              const forcedClean = cleanColorNameUtil(finalName);
+              if (forcedClean !== finalName) {
+                console.warn(`⚠️ [availableColors] Nettoyage forcé: "${finalName}" → "${forcedClean}"`);
+              }
+            }
+            
+            // Utiliser cleanedStyleKey au lieu de styleKey pour garantir l'unicité
+            colorsMap.set(cleanedStyleKey, {
               name: finalName,
               image: variant.image || '',
               count: 1
             });
             if (idx < 5) {
-              console.log(`✅ [availableColors] Nouveau style sauvegardé [${idx}]: styleKey="${styleKey}", name="${finalName}", originalStyle="${style}", cleanStyle="${cleanStyle}"`);
-            }
-            
-            // Vérifier si le nom contient encore une taille
-            if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(finalName)) {
-              console.error(`❌ [availableColors] ERREUR: Le nom stocké contient encore une taille! styleKey="${styleKey}", name="${finalName}", originalStyle="${style}"`);
+              console.log(`✅ [availableColors] Nouveau style sauvegardé [${idx}]: cleanedStyleKey="${cleanedStyleKey}", name="${finalName}", originalStyle="${style}", cleanStyle="${cleanStyle}"`);
             }
           }
         } else {
@@ -552,59 +561,38 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
     });
     
-    const result = Array.from(colorsMap.values());
+    // FORCER le nettoyage et le filtrage : nettoyer tous les noms AVANT de les utiliser
+    const cleanedMap = new Map<string, typeof colorsMap.values extends () => IterableIterator<infer T> ? T : never>();
     
-    console.log('📊 [availableColors] Avant filtrage - Total entrées dans colorsMap:', result.length);
-    if (result.length > 0) {
-      console.log('📊 [availableColors] Entrées brutes (premiers 20):', result.slice(0, 20).map(c => ({ 
-        name: c.name, 
-        count: c.count,
-        normalized: cleanColorNameUtil(c.name).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ')
-      })));
-      
-      // Vérifier les doublons potentiels AVANT filtrage
-      const nameCounts = new Map<string, number>();
-      result.forEach(c => {
-        const normalized = cleanColorNameUtil(c.name).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
-        nameCounts.set(normalized, (nameCounts.get(normalized) || 0) + 1);
-      });
-      nameCounts.forEach((count, name) => {
-        if (count > 1) {
-          console.error(`❌ DOUBLON DÉTECTÉ AVANT FILTRAGE: "${name}" apparaît ${count} fois dans colorsMap`);
-        }
-      });
-    }
-    
-    // Filtrer les doublons : si plusieurs entrées ont le même nom (après nettoyage), ne garder que la première
-    // Utiliser un Map pour garantir l'unicité par nom normalisé
-    const uniqueMap = new Map<string, typeof result[0]>();
-    
-    result.forEach((colorData, idx) => {
-      // Nettoyer le nom pour la comparaison
+    // Nettoyer tous les noms dans colorsMap
+    colorsMap.forEach((colorData, key) => {
       const cleanedName = cleanColorNameUtil(colorData.name);
-      // Normalisation stricte : minuscules, trim, espaces multiples normalisés, tirets/underscores normalisés
-      const normalizedName = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
+      const normalizedKey = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
       
-      if (!uniqueMap.has(normalizedName)) {
-        // S'assurer que le nom est bien nettoyé
-        uniqueMap.set(normalizedName, {
+      // Capitaliser pour l'affichage
+      const capitalizedName = cleanedName.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      ).join(' ');
+      
+      // Utiliser le nom normalisé comme clé pour regrouper les doublons
+      if (!cleanedMap.has(normalizedKey)) {
+        cleanedMap.set(normalizedKey, {
           ...colorData,
-          name: cleanedName
+          name: capitalizedName
         });
-        if (idx < 10) {
-          console.log(`✅ [availableColors] Ajouté style unique [${idx}]: "${cleanedName}" (normalized: "${normalizedName}")`);
-        }
       } else {
-        console.log(`⚠️ [availableColors] Doublon ignoré [${idx}]: "${cleanedName}" (normalized: "${normalizedName}" - déjà présent)`);
+        // Si le style existe déjà, incrémenter le count
+        const existing = cleanedMap.get(normalizedKey)!;
+        existing.count += colorData.count;
       }
     });
     
-    // Convertir le Map en array
-    const uniqueResult = Array.from(uniqueMap.values());
+    const uniqueResult = Array.from(cleanedMap.values());
     
-    // Debug: vérifier les noms stockés et les doublons
-    console.log('🔍 [availableColors] Résultat final - Total styles uniques:', uniqueResult.length);
-    console.log('🔍 [availableColors] Noms stockés:', uniqueResult.map(c => ({ name: c.name, count: c.count })));
+    // Logs FORCÉS pour debug
+    console.log('🚀 [availableColors] useMemo - Total variants:', availableVariants.length);
+    console.log('📊 [availableColors] Après nettoyage - Total styles uniques:', uniqueResult.length);
+    console.log('📊 [availableColors] Styles uniques:', uniqueResult.slice(0, 10).map(c => ({ name: c.name, count: c.count })));
     
     // Vérifier si des noms contiennent encore des tailles
     uniqueResult.forEach((colorData, idx) => {
