@@ -429,21 +429,48 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       if (selectedColor && selectedSize) {
         const selectedColorNormalized = normalizeColor(selectedColor);
         const selectedSizeLower = selectedSize.toLowerCase();
+        const selectedSizeUpper = selectedSize.toUpperCase();
         
-        // 1. Chercher un variant qui contient les DEUX dans sa clé/nom
+        // 1. PRIORITÉ : Chercher un variant qui contient les DEUX dans sa clé/nom
         const containsBoth = searchString.includes(selectedColorNormalized) && 
-                            (searchString.includes(selectedSizeLower) || searchString.includes(selectedSize.toUpperCase().toLowerCase()));
+                            (searchString.includes(selectedSizeLower) || searchString.includes(selectedSizeUpper.toLowerCase()));
         
         if (containsBoth) {
           console.log(`✅ Match par clé combinée: "${variantKey}" contient "${selectedColor}" et "${selectedSize}"`);
           return true;
         }
         
-        // 2. Exiger que les deux correspondent individuellement (couleur ET taille)
-        // On ne peut pas accepter un variant qui correspond seulement à la couleur si la taille ne correspond pas
+        // 2. PRIORITÉ : Match exact avec couleur ET taille extraites individuellement
         const bothMatch = colorMatch && sizeMatch;
         if (bothMatch) {
           console.log(`✅ Match exact: couleur="${selectedColor}" et taille="${selectedSize}" correspondent`);
+          return true;
+        }
+        
+        // 3. FALLBACK INTELLIGENT : Si pas de match exact, chercher dans le nom complet du variant
+        // Cela gère les cas où la "taille" sélectionnée fait partie du nom de couleur (ex: "Starry Sky Green")
+        // ou où la structure des variants est non-standard
+        const variantNameLower = (variant.name || '').toLowerCase();
+        const containsColorInName = variantNameLower.includes(selectedColorNormalized);
+        const containsSizeInName = variantNameLower.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeUpper.toLowerCase());
+        
+        // Si le nom du variant contient les deux (couleur ET taille), c'est un match valide
+        if (containsColorInName && containsSizeInName) {
+          console.log(`✅ Match par nom complet: "${variant.name}" contient "${selectedColor}" et "${selectedSize}"`);
+          return true;
+        }
+        
+        // 4. FALLBACK : Si la couleur correspond exactement dans le nom ET que la taille correspond quelque part
+        // (gère les cas où la taille fait partie du nom de couleur)
+        if (containsColorInName && (containsSizeInName || sizeMatch)) {
+          console.log(`✅ Match partiel par nom: couleur="${selectedColor}" dans le nom et taille trouvée`);
+          return true;
+        }
+        
+        // 5. DERNIER FALLBACK : Si la taille correspond dans le nom ET que la couleur correspond quelque part
+        // (gère les cas inverses où la couleur fait partie du nom de taille)
+        if (containsSizeInName && (containsColorInName || colorMatch)) {
+          console.log(`✅ Match partiel par nom: taille="${selectedSize}" dans le nom et couleur trouvée`);
           return true;
         }
         
