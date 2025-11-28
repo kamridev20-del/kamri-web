@@ -100,36 +100,30 @@ export default function HomeHero() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 relative">
         {/* Carrousel hero complet */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 items-center"
-          >
+        <div className="relative overflow-hidden">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={currentSlide.id}
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '-100%', opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 items-center"
+            >
             {/* Contenu texte - Colonne gauche */}
             <div className="hero-content space-y-2 sm:space-y-3 lg:space-y-4 order-2 lg:order-1">
               {/* Badge promotionnel */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
+              <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#4CAF50]/10 rounded-full border border-[#4CAF50]/20 mb-2">
                   <Sparkles className="w-4 h-4 text-[#4CAF50]" />
                   <span className="text-sm sm:text-base font-semibold text-[#4CAF50]">
                     {currentSlide.badge}
                   </span>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Titre principal */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+              <h1
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
@@ -144,24 +138,18 @@ export default function HomeHero() {
                   />
                 </span>
                 {currentSlide.titleEnd && ` ${currentSlide.titleEnd}`}
-              </motion.h1>
+              </h1>
 
               {/* Sous-titre */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+              <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#4B6254] font-light leading-relaxed max-w-xl"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {currentSlide.subtitle}
-              </motion.p>
+              </p>
 
               {/* Points clés */}
-              <motion.ul
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+              <ul
                 className="space-y-2 sm:space-y-3 text-sm sm:text-base text-[#4B6254]"
               >
                 <li className="flex items-center gap-2">
@@ -176,15 +164,10 @@ export default function HomeHero() {
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
                   <span>Paiement sécurisé</span>
                 </li>
-              </motion.ul>
+              </ul>
 
               {/* Statistiques */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex flex-wrap gap-4 sm:gap-6 pt-2"
-              >
+              <div className="flex flex-wrap gap-4 sm:gap-6 pt-2">
                 <div className="flex items-center gap-2">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#4CAF50]/10 rounded-full flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-[#4CAF50]" />
@@ -203,15 +186,10 @@ export default function HomeHero() {
                     <div className="text-xs sm:text-sm text-[#4B6254]">Note moyenne</div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Boutons CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2"
-              >
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
                 <Link
                   href={currentSlide.ctaPrimary.href}
                   className="group relative inline-flex items-center justify-center gap-2 bg-[#4CAF50] text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:bg-[#2E7D32] transform hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden"
@@ -233,15 +211,10 @@ export default function HomeHero() {
                 >
                   {currentSlide.ctaSecondary.text}
                 </Link>
-              </motion.div>
+              </div>
 
               {/* Badges de confiance */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="flex flex-wrap items-center gap-4 pt-4"
-              >
+              <div className="flex flex-wrap items-center gap-4 pt-4">
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4B6254]">
                   <Shield className="w-4 h-4 text-[#4CAF50]" />
                   <span>Paiement sécurisé</span>
@@ -250,16 +223,11 @@ export default function HomeHero() {
                   <Truck className="w-4 h-4 text-[#4CAF50]" />
                   <span>Livraison rapide</span>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Image - Colonne droite */}
-            <motion.div
-              initial={{ opacity: 0, scale: 1.1, x: 50 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="hero-image relative order-1 lg:order-2"
-            >
+            <div className="hero-image relative order-1 lg:order-2">
               <div className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl group">
                 <div className="relative w-full h-full">
                   <Image
@@ -334,9 +302,10 @@ export default function HomeHero() {
                   delay: 0.5,
                 }}
               />
-            </motion.div>
+            </div>
           </motion.div>
-        </AnimatePresence>
+          </AnimatePresence>
+        </div>
 
         {/* Flèches de navigation pour le carrousel hero */}
         <button
