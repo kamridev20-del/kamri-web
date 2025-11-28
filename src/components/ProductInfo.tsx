@@ -551,23 +551,38 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     console.log('📊 [availableColors] Avant filtrage - Total entrées dans colorsMap:', result.length);
     if (result.length > 0) {
-      console.log('📊 [availableColors] Entrées brutes (premiers 10):', result.slice(0, 10).map(c => ({ name: c.name, count: c.count })));
+      console.log('📊 [availableColors] Entrées brutes (premiers 20):', result.slice(0, 20).map(c => ({ 
+        name: c.name, 
+        count: c.count,
+        normalized: cleanColorNameUtil(c.name).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ')
+      })));
+      
+      // Vérifier les doublons potentiels AVANT filtrage
+      const nameCounts = new Map<string, number>();
+      result.forEach(c => {
+        const normalized = cleanColorNameUtil(c.name).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
+        nameCounts.set(normalized, (nameCounts.get(normalized) || 0) + 1);
+      });
+      nameCounts.forEach((count, name) => {
+        if (count > 1) {
+          console.error(`❌ DOUBLON DÉTECTÉ AVANT FILTRAGE: "${name}" apparaît ${count} fois dans colorsMap`);
+        }
+      });
     }
     
     // Filtrer les doublons : si plusieurs entrées ont le même nom (après nettoyage), ne garder que la première
-    const uniqueResult: typeof result = [];
-    const seenNames = new Set<string>();
+    // Utiliser un Map pour garantir l'unicité par nom normalisé
+    const uniqueMap = new Map<string, typeof result[0]>();
     
     result.forEach((colorData, idx) => {
       // Nettoyer le nom pour la comparaison
       const cleanedName = cleanColorNameUtil(colorData.name);
-      // Normalisation stricte : minuscules, trim, espaces multiples normalisés
-      const normalizedName = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
+      // Normalisation stricte : minuscules, trim, espaces multiples normalisés, tirets/underscores normalisés
+      const normalizedName = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
       
-      if (!seenNames.has(normalizedName)) {
-        seenNames.add(normalizedName);
+      if (!uniqueMap.has(normalizedName)) {
         // S'assurer que le nom est bien nettoyé
-        uniqueResult.push({
+        uniqueMap.set(normalizedName, {
           ...colorData,
           name: cleanedName
         });
@@ -578,6 +593,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         console.log(`⚠️ [availableColors] Doublon ignoré [${idx}]: "${cleanedName}" (normalized: "${normalizedName}" - déjà présent)`);
       }
     });
+    
+    // Convertir le Map en array
+    const uniqueResult = Array.from(uniqueMap.values());
     
     // Debug: vérifier les noms stockés et les doublons
     console.log('🔍 [availableColors] Résultat final - Total styles uniques:', uniqueResult.length);
