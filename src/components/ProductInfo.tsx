@@ -326,22 +326,31 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       return;
     }
     
-    const matchingVariant = availableVariants.find(variant => {
+    // ✅ APPROCHE EN DEUX PASSES : D'abord chercher un match exact, puis un fallback
+    // Cela permet de gérer les produits standards (couleur + taille) et les produits non-standard
+    
+    // Normaliser les couleurs
+    const normalizeColor = (color: string) => {
+      const normalized = color.toLowerCase().trim();
+      if (normalized === 'grey') return 'gray';
+      if (normalized === 'gray') return 'gray';
+      return normalized;
+    };
+    
+    // Fonction pour extraire les infos d'un variant
+    const extractVariantInfo = (variant: ProductVariant) => {
       let variantColor = '';
       let variantSize = '';
       let variantKey = '';
       
-      // Utiliser la MÊME logique d'extraction que pour availableColors et availableSizes
       if (variant.properties) {
         try {
           if (typeof variant.properties === 'string') {
-            // Essayer de parser comme JSON d'abord
             try {
               const props = JSON.parse(variant.properties);
               
               if (typeof props === 'string') {
                 variantKey = props;
-                // Pattern : "Purple-S", "Black Zone2-S"
                 const colorMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
                 variantColor = colorMatch ? colorMatch[1].trim() : props.split(/[-\s]/)[0];
                 const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
@@ -357,7 +366,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 variantSize = sizeMatch ? sizeMatch[1] : '';
               }
             } catch {
-              // Ce n'est pas du JSON, c'est une string directe
               variantKey = variant.properties;
               const colorMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
               variantColor = colorMatch ? colorMatch[1].trim() : variant.properties.split(/[-\s]/)[0];
@@ -365,7 +373,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               variantSize = sizeMatch ? sizeMatch[1] : '';
             }
           } else {
-            // C'est un objet
             const props = variant.properties;
             variantColor = props.value1 || '';
             variantSize = props.value2 || '';
@@ -381,108 +388,111 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         }
       }
       
-      // ✅ STRATÉGIE DE MATCHING AMÉLIORÉE :
-      // 1. Normaliser les couleurs (Gray = Grey)
-      // 2. Si on a couleur ET taille, chercher un variant dont la clé/nom contient les deux
-      // 3. Si pas de match exact, accepter un match partiel (couleur OU taille)
-      
-      // Normaliser les couleurs
-      const normalizeColor = (color: string) => {
-        const normalized = color.toLowerCase().trim();
-        if (normalized === 'grey') return 'gray';
-        if (normalized === 'gray') return 'gray';
-        return normalized;
-      };
-      
-      let colorMatch = !selectedColor;
-      let sizeMatch = !selectedSize;
-      
-      // Construire une chaîne de recherche combinée (clé + nom)
+      return { variantColor, variantSize, variantKey };
+    };
+    
+    // Fonction pour calculer le score de matching d'un variant
+    const calculateMatchScore = (variant: ProductVariant) => {
+      const { variantColor, variantSize, variantKey } = extractVariantInfo(variant);
       const searchString = `${variantKey} ${variant.name || ''}`.toLowerCase();
+      const variantNameLower = (variant.name || '').toLowerCase();
+      
+      let score = 0;
+      let colorMatch = false;
+      let sizeMatch = false;
       
       if (selectedColor) {
         const selectedColorNormalized = normalizeColor(selectedColor);
         const variantColorNormalized = normalizeColor(variantColor);
         
-        // Matcher par couleur exacte dans color
-        colorMatch = variantColorNormalized === selectedColorNormalized;
-        // Ou si la clé/nom contient la couleur
-        if (!colorMatch) {
-          colorMatch = searchString.includes(selectedColorNormalized);
+        // Match exact de couleur
+        if (variantColorNormalized === selectedColorNormalized) {
+          colorMatch = true;
+          score += 10; // Score élevé pour match exact
+        } else if (searchString.includes(selectedColorNormalized) || variantNameLower.includes(selectedColorNormalized)) {
+          colorMatch = true;
+          score += 5; // Score moyen pour match partiel
         }
+      } else {
+        colorMatch = true; // Pas de couleur sélectionnée = match
       }
       
       if (selectedSize) {
         const selectedSizeUpper = selectedSize.toUpperCase();
         const selectedSizeLower = selectedSize.toLowerCase();
-        // Matcher par taille exacte (insensible à la casse)
-        sizeMatch = variantSize.toUpperCase() === selectedSizeUpper;
-        // Ou si la clé/nom contient la taille
-        if (!sizeMatch) {
-          sizeMatch = searchString.includes(selectedSizeLower) || searchString.includes(selectedSizeUpper.toLowerCase());
+        
+        // Match exact de taille
+        if (variantSize.toUpperCase() === selectedSizeUpper) {
+          sizeMatch = true;
+          score += 10;
+        } else if (searchString.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeUpper.toLowerCase())) {
+          sizeMatch = true;
+          score += 5;
         }
+      } else {
+        sizeMatch = true; // Pas de taille sélectionnée = match
       }
       
-      console.log(`🔍 Variant "${variant.name}": key="${variantKey}", color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch})`);
+      // Bonus si les deux correspondent
+      if (colorMatch && sizeMatch && selectedColor && selectedSize) {
+        score += 5;
+      }
       
-      // ✅ STRATÉGIE SPÉCIALE : Si on a couleur ET taille
-      if (selectedColor && selectedSize) {
-        const selectedColorNormalized = normalizeColor(selectedColor);
-        const selectedSizeLower = selectedSize.toLowerCase();
-        const selectedSizeUpper = selectedSize.toUpperCase();
+      console.log(`🔍 Variant "${variant.name}": key="${variantKey}", color="${variantColor}" (match: ${colorMatch}), size="${variantSize}" (match: ${sizeMatch}), score=${score}`);
+      
+      return { score, colorMatch, sizeMatch };
+    };
+    
+    let matchingVariant: ProductVariant | null = null;
+    
+    if (selectedColor && selectedSize) {
+      // PASS 1 : Chercher un match exact (couleur ET taille)
+      matchingVariant = availableVariants.find(variant => {
+        const { score, colorMatch, sizeMatch } = calculateMatchScore(variant);
+        // Match exact = les deux correspondent ET score élevé
+        return colorMatch && sizeMatch && score >= 15;
+      }) || null;
+      
+      if (matchingVariant) {
+        console.log('✅ Match exact trouvé:', matchingVariant.name);
+      } else {
+        // PASS 2 : Si pas de match exact, chercher le meilleur match partiel
+        const scoredVariants = availableVariants.map(variant => ({
+          variant,
+          ...calculateMatchScore(variant)
+        })).filter(({ colorMatch, sizeMatch }) => colorMatch || sizeMatch);
         
-        // 1. PRIORITÉ : Chercher un variant qui contient les DEUX dans sa clé/nom
-        const containsBoth = searchString.includes(selectedColorNormalized) && 
-                            (searchString.includes(selectedSizeLower) || searchString.includes(selectedSizeUpper.toLowerCase()));
+        // Trier par score décroissant, puis prioriser les matches de couleur
+        scoredVariants.sort((a, b) => {
+          // D'abord par score
+          if (b.score !== a.score) {
+            return b.score - a.score;
+          }
+          // Si même score, prioriser celui qui a un match de couleur
+          if (a.colorMatch && !b.colorMatch) return -1;
+          if (b.colorMatch && !a.colorMatch) return 1;
+          return 0;
+        });
         
-        if (containsBoth) {
-          console.log(`✅ Match par clé combinée: "${variantKey}" contient "${selectedColor}" et "${selectedSize}"`);
-          return true;
+        if (scoredVariants.length > 0) {
+          matchingVariant = scoredVariants[0].variant;
+          console.log(`✅ Match partiel accepté (score: ${scoredVariants[0].score}, couleur: ${scoredVariants[0].colorMatch}, taille: ${scoredVariants[0].sizeMatch}):`, matchingVariant.name);
         }
-        
-        // 2. PRIORITÉ : Match exact avec couleur ET taille extraites individuellement
-        const bothMatch = colorMatch && sizeMatch;
-        if (bothMatch) {
-          console.log(`✅ Match exact: couleur="${selectedColor}" et taille="${selectedSize}" correspondent`);
-          return true;
+      }
+    } else {
+      // Si seulement couleur ou taille, utiliser find() simple
+      matchingVariant = availableVariants.find(variant => {
+        const { colorMatch, sizeMatch } = calculateMatchScore(variant);
+        if (selectedColor && selectedSize) {
+          return colorMatch && sizeMatch;
+        } else if (selectedColor) {
+          return colorMatch;
+        } else if (selectedSize) {
+          return sizeMatch;
         }
-        
-        // 3. FALLBACK INTELLIGENT : Si pas de match exact, chercher dans le nom complet du variant
-        // Cela gère les cas où la "taille" sélectionnée fait partie du nom de couleur (ex: "Starry Sky Green")
-        // ou où la structure des variants est non-standard
-        const variantNameLower = (variant.name || '').toLowerCase();
-        const containsColorInName = variantNameLower.includes(selectedColorNormalized);
-        const containsSizeInName = variantNameLower.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeUpper.toLowerCase());
-        
-        // Si le nom du variant contient les deux (couleur ET taille), c'est un match valide
-        if (containsColorInName && containsSizeInName) {
-          console.log(`✅ Match par nom complet: "${variant.name}" contient "${selectedColor}" et "${selectedSize}"`);
-          return true;
-        }
-        
-        // 4. FALLBACK : Si la couleur correspond exactement dans le nom ET que la taille correspond quelque part
-        // (gère les cas où la taille fait partie du nom de couleur)
-        if (containsColorInName && (containsSizeInName || sizeMatch)) {
-          console.log(`✅ Match partiel par nom: couleur="${selectedColor}" dans le nom et taille trouvée`);
-          return true;
-        }
-        
-        // 5. DERNIER FALLBACK : Si la taille correspond dans le nom ET que la couleur correspond quelque part
-        // (gère les cas inverses où la couleur fait partie du nom de taille)
-        if (containsSizeInName && (containsColorInName || colorMatch)) {
-          console.log(`✅ Match partiel par nom: taille="${selectedSize}" dans le nom et couleur trouvée`);
-          return true;
-        }
-        
         return false;
-      } else if (selectedColor) {
-        return colorMatch;
-      } else if (selectedSize) {
-        return sizeMatch;
-      }
-      
-      return false;
-    });
+      }) || null;
+    }
     
     if (matchingVariant) {
       console.log('✅ Variant trouvé:', { 
