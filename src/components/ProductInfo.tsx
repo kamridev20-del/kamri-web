@@ -68,24 +68,27 @@ interface ProductInfoProps {
 
 // ✅ Fonction utilitaire pour nettoyer un nom de couleur/style de toute taille
 // Définie en dehors du composant pour être accessible dans les useMemo
+// VERSION SIMPLIFIÉE ET PLUS AGRESSIVE selon recommandation expert
 function cleanColorNameUtil(name: string): string {
   if (!name) return '';
+  
   let cleaned = name;
   
-  // 1. Retirer toute taille numérique (30-50) avec le tiret/espace qui précède
-  cleaned = cleaned.replace(/[- ]+(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+  // 1. Retirer TOUTES les occurrences de tailles (pas seulement à la fin)
+  // Pattern: tiret/espace optionnel + nombre 30-50 + fin de mot
+  cleaned = cleaned.replace(/[- ]*(3[0-9]|4[0-9]|5[0])\b/g, '');
   
-  // 2. Retirer aussi les tirets/espaces avec nombres à la fin (pour les cas comme "Style-36")
-  cleaned = cleaned.replace(/[- ]+\d+$/, '').trim();
-  
-  // 3. Retirer les tirets orphelins à la fin (cas comme "Style-")
-  cleaned = cleaned.replace(/[- ]+$/, '').trim();
-  
-  // 4. Retirer toute taille numérique isolée restante (30-50)
-  cleaned = cleaned.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-  
-  // 5. Nettoyer les espaces multiples
+  // 2. Nettoyer les tirets/espaces multiples et orphelins
+  cleaned = cleaned.replace(/\s*[-_]+\s*/g, ' ');
   cleaned = cleaned.replace(/\s+/g, ' ');
+  
+  // 3. Trim final
+  cleaned = cleaned.trim();
+  
+  // Log pour debug (seulement si changement détecté)
+  if (cleaned !== name) {
+    console.log('🧹 [Clean]', name, '→', cleaned);
+  }
   
   return cleaned;
 }
@@ -172,10 +175,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
     }
     
-    // Debug: afficher la structure reçue
-    if (variantKey) {
-      console.log('🔍 [extractStyle] variantKey extrait:', variantKey, 'hasGender:', hasGender);
-    }
+    // 🔑 LOGS DE DÉBOGAGE selon recommandation expert
+    console.log('🔑 [Extract] INPUT:', { 
+      variantKey, 
+      hasGender,
+      originalProperties: variant.properties,
+      variantName
+    });
     
     // 2. Si on a un variantKey avec genre, extraire le style SANS la taille
     // Structure backend: variantKey = "Deep Rose Black Women-36" ou "Dark Gray Men-36"
@@ -238,9 +244,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         console.warn('⚠️ [extractStyle] VariantKey contient des nombres mais aucune taille détectée:', variantKey);
         // Retirer quand même les nombres à la fin par sécurité
         const cleaned = variantKey.replace(/[- ]*\d+$/, '').trim();
+        console.log('🔑 [Extract] OUTPUT (fallback avec nettoyage):', cleaned || variantKey);
         return cleaned || variantKey; // Retourner le cleaned ou le variantKey si cleaned est vide
       }
       
+      console.log('🔑 [Extract] OUTPUT (fallback):', variantKey);
       return variantKey;
     }
     
@@ -472,8 +480,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       
       if (style) {
-        // Utiliser la fonction utilitaire pour garantir un nettoyage complet
+        // 🎨 NETTOYAGE AGRESSIF IMMÉDIAT selon recommandation expert
         let cleanStyle = cleanColorNameUtil(style);
+        // Nettoyage supplémentaire pour être sûr
+        cleanStyle = cleanStyle.replace(/[- ](3[0-9]|4[0-9]|5[0])$/g, '').trim();
+        cleanStyle = cleanStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
         
         // Si le style est vide après nettoyage, skip ce variant
         if (!cleanStyle) {
@@ -481,64 +492,41 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           return; // Skip ce variant
         }
         
-        // Capitaliser chaque mot du style pour l'affichage
-        const capitalizedStyle = cleanStyle.split(' ').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        ).join(' ');
+        // 🎨 Normalisation de la clé (SANS tirets ni tailles) selon recommandation expert
+        const styleKey = cleanStyle
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, ' ')
+          .replace(/[-_]+/g, ' ')
+          .replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '')  // ← Ajout crucial selon expert
+          .trim();
         
-        // Normaliser le styleKey APRÈS nettoyage pour garantir l'unicité (tout en minuscules, sans espaces multiples, sans tirets/underscores)
-        const styleKey = cleanStyle.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
-        
-        // Debug pour les premiers variants
-        if (idx < 5) {
-          console.log(`🔍 [availableColors] Variant ${idx} - styleKey: "${styleKey}", cleanStyle: "${cleanStyle}"`);
-          if (colorsMap.has(styleKey)) {
-            console.log(`  → ⚠️ StyleKey existe déjà dans colorsMap, count sera incrémenté`);
-          } else {
-            console.log(`  → ✅ Nouveau styleKey, sera ajouté`);
-          }
-        }
+        // 🎨 LOGS DE DÉBOGAGE selon recommandation expert
+        console.log(`🎨 [${idx}] Style traité:`, { 
+          original: style, 
+          cleaned: cleanStyle, 
+          styleKey 
+        });
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
         if (hasGender) {
-          const existing = colorsMap.get(styleKey);
-          if (existing) {
-            existing.count++;
-            if (idx < 5) {
-              console.log(`✅ [availableColors] Style existant trouvé, count incrémenté:`, styleKey, '→', existing.name, 'count:', existing.count);
-            }
+          // Vérifier si existe
+          if (colorsMap.has(styleKey)) {
+            colorsMap.get(styleKey)!.count++;
+            console.log(`✅ [${idx}] Variant regroupé sous styleKey:`, styleKey);
           } else {
-            // NETTOYER le styleKey pour garantir qu'aucune taille ne reste
-            // Le styleKey doit être basé sur le style nettoyé, SANS la taille
-            const cleanedStyleKey = cleanColorNameUtil(cleanStyle).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
+            // Capitaliser proprement
+            const capitalizedStyle = cleanStyle
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ');
             
-            // Capitaliser pour l'affichage
-            const capitalizedStyle = cleanStyle.split(' ').map(word => 
-              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            ).join(' ');
-            
-            // Utiliser cleanColorNameUtil une dernière fois pour garantir qu'aucune taille ne reste
-            const finalName = cleanColorNameUtil(capitalizedStyle);
-            
-            // Vérifier que le nom ne contient pas de taille
-            if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(finalName)) {
-              console.error(`❌ [availableColors] ERREUR AVANT STOCKAGE: Le nom contient encore une taille! originalStyle="${style}", cleanStyle="${cleanStyle}", finalName="${finalName}"`);
-              // Forcer le nettoyage supplémentaire
-              const forcedClean = cleanColorNameUtil(finalName);
-              if (forcedClean !== finalName) {
-                console.warn(`⚠️ [availableColors] Nettoyage forcé: "${finalName}" → "${forcedClean}"`);
-              }
-            }
-            
-            // Utiliser cleanedStyleKey au lieu de styleKey pour garantir l'unicité
-            colorsMap.set(cleanedStyleKey, {
-              name: finalName,
+            colorsMap.set(styleKey, {
+              name: capitalizedStyle,
               image: variant.image || '',
               count: 1
             });
-            if (idx < 5) {
-              console.log(`✅ [availableColors] Nouveau style sauvegardé [${idx}]: cleanedStyleKey="${cleanedStyleKey}", name="${finalName}", originalStyle="${style}", cleanStyle="${cleanStyle}"`);
-            }
+            console.log(`🆕 [${idx}] Nouvelle entrée créée:`, { styleKey, name: capitalizedStyle });
           }
         } else {
           // Sinon, filtrer par couleurs connues (comportement original)
