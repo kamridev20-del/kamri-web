@@ -74,15 +74,19 @@ function cleanColorNameUtil(name: string): string {
   
   let cleaned = name;
   
-  // 1. Retirer TOUTES les occurrences de tailles (pas seulement à la fin)
+  // 1. Retirer TOUTES les occurrences de tailles en LETTRES (XXS, XS, S, M, L, XL, XXL, XXXL, 2XL, 3XL, etc.)
+  // Pattern: tiret/espace optionnel + taille lettre + fin de mot ou espace/tiret
+  cleaned = cleaned.replace(/[- ]*(XXS|XS|S|M|L|XL|XXL|XXXL|2XL|3XL|4XL|5XL|6XL|XI)\b/gi, '');
+  
+  // 2. Retirer TOUTES les occurrences de tailles numériques (30-50)
   // Pattern: tiret/espace optionnel + nombre 30-50 + fin de mot
   cleaned = cleaned.replace(/[- ]*(3[0-9]|4[0-9]|5[0])\b/g, '');
   
-  // 2. Nettoyer les tirets/espaces multiples et orphelins
+  // 3. Nettoyer les tirets/espaces multiples et orphelins
   cleaned = cleaned.replace(/\s*[-_]+\s*/g, ' ');
   cleaned = cleaned.replace(/\s+/g, ' ');
   
-  // 3. Trim final
+  // 4. Trim final
   cleaned = cleaned.trim();
   
   // Log pour debug (seulement si changement détecté)
