@@ -439,14 +439,15 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           return true;
         }
         
-        // 2. Si pas de match exact, accepter si la couleur correspond (la taille peut être optionnelle pour certains produits)
-        if (colorMatch) {
-          console.log(`✅ Match par couleur: "${variantKey}" correspond à "${selectedColor}"`);
+        // 2. Exiger que les deux correspondent individuellement (couleur ET taille)
+        // On ne peut pas accepter un variant qui correspond seulement à la couleur si la taille ne correspond pas
+        const bothMatch = colorMatch && sizeMatch;
+        if (bothMatch) {
+          console.log(`✅ Match exact: couleur="${selectedColor}" et taille="${selectedSize}" correspondent`);
           return true;
         }
         
-        // 3. Sinon, exiger que les deux correspondent individuellement
-        return colorMatch && sizeMatch;
+        return false;
       } else if (selectedColor) {
         return colorMatch;
       } else if (selectedSize) {
