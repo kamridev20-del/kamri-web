@@ -176,12 +176,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     }
     
     // 🔑 LOGS DE DÉBOGAGE selon recommandation expert
-    console.log('🔑 [Extract] INPUT:', { 
-      variantKey, 
-      hasGender,
-      originalProperties: variant.properties,
-      variantName
-    });
+    console.log('🔑 [Extract] INPUT:', variantKey);
     
     // 2. Si on a un variantKey avec genre, extraire le style SANS la taille
     // Structure backend: variantKey = "Deep Rose Black Women-36" ou "Dark Gray Men-36"
@@ -203,7 +198,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         style = style.replace(/\s+/g, ' ');
         
         if (style) {
-          console.log('✅ [extractStyle] Style extrait:', style, 'depuis variantKey:', variantKey);
+          console.log('🔑 [Extract] OUTPUT:', style);
           return style;
         }
       }
@@ -329,9 +324,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
 
   // ✅ Extraire les couleurs uniques depuis les variants
   const availableColors = useMemo(() => {
-    console.log('🚀 [availableColors] useMemo déclenché - Total variants:', availableVariants.length);
-    console.log('🔍 DEBUG: Total variants disponibles:', availableVariants.length);
-    console.log('🔍 DEBUG: Premiers variants:', availableVariants.slice(0, 3));
+    console.log('🚀 [availableColors] DÉBUT - Traitement de', availableVariants.length, 'variants');
     
     const colorsMap = new Map<string, { name: string; image: string; count: number; variantKey?: string }>();
     
