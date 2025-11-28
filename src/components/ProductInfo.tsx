@@ -1013,13 +1013,21 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         const selectedSizeUpper = selectedSize.toUpperCase();
         const selectedSizeLower = selectedSize.toLowerCase();
         
-        // Match exact de taille
-        if (variantSize.toUpperCase() === selectedSizeUpper) {
-          sizeMatch = true;
-          score += 10;
-        } else if (searchString.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeUpper.toLowerCase())) {
-          sizeMatch = true;
-          score += 5;
+        // 🔥 CORRECTION : Si on a une taille extraite, on doit faire un match EXACT uniquement
+        // Sinon, on peut accepter un match partiel dans le nom
+        if (variantSize) {
+          // Match exact de taille uniquement
+          if (variantSize.toUpperCase() === selectedSizeUpper) {
+            sizeMatch = true;
+            score += 10;
+          }
+          // Ne pas accepter de match partiel si on a déjà une taille extraite
+        } else {
+          // Si pas de taille extraite, chercher dans le nom (fallback)
+          if (searchString.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeLower) || variantNameLower.includes(selectedSizeUpper.toLowerCase())) {
+            sizeMatch = true;
+            score += 5;
+          }
         }
       } else {
         sizeMatch = true; // Pas de taille sélectionnée = match
