@@ -549,37 +549,14 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
     });
     
-    // FORCER le nettoyage et le filtrage : nettoyer tous les noms AVANT de les utiliser
-    const cleanedMap = new Map<string, typeof colorsMap.values extends () => IterableIterator<infer T> ? T : never>();
+    // 📊 LOGS FINAUX selon recommandation expert
+    console.log('📊 [availableColors] colorsMap final:', 
+      Array.from(colorsMap.entries()).map(([key, val]) => ({ key, ...val }))
+    );
     
-    // Nettoyer tous les noms dans colorsMap
-    colorsMap.forEach((colorData, key) => {
-      const cleanedName = cleanColorNameUtil(colorData.name);
-      const normalizedKey = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ').trim();
-      
-      // Capitaliser pour l'affichage
-      const capitalizedName = cleanedName.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      ).join(' ');
-      
-      // Utiliser le nom normalisé comme clé pour regrouper les doublons
-      if (!cleanedMap.has(normalizedKey)) {
-        cleanedMap.set(normalizedKey, {
-          ...colorData,
-          name: capitalizedName
-        });
-      } else {
-        // Si le style existe déjà, incrémenter le count
-        const existing = cleanedMap.get(normalizedKey)!;
-        existing.count += colorData.count;
-      }
-    });
+    const uniqueResult = Array.from(colorsMap.values());
     
-    const uniqueResult = Array.from(cleanedMap.values());
-    
-    // Logs FORCÉS pour debug
-    console.log('🚀 [availableColors] useMemo - Total variants:', availableVariants.length);
-    console.log('📊 [availableColors] Après nettoyage - Total styles uniques:', uniqueResult.length);
+    console.log('📊 [availableColors] Après traitement - Total styles uniques:', uniqueResult.length);
     console.log('📊 [availableColors] Styles uniques:', uniqueResult.slice(0, 10).map(c => ({ name: c.name, count: c.count })));
     
     // Vérifier si des noms contiennent encore des tailles
