@@ -214,7 +214,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   const availableColors = useMemo(() => {
     // 🔥 LOG FORCÉ AU DÉBUT pour s'assurer qu'on voit l'exécution
     console.log('🚀🚀🚀 [availableColors] DÉBUT - Traitement de', availableVariants.length, 'variants');
-    console.log('🚀🚀🚀 [availableColors] hasGender:', hasGender);
     
     const colorsMap = new Map<string, { name: string; image: string; count: number; variantKey?: string }>();
     
@@ -355,6 +354,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       return /(Men|Women|Man|Woman)/i.test(key || variant.name || '');
     });
+    
+    console.log('🚀🚀🚀 [availableColors] hasGender:', hasGender);
     
     availableVariants.forEach((variant, idx) => {
       if (idx < 2) {
