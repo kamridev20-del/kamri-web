@@ -570,35 +570,45 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     const result = Array.from(colorsMap.values());
     
+    console.log('🔍 [availableColors] Avant filtrage - Total entrées dans colorsMap:', result.length);
+    console.log('🔍 [availableColors] Entrées brutes:', result.map(c => ({ name: c.name, count: c.count })));
+    
     // Filtrer les doublons : si plusieurs entrées ont le même nom (après nettoyage), ne garder que la première
     const uniqueResult: typeof result = [];
     const seenNames = new Set<string>();
     
-    result.forEach((colorData) => {
-      const normalizedName = cleanColorNameUtil(colorData.name).toLowerCase().trim();
+    result.forEach((colorData, idx) => {
+      // Nettoyer le nom pour la comparaison
+      const cleanedName = cleanColorNameUtil(colorData.name);
+      const normalizedName = cleanedName.toLowerCase().trim().replace(/\s+/g, ' ');
+      
       if (!seenNames.has(normalizedName)) {
         seenNames.add(normalizedName);
         // S'assurer que le nom est bien nettoyé
-        const cleanedName = cleanColorNameUtil(colorData.name);
         uniqueResult.push({
           ...colorData,
           name: cleanedName
         });
+        if (idx < 5) {
+          console.log(`✅ [availableColors] Ajouté style unique [${idx}]:`, cleanedName);
+        }
+      } else {
+        if (idx < 5) {
+          console.log(`⚠️ [availableColors] Doublon ignoré [${idx}]:`, cleanedName, '(déjà présent)');
+        }
       }
     });
     
     // Debug: vérifier les noms stockés et les doublons
-    if (uniqueResult.length > 0) {
-      console.log('🔍 [availableColors] Résultat final - Total styles uniques:', uniqueResult.length);
-      console.log('🔍 [availableColors] Noms stockés:', uniqueResult.map(c => ({ name: c.name, count: c.count })));
-      
-      // Vérifier si des noms contiennent encore des tailles
-      uniqueResult.forEach((colorData, idx) => {
-        if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(colorData.name)) {
-          console.error(`❌ ERREUR: availableColors[${idx}].name contient encore une taille:`, colorData.name);
-        }
-      });
-    }
+    console.log('🔍 [availableColors] Résultat final - Total styles uniques:', uniqueResult.length);
+    console.log('🔍 [availableColors] Noms stockés:', uniqueResult.map(c => ({ name: c.name, count: c.count })));
+    
+    // Vérifier si des noms contiennent encore des tailles
+    uniqueResult.forEach((colorData, idx) => {
+      if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(colorData.name)) {
+        console.error(`❌ ERREUR: availableColors[${idx}].name contient encore une taille:`, colorData.name);
+      }
+    });
     
     return uniqueResult;
   }, [availableVariants]);
