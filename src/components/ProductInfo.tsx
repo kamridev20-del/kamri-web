@@ -105,7 +105,7 @@ function extractColorFromVariantKey(variantKey: string): string {
   
   // 🔥 CORRECTION : Accepter ESPACE OU TIRET entre la taille et la couleur
   // Pattern 1: Taille au DÉBUT avec ESPACE ou TIRET (S Black, S-Black, XL Orange, M-Orange, M Army Green)
-  const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+(.+)$/i;
+  const sizeAtStart = /^(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+(.+)$/i;
   //                                                                    ^^^^^^^ Accepte ESPACE OU TIRET
   const match = variantKey.match(sizeAtStart);
   
@@ -115,7 +115,7 @@ function extractColorFromVariantKey(variantKey: string): string {
   }
   
   // Pattern 2: Taille à la FIN avec ESPACE ou TIRET (Black S, Black-S, Orange XL, Orange-XL)
-  const sizeAtEnd = /^(.+)[\s-]+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+  const sizeAtEnd = /^(.+)[\s-]+(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
   //                       ^^^^^^^ Accepte ESPACE OU TIRET
   const matchEnd = variantKey.match(sizeAtEnd);
   
@@ -349,13 +349,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               // Si on a un key, chercher la taille au DÉBUT ou à la FIN
               if (keyToCheck) {
                 // Pattern 1: Taille au DÉBUT (S-Black, S Black, M-Orange, XL Army Green)
-                const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+                const sizeAtStart = /^(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
                 const matchStart = keyToCheck.match(sizeAtStart);
                 if (matchStart) {
                   size = matchStart[1];
                 } else {
                   // Pattern 2: Taille à la FIN (Black S, Black-S, Orange XL)
-                  const sizeAtEnd = /[\s-]+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+                  const sizeAtEnd = /[\s-]+(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
                   const matchEnd = keyToCheck.match(sizeAtEnd);
                   if (matchEnd) {
                     size = matchEnd[1];
@@ -379,12 +379,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             // 🔥 NOUVEAU : Vérifier aussi dans props.key
             if (props.key) {
               const keyToCheck = String(props.key);
-              const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+              const sizeAtStart = /^(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
               const matchStart = keyToCheck.match(sizeAtStart);
               if (matchStart) {
                 size = matchStart[1];
               } else {
-                const sizeAtEnd = /[\s-]+(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
+                const sizeAtEnd = /[\s-]+(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i;
                 const matchEnd = keyToCheck.match(sizeAtEnd);
                 if (matchEnd) size = matchEnd[1];
               }
@@ -753,7 +753,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 const keyStr = String(props.key);
                 // 🔥 CORRECTION : Chercher la taille au DÉBUT (S-Black, M-Black) OU à la FIN
                 // Pattern 1: Taille au DÉBUT (S-Black, S Black, M-Orange, XL Army Green)
-                const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+                const sizeAtStart = /^(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
                 const matchStart = keyStr.match(sizeAtStart);
                 if (matchStart) {
                   size = matchStart[1];
@@ -764,7 +764,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                     size = numericSizeMatch[1];
                   } else {
                     // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
-                    const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
+                    const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
                     if (sizeMatch) {
                       size = sizeMatch[1];
                     }
@@ -793,7 +793,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               const keyStr = String(props.key);
               // 🔥 CORRECTION : Chercher la taille au DÉBUT (S-Black, M-Black) OU à la FIN
               // Pattern 1: Taille au DÉBUT (S-Black, S Black, M-Orange, XL Army Green)
-              const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+              const sizeAtStart = /^(XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
               const matchStart = keyStr.match(sizeAtStart);
               if (matchStart) {
                 size = matchStart[1];
@@ -804,7 +804,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                   size = numericSizeMatch[1];
                 } else {
                   // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
-                  const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
+                  const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
                   if (sizeMatch) {
                     size = sizeMatch[1];
                   }
