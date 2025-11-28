@@ -117,6 +117,101 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     return [];
   }, [product]);
 
+  // ✅ Fonction utilitaire pour extraire le style (couleur + genre) sans la taille
+  const extractStyleFromVariant = useCallback((variant: ProductVariant, hasGender: boolean): string => {
+    let variantKey = '';
+    let variantName = variant.name || '';
+    
+    // 1. Extraire variantKey depuis properties
+    if (variant.properties) {
+      try {
+        if (typeof variant.properties === 'string') {
+          try {
+            const props = JSON.parse(variant.properties);
+            if (typeof props === 'string') {
+              variantKey = props;
+            } else if (props.key) {
+              variantKey = String(props.key);
+            }
+          } catch {
+            variantKey = variant.properties;
+          }
+        } else {
+          const props = variant.properties as any;
+          variantKey = props.key || '';
+        }
+      } catch (e) {
+        // Ignore
+      }
+    }
+    
+    // 2. Si on a un variantKey avec genre, extraire le style
+    if (variantKey && hasGender) {
+      // Retirer la taille numérique à la fin (30-50)
+      const sizePattern = /[- ]\s*(3[0-9]|4[0-9]|5[0])$/i;
+      if (sizePattern.test(variantKey)) {
+        let style = variantKey.replace(sizePattern, '').trim();
+        // Nettoyage final
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        if (style) return style;
+      } else {
+        // Split et vérifier la dernière partie
+        const parts = variantKey.split(/[- ]+/);
+        if (parts.length > 1) {
+          const lastPart = parts[parts.length - 1].trim();
+          const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
+          if (isNumericSize) {
+            let style = parts.slice(0, -1).join(' ').trim();
+            style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+            if (style) return style;
+          }
+        }
+      }
+    }
+    
+    // 3. Fallback: extraire depuis le nom du variant
+    if (variantName && hasGender) {
+      // Retirer la taille à la fin
+      let nameToProcess = variantName.replace(/[- ]\s*(3[0-9]|4[0-9]|5[0])$/i, '').trim();
+      
+      // Chercher la partie avec genre
+      const nameMatch = nameToProcess.match(/([A-Za-z\s]+(?:Men|Women|Man|Woman))(?:\s|$)/i);
+      if (nameMatch) {
+        let style = nameMatch[1].trim();
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        if (style) return style;
+      }
+      
+      // Chercher par index du genre
+      const nameParts = nameToProcess.split(' ');
+      const genderIndex = nameParts.findIndex(p => /^(Men|Women|Man|Woman)$/i.test(p));
+      if (genderIndex > 0) {
+        let style = nameParts.slice(0, genderIndex + 1).join(' ');
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        if (style) return style;
+      }
+    }
+    
+    // 4. Si pas de genre, extraire juste la couleur depuis variantKey
+    if (variantKey && !hasGender) {
+      const zoneMatch = variantKey.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+      if (zoneMatch) {
+        return zoneMatch[1].trim();
+      }
+      return variantKey.split(/[-\s]/)[0];
+    }
+    
+    // 5. Dernier recours: première partie du nom
+    if (variantName) {
+      const nameMatch = variantName.match(/^([A-Za-z]+)/);
+      if (nameMatch) {
+        return nameMatch[1];
+      }
+    }
+    
+    return '';
+  }, []);
+
   // ✅ Détecter si les variants contiennent des genres (pour afficher "Style" au lieu de "Couleur")
   const hasGenderInVariants = useMemo(() => {
     return availableVariants.some(variant => {
@@ -280,9 +375,6 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     });
     
     availableVariants.forEach((variant, idx) => {
-      let style = '';
-      let variantKey = '';
-      
       if (idx < 2) {
         console.log(`🔍 DEBUG Variant ${idx}:`, {
           name: variant.name,
@@ -291,138 +383,10 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         });
       }
       
-      // Extraire depuis properties (JSON ou string)
-      if (variant.properties) {
-        try {
-          // Si c'est déjà une string simple comme "Purple-S" ou "Black-M"
-          if (typeof variant.properties === 'string') {
-            // Essayer de parser comme JSON d'abord
-            try {
-              const props = JSON.parse(variant.properties);
-              
-              if (typeof props === 'string') {
-                variantKey = props;
-              } else if (props.key) {
-                variantKey = String(props.key);
-              } else if (props.value1) {
-                style = props.value1;
-              }
-            } catch {
-              // Ce n'est pas du JSON, c'est une string directe
-              variantKey = variant.properties;
-            }
-          } else {
-            // C'est un objet
-            const props = variant.properties as any;
-            variantKey = props.key || '';
-            if (props.value1) {
-              style = props.value1;
-            }
-          }
-        } catch (e) {
-          console.warn('Erreur parsing properties:', e);
-        }
-      }
-      
-      // Si on a un variantKey et qu'il y a des genres, extraire le style complet (couleur + genre) en excluant la taille
-      if (variantKey && hasGender) {
-        // Pattern: "Beige Maroon Women-36" → "Beige Maroon Women"
-        // Pattern: "Black Men-36" → "Black Men"
-        // Pattern: "Dark Gray Men-36" → "Dark Gray Men"
-        // Exclure la taille numérique à la fin (30-50) qui suit un tiret ou un espace
-        
-        // Méthode 1: Regex pour retirer la taille à la fin (tiret ou espace + nombre)
-        // Pattern amélioré pour capturer: "-36", " -36", "- 36", " 36"
-        const sizePattern = /[- ]\s*(3[0-9]|4[0-9]|5[0])$/i;
-        if (sizePattern.test(variantKey)) {
-          // Retirer la taille à la fin (tiret/espace + nombre)
-          style = variantKey.replace(sizePattern, '').trim();
-        } else {
-          // Méthode 2: Split et vérifier la dernière partie
-          const parts = variantKey.split(/[- ]+/);
-          if (parts.length > 1) {
-            const lastPart = parts[parts.length - 1].trim();
-            const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
-            if (isNumericSize) {
-              // La dernière partie est une taille, prendre tout le reste
-              style = parts.slice(0, -1).join(' ').trim();
-            } else {
-              // Pas de taille détectée, prendre tout
-              style = variantKey;
-            }
-          } else {
-            style = variantKey;
-          }
-        }
-        
-        // Nettoyage final: retirer toute taille restante (au cas où)
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-        
-        // Debug: vérifier qu'on n'a pas de taille dans le style
-        if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(style)) {
-          console.warn('⚠️ Taille détectée dans le style extrait après nettoyage:', { variantKey, style });
-        }
-      } else if (variantKey) {
-        // Pas de genre, extraire juste la couleur (comme avant)
-        const zoneMatch = variantKey.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-        style = zoneMatch ? zoneMatch[1].trim() : variantKey.split(/[-\s]/)[0];
-      }
-      
-      // Fallback : extraire du nom
-      if (!style && variant.name) {
-        if (hasGender) {
-          // Extraire le style complet du nom (couleur + genre) en excluant la taille
-          // Pattern: "Low-top Mountain Climbing Shoes Hiking Boots Men Dark Gray Men-36" → "Dark Gray Men"
-          // D'abord, chercher la partie avec genre
-          let nameToProcess = variant.name;
-          
-          // Retirer la taille à la fin si elle existe
-          const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
-          if (sizePattern.test(nameToProcess)) {
-            nameToProcess = nameToProcess.replace(sizePattern, '').trim();
-          }
-          
-          // Chercher la partie avec genre (Men/Women)
-          const nameMatch = nameToProcess.match(/([A-Za-z\s]+(?:Men|Women|Man|Woman))(?:\s|$)/i);
-          if (nameMatch) {
-            style = nameMatch[1].trim();
-            // S'assurer qu'on n'a pas de taille dans le style
-            style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-          } else {
-            const nameParts = nameToProcess.split(' ');
-            const genderIndex = nameParts.findIndex(p => /^(Men|Women|Man|Woman)$/i.test(p));
-            if (genderIndex > 0) {
-              style = nameParts.slice(0, genderIndex + 1).join(' ');
-              // S'assurer qu'on n'a pas de taille dans le style
-              style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-            } else {
-              // Dernier recours: prendre les derniers mots avant un nombre
-              const parts = nameToProcess.split(/\s+/);
-              const sizeIndex = parts.findIndex(p => /^(3[0-9]|4[0-9]|5[0])$/.test(p));
-              if (sizeIndex > 0) {
-                style = parts.slice(0, sizeIndex).join(' ');
-              } else {
-                style = parts[0] || nameToProcess;
-              }
-            }
-          }
-        } else {
-          const nameMatch = variant.name.match(/^([A-Za-z]+)/);
-          if (nameMatch) {
-            style = nameMatch[1];
-          }
-        }
-      }
+      // Utiliser la fonction utilitaire pour extraire le style
+      const style = extractStyleFromVariant(variant, hasGender);
       
       if (style) {
-        // Nettoyage final: s'assurer qu'aucune taille n'est présente
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-        
-        // Ne pas stocker si le style est vide après nettoyage
-        if (!style) {
-          console.warn('⚠️ Style vide après nettoyage:', { variantKey, variantName: variant.name });
-        } else {
-        
         const styleKey = style.toLowerCase().trim();
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
