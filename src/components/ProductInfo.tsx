@@ -242,7 +242,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         console.warn('⚠️ [extractStyle] VariantKey contient des nombres mais aucune taille détectée:', variantKey);
         // Retirer quand même les nombres à la fin par sécurité
         const cleaned = variantKey.replace(/[- ]*\d+$/, '').trim();
-        console.log('🔑 [Extract] OUTPUT (fallback avec nettoyage):', cleaned || variantKey);
+        console.log('🔑 [Extract] FALLBACK:', cleaned || variantKey);
         return cleaned || variantKey; // Retourner le cleaned ou le variantKey si cleaned est vide
       }
       
