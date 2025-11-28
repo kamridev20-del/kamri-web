@@ -710,12 +710,23 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
   // ✅ Fonction utilitaire pour nettoyer un nom de couleur/style de toute taille
   const cleanColorName = useCallback((name: string): string => {
     if (!name) return '';
-    // Retirer toute taille numérique (30-50)
-    let cleaned = name.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
-    // Retirer aussi les tirets/espaces avec nombres à la fin
-    cleaned = cleaned.replace(/[- ]*\d+$/, '').trim();
-    // Nettoyer les espaces multiples
+    let cleaned = name;
+    
+    // 1. Retirer toute taille numérique (30-50) avec le tiret/espace qui précède
+    cleaned = cleaned.replace(/[- ]+(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+    
+    // 2. Retirer aussi les tirets/espaces avec nombres à la fin (pour les cas comme "Style-36")
+    cleaned = cleaned.replace(/[- ]+\d+$/, '').trim();
+    
+    // 3. Retirer les tirets orphelins à la fin (cas comme "Style-")
+    cleaned = cleaned.replace(/[- ]+$/, '').trim();
+    
+    // 4. Retirer toute taille numérique isolée restante (30-50)
+    cleaned = cleaned.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+    
+    // 5. Nettoyer les espaces multiples
     cleaned = cleaned.replace(/\s+/g, ' ');
+    
     return cleaned;
   }, []);
 
