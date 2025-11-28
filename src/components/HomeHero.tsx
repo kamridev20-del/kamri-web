@@ -128,25 +128,15 @@ export default function HomeHero() {
         </AnimatePresence>
       </div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 relative z-10">
-        {/* Carrousel hero complet */}
-        <div className="relative overflow-hidden">
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={currentSlide.id}
-              initial={{ x: '100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '-100%', opacity: 0 }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 items-center"
-            >
-            {/* Contenu texte - Colonne gauche */}
-            <div className="hero-content space-y-2 sm:space-y-3 lg:space-y-4 order-2 lg:order-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 items-center">
+          {/* Contenu texte - Colonne gauche (FIXE, pas dans le carrousel) */}
+          <div className="hero-content space-y-2 sm:space-y-3 lg:space-y-4 order-2 lg:order-1">
               {/* Badge promotionnel */}
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#4CAF50]/10 rounded-full border border-[#4CAF50]/20 mb-2">
                   <Sparkles className="w-4 h-4 text-[#4CAF50]" />
                   <span className="text-sm sm:text-base font-semibold text-[#4CAF50]">
-                    {currentSlide.badge}
+                    Nouvelle collection 2025
                   </span>
                 </div>
               </div>
@@ -156,17 +146,17 @@ export default function HomeHero() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                {currentSlide.title}{' '}
+                Découvrez les{' '}
                 <span className="relative inline-block">
-                  <span className="relative z-10 text-[#4CAF50]">{currentSlide.titleHighlight}</span>
+                  <span className="relative z-10 text-[#4CAF50]">tendances</span>
                   <motion.span
                     className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
                     transition={{ duration: 0.8, delay: 0.5 }}
                   />
-                </span>
-                {currentSlide.titleEnd && ` ${currentSlide.titleEnd}`}
+                </span>{' '}
+                du moment
               </h1>
 
               {/* Sous-titre */}
@@ -174,7 +164,7 @@ export default function HomeHero() {
                 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#4B6254] font-light leading-relaxed max-w-xl"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                {currentSlide.subtitle}
+                Collection exclusive de vêtements et accessoires de qualité supérieure
               </p>
 
               {/* Points clés */}
@@ -220,11 +210,11 @@ export default function HomeHero() {
               {/* Boutons CTA */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
                 <Link
-                  href={currentSlide.ctaPrimary.href}
+                  href="/products"
                   className="group relative inline-flex items-center justify-center gap-2 bg-[#4CAF50] text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:bg-[#2E7D32] transform hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  <span className="relative z-10">{currentSlide.ctaPrimary.text}</span>
+                  <span className="relative z-10">Explorer maintenant</span>
                   <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-[#66BB6A] to-[#4CAF50] opacity-0 group-hover:opacity-100"
@@ -234,11 +224,11 @@ export default function HomeHero() {
                   />
                 </Link>
                 <Link
-                  href={currentSlide.ctaSecondary.href}
+                  href="/promotions"
                   className="inline-flex items-center justify-center gap-2 bg-white text-[#4CAF50] px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg border-2 border-[#4CAF50] shadow-sm hover:bg-[#E8F5E8] hover:shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  {currentSlide.ctaSecondary.text}
+                  Voir les promos
                 </Link>
               </div>
 
@@ -255,23 +245,32 @@ export default function HomeHero() {
               </div>
             </div>
 
-            {/* Image - Colonne droite */}
-            <div className="hero-image relative order-1 lg:order-2">
-              <div className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl group">
-                <div className="relative w-full h-full">
-                  <Image
-                    src={currentSlide.image}
-                    alt={currentSlide.imageAlt}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                    priority={currentSlideIndex === 0}
-                    onLoad={() => setImageLoaded(true)}
-                  />
-                  {!imageLoaded && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#EAF3EE] to-[#FFFFFF] animate-pulse" />
-                  )}
-                </div>
+          {/* Image - Colonne droite (dans le carrousel) */}
+          <div className="hero-image relative order-1 lg:order-2">
+            <div className="relative overflow-hidden">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={`img-${currentSlide.id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl group"
+                >
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={currentSlide.image}
+                      alt={currentSlide.imageAlt}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                      priority={currentSlideIndex === 0}
+                      onLoad={() => setImageLoaded(true)}
+                    />
+                    {!imageLoaded && (
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#EAF3EE] to-[#FFFFFF] animate-pulse" />
+                    )}
+                  </div>
 
                 {/* Overlay décoratif */}
                 <motion.div
@@ -303,37 +302,37 @@ export default function HomeHero() {
                     </span>
                   </div>
                 </motion.div>
-              </div>
-
-              {/* Formes géométriques décoratives */}
-              <motion.div
-                className="absolute -bottom-8 -left-8 w-32 h-32 bg-[#4CAF50]/10 rounded-full blur-2xl"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.5, 0.3],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-              <motion.div
-                className="absolute -top-8 -right-8 w-24 h-24 bg-[#81C784]/10 rounded-full blur-xl"
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: 0.5,
-                }}
-              />
+                </motion.div>
+              </AnimatePresence>
             </div>
-          </motion.div>
-          </AnimatePresence>
+
+            {/* Formes géométriques décoratives */}
+            <motion.div
+              className="absolute -bottom-8 -left-8 w-32 h-32 bg-[#4CAF50]/10 rounded-full blur-2xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+            <motion.div
+              className="absolute -top-8 -right-8 w-24 h-24 bg-[#81C784]/10 rounded-full blur-xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 0.5,
+              }}
+            />
+          </div>
         </div>
 
         {/* Flèches de navigation pour le carrousel hero */}
