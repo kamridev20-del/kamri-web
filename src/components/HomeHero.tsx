@@ -93,12 +93,12 @@ export default function HomeHero() {
 
   return (
     <section 
-      className="relative min-h-[450px] sm:min-h-[500px] lg:min-h-[550px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
+      className="relative min-h-[350px] sm:min-h-[400px] lg:min-h-[450px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
       aria-label="Section hero - Découvrez les tendances"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 relative">
         {/* Carrousel hero complet */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -107,10 +107,10 @@ export default function HomeHero() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center"
           >
             {/* Contenu texte - Colonne gauche */}
-            <div className="hero-content space-y-6 sm:space-y-8 order-2 lg:order-1">
+            <div className="hero-content space-y-3 sm:space-y-4 lg:space-y-5 order-2 lg:order-1">
               {/* Badge promotionnel */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -260,7 +260,7 @@ export default function HomeHero() {
               transition={{ delay: 0.3, duration: 0.8 }}
               className="hero-image relative order-1 lg:order-2"
             >
-              <div className="relative w-full h-[300px] sm:h-[350px] lg:h-[400px] xl:h-[450px] overflow-hidden rounded-2xl shadow-2xl group">
+              <div className="relative w-full h-[250px] sm:h-[280px] lg:h-[320px] xl:h-[360px] overflow-hidden rounded-2xl shadow-2xl group">
                 <div className="relative w-full h-full">
                   <Image
                     src={currentSlide.image}
