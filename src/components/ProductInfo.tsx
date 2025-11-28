@@ -1236,6 +1236,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 : 'Couleur' + (selectedColor ? ` (${selectedColor})` : '')
             }
           </h3>
+          {console.log(`🎨 [Render] Rendu de ${availableColors.length} cartes de style. Noms:`, availableColors.map(c => c.name))}
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData, index) => {
               // Le nom devrait déjà être nettoyé dans availableColors, mais on nettoie quand même pour être sûr
