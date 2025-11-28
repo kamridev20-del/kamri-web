@@ -251,7 +251,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         return cleaned || variantKey; // Retourner le cleaned ou le variantKey si cleaned est vide
       }
       
-      console.log('🔑 [Extract] OUTPUT (fallback):', variantKey);
+      console.log('🔑 [Extract] FALLBACK:', variantKey);
       return variantKey;
     }
     
@@ -495,28 +495,37 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           return; // Skip ce variant
         }
         
-        // 🎨 Normalisation de la clé (SANS tirets ni tailles) selon recommandation expert
-        const styleKey = cleanStyle
+        // 🔥 CRITIQUE : CRÉER LE STYLEKEY AVEC NETTOYAGE AGRESSIF
+        // Étape 1 : Normalisation de base
+        let styleKey = cleanStyle
           .toLowerCase()
           .trim()
           .replace(/\s+/g, ' ')
-          .replace(/[-_]+/g, ' ')
-          .replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '')  // ← Ajout crucial selon expert
-          .trim();
+          .replace(/[-_]+/g, ' ');
         
-        // 🎨 LOGS DE DÉBOGAGE selon recommandation expert
-        console.log(`🎨 [${idx}] Style traité:`, { 
-          original: style, 
-          cleaned: cleanStyle, 
-          styleKey 
-        });
+        // 🔥 ÉTAPE 2 : RETIRER LES TAILLES DU STYLEKEY AUSSI (CRITIQUE !)
+        styleKey = styleKey.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+        styleKey = styleKey.replace(/\s+/g, ' '); // Re-nettoyer les espaces après suppression
+        
+        // 🔍 LOG DÉTAILLÉ POUR LES 5 PREMIERS selon recommandation expert
+        if (idx < 5) {
+          console.log(`🎨 [${idx}] Traitement:`, {
+            original: style,
+            cleaned: cleanStyle,
+            styleKey: styleKey,
+            variantImage: variant.image?.substring(0, 50)
+          });
+        }
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
         if (hasGender) {
           // Vérifier si existe
-          if (colorsMap.has(styleKey)) {
-            colorsMap.get(styleKey)!.count++;
-            console.log(`✅ [${idx}] Variant regroupé sous styleKey:`, styleKey);
+          const existing = colorsMap.get(styleKey);
+          if (existing) {
+            existing.count++;
+            if (idx < 15) {
+              console.log(`✅ [${idx}] REGROUPÉ sous "${styleKey}" (count: ${existing.count})`);
+            }
           } else {
             // Capitaliser proprement
             const capitalizedStyle = cleanStyle
@@ -529,7 +538,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               image: variant.image || '',
               count: 1
             });
-            console.log(`🆕 [${idx}] Nouvelle entrée créée:`, { styleKey, name: capitalizedStyle });
+            
+            if (idx < 15) {
+              console.log(`🆕 [${idx}] NOUVEAU style créé:`, {
+                styleKey,
+                name: capitalizedStyle
+              });
+            }
           }
         } else {
           // Sinon, filtrer par couleurs connues (comportement original)
@@ -552,15 +567,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
     });
     
-    // 📊 LOGS FINAUX selon recommandation expert
-    console.log('📊 [availableColors] colorsMap final:', 
-      Array.from(colorsMap.entries()).map(([key, val]) => ({ key, ...val }))
-    );
+    // 📊 LOGS FINAUX DÉTAILLÉS selon recommandation expert
+    console.log('📊 [availableColors] RÉSULTAT FINAL:');
+    console.log('  - Nombre d\'entrées dans colorsMap:', colorsMap.size);
+    console.log('  - Liste des styles:');
+    Array.from(colorsMap.entries()).forEach(([key, val]) => {
+      console.log(`    "${key}" → "${val.name}" (count: ${val.count})`);
+    });
     
     const uniqueResult = Array.from(colorsMap.values());
-    
-    console.log('📊 [availableColors] Après traitement - Total styles uniques:', uniqueResult.length);
-    console.log('📊 [availableColors] Styles uniques:', uniqueResult.slice(0, 10).map(c => ({ name: c.name, count: c.count })));
+    console.log('  - Retour de', uniqueResult.length, 'styles');
     
     // Vérifier si des noms contiennent encore des tailles
     uniqueResult.forEach((colorData, idx) => {
