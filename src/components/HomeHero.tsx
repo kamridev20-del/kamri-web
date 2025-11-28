@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Shield, Sparkles, Star, TrendingUp, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, ChevronLeft, ChevronRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
