@@ -328,10 +328,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       if (variantKey && hasGender) {
         // Pattern: "Beige Maroon Women-36" → "Beige Maroon Women"
         // Pattern: "Black Men-36" → "Black Men"
-        // Exclure la taille numérique à la fin (30-50)
-        const styleMatch = variantKey.match(/^(.+?)(?:[- ](?:3[0-9]|4[0-9]|5[0]))?$/i);
-        if (styleMatch) {
-          style = styleMatch[1].trim();
+        // Pattern: "Beige Maroon Women 36" → "Beige Maroon Women"
+        // Exclure la taille numérique à la fin (30-50) qui suit un tiret ou un espace
+        const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
+        if (sizePattern.test(variantKey)) {
+          // Retirer la taille à la fin
+          style = variantKey.replace(sizePattern, '').trim();
         } else {
           // Fallback: prendre tout sauf la dernière partie si c'est un nombre
           const parts = variantKey.split(/[- ]/);
@@ -484,25 +486,45 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               const props = JSON.parse(variant.properties);
               
               if (typeof props === 'string') {
-                // Pattern : "Purple-S", "Black Zone2-S" → taille = "S"
-                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
-                if (sizeMatch) {
-                  size = sizeMatch[1];
+                // Pour les chaussures: "Beige Maroon Women-36" → taille = "36"
+                // Pour les vêtements: "Purple-S", "Black Zone2-S" → taille = "S"
+                // Priorité aux tailles numériques (30-50) à la fin
+                const numericSizeMatch = props.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+                if (numericSizeMatch) {
+                  size = numericSizeMatch[1];
+                } else {
+                  // Sinon, chercher une taille lettre ou autre à la fin
+                  const sizeMatch = props.match(/[- ]([A-Z0-9]+)$/i);
+                  if (sizeMatch) {
+                    size = sizeMatch[1];
+                  }
                 }
               } else if (props.value2) {
                 size = props.value2;
               } else if (props.key) {
-                const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
-                if (sizeMatch) {
-                  size = sizeMatch[1];
+                const keyStr = String(props.key);
+                // Priorité aux tailles numériques (30-50) à la fin
+                const numericSizeMatch = keyStr.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+                if (numericSizeMatch) {
+                  size = numericSizeMatch[1];
+                } else {
+                  const sizeMatch = keyStr.match(/[- ]([A-Z0-9]+)$/i);
+                  if (sizeMatch) {
+                    size = sizeMatch[1];
+                  }
                 }
               }
             } catch {
               // Ce n'est pas du JSON, c'est une string directe
-              // Format: "Purple-S", "Black-M", "Black Zone2-S"
-              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
-              if (sizeMatch) {
-                size = sizeMatch[1];
+              // Format: "Purple-S", "Black-M", "Beige Maroon Women-36"
+              const numericSizeMatch = variant.properties.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+              if (numericSizeMatch) {
+                size = numericSizeMatch[1];
+              } else {
+                const sizeMatch = variant.properties.match(/[- ]([A-Z0-9]+)$/i);
+                if (sizeMatch) {
+                  size = sizeMatch[1];
+                }
               }
             }
           } else {
@@ -511,9 +533,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             if (props.value2) {
               size = props.value2;
             } else if (props.key) {
-              const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
-              if (sizeMatch) {
-                size = sizeMatch[1];
+              const keyStr = String(props.key);
+              // Priorité aux tailles numériques (30-50) à la fin
+              const numericSizeMatch = keyStr.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+              if (numericSizeMatch) {
+                size = numericSizeMatch[1];
+              } else {
+                const sizeMatch = keyStr.match(/[- ]([A-Z0-9]+)$/i);
+                if (sizeMatch) {
+                  size = sizeMatch[1];
+                }
               }
             }
           }
@@ -611,41 +640,65 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               
               if (typeof props === 'string') {
                 variantKey = props;
-                const colorMatch = props.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-                variantColor = colorMatch ? colorMatch[1].trim() : props.split(/[-\s]/)[0];
-                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
-                variantSize = sizeMatch ? sizeMatch[1] : '';
-              } else if (props.value1 || props.value2) {
-                variantColor = props.value1 || '';
-                variantSize = props.value2 || '';
-                variantKey = props.key || '';
               } else if (props.key) {
                 variantKey = String(props.key);
-                variantColor = variantKey.split(/[-\s]/)[0];
-                const sizeMatch = variantKey.match(/[-\s]([A-Z0-9]+)$/i);
-                variantSize = sizeMatch ? sizeMatch[1] : '';
+              } else if (props.value1) {
+                variantColor = props.value1;
+              }
+              if (props.value2) {
+                variantSize = props.value2;
               }
             } catch {
               variantKey = variant.properties;
-              const colorMatch = variant.properties.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
-              variantColor = colorMatch ? colorMatch[1].trim() : variant.properties.split(/[-\s]/)[0];
-              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
-              variantSize = sizeMatch ? sizeMatch[1] : '';
             }
           } else {
             // TypeScript: properties peut être un objet dans certains cas
             const props = variant.properties as any;
+            variantKey = props.key || '';
             variantColor = props.value1 || '';
             variantSize = props.value2 || '';
-            variantKey = props.key || '';
-            if (props.key) {
-              variantColor = variantColor || String(props.key).split(/[-\s]/)[0];
-              const sizeMatch = String(props.key).match(/[-\s]([A-Z0-9]+)$/i);
-              variantSize = variantSize || (sizeMatch ? sizeMatch[1] : '');
-            }
           }
         } catch (e) {
           console.warn('Erreur matching variant:', e);
+        }
+      }
+      
+      // Si on a un variantKey, extraire le style et la taille correctement
+      if (variantKey) {
+        // Vérifier si le variant contient un genre
+        const hasGender = /(Men|Women|Man|Woman)/i.test(variantKey);
+        
+        if (hasGender) {
+          // Pour les chaussures: extraire le style complet (couleur + genre) sans la taille
+          const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
+          if (sizePattern.test(variantKey)) {
+            variantColor = variantKey.replace(sizePattern, '').trim();
+            const sizeMatch = variantKey.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+            variantSize = sizeMatch ? sizeMatch[1] : '';
+          } else {
+            // Fallback
+            const parts = variantKey.split(/[- ]/);
+            const lastPart = parts[parts.length - 1];
+            const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
+            if (isNumericSize && parts.length > 1) {
+              variantColor = parts.slice(0, -1).join(' ');
+              variantSize = lastPart;
+            } else {
+              variantColor = variantKey;
+            }
+          }
+        } else {
+          // Pas de genre, extraire comme avant
+          const colorMatch = variantKey.match(/^([A-Za-z\s]+?)(?:\s*Zone\d+)?[-\s]/i);
+          variantColor = colorMatch ? colorMatch[1].trim() : variantKey.split(/[-\s]/)[0];
+          // Priorité aux tailles numériques (30-50) à la fin
+          const numericSizeMatch = variantKey.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+          if (numericSizeMatch) {
+            variantSize = numericSizeMatch[1];
+          } else {
+            const sizeMatch = variantKey.match(/[- ]([A-Z0-9]+)$/i);
+            variantSize = sizeMatch ? sizeMatch[1] : '';
+          }
         }
       }
       
@@ -665,22 +718,28 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       if (selectedColor) {
         const selectedColorNormalized = normalizeColor(selectedColor);
         const variantColorNormalized = normalizeColor(variantColor);
+        const selectedColorLower = selectedColor.toLowerCase();
         
-        // Match exact du nom complet du variant (pour les produits sans vraies tailles)
-        // Si la couleur sélectionnée correspond exactement au nom/variantKey, c'est un match parfait
-        if (variantKey.toLowerCase() === selectedColor.toLowerCase() || 
-            variantNameLower === selectedColor.toLowerCase() ||
-            variantNameLower.includes(selectedColor.toLowerCase()) && selectedColor.length > 3) {
-          colorMatch = true;
-          score += 20; // Score très élevé pour match exact du variant complet
-        }
-        // Match exact de couleur
-        else if (variantColorNormalized === selectedColorNormalized) {
+        // Match exact du style/couleur extrait
+        if (variantColorNormalized === selectedColorNormalized) {
           colorMatch = true;
           score += 10; // Score élevé pour match exact
-        } else if (searchString.includes(selectedColorNormalized) || variantNameLower.includes(selectedColorNormalized)) {
+        }
+        // Match dans le variantKey (pour les chaussures: "Beige Maroon Women" dans "Beige Maroon Women-36")
+        else if (variantKey.toLowerCase().includes(selectedColorLower) && 
+                 selectedColorLower.length > 3) {
+          colorMatch = true;
+          score += 8; // Score élevé pour match dans la clé
+        }
+        // Match dans le nom du variant
+        else if (variantNameLower.includes(selectedColorLower) && selectedColorLower.length > 3) {
           colorMatch = true;
           score += 5; // Score moyen pour match partiel
+        }
+        // Match dans la chaîne de recherche combinée
+        else if (searchString.includes(selectedColorNormalized)) {
+          colorMatch = true;
+          score += 3; // Score faible pour match très partiel
         }
       } else {
         colorMatch = true; // Pas de couleur sélectionnée = match
