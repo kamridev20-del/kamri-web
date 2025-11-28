@@ -132,6 +132,14 @@ function extractColorFromVariantKey(variantKey: string): string {
     return matchNumeric[1].trim();
   }
   
+  // 🔥 NOUVEAU : Pattern 4: Format numérique 1000-9999 avec tiret (Puriv-3000, Puriv-4000)
+  const formatNumeric = /^(.+)[- ]([1-9][0-9]{3})$/;
+  const matchFormat = variantKey.match(formatNumeric);
+  
+  if (matchFormat) {
+    return matchFormat[1].trim();
+  }
+  
   // Fallback: retourner tel quel si aucun pattern détecté
   return variantKey.trim();
 }
@@ -403,6 +411,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         if (validSizeLetters.includes(upper)) return true;
         const numSize = parseInt(upper, 10);
         if (!isNaN(numSize) && numSize >= 30 && numSize <= 50) return true;
+        // 🔥 NOUVEAU : Formats numériques (moulinets de pêche, etc.) : 1000-9999
+        if (!isNaN(numSize) && numSize >= 1000 && numSize <= 9999) return true;
       }
       return false;
     });
@@ -809,10 +819,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 if (numericSizeMatch) {
                   size = numericSizeMatch[1];
                 } else {
-                  // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
-                  const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
-                  if (sizeMatch) {
-                    size = sizeMatch[1];
+                  // 🔥 NOUVEAU : Pattern 2b: Format numérique 1000-9999 à la fin (Puriv-3000, Puriv-4000)
+                  const formatNumericMatch = keyStr.match(/[- ]([1-9][0-9]{3})$/);
+                  if (formatNumericMatch) {
+                    size = formatNumericMatch[1];
+                  } else {
+                    // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
+                    const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
+                    if (sizeMatch) {
+                      size = sizeMatch[1];
+                    }
                   }
                 }
               }
