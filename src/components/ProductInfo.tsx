@@ -389,7 +389,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
               if (sizeMatch) size = sizeMatch[1];
             }
-          } else {
+              } else {
             const props = variant.properties as any;
             // 🔥 NOUVEAU : Vérifier aussi dans props.key
             if (props.key) {
@@ -453,8 +453,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               } catch {
                 variantKey = variant.properties;
                 variantLabel = variant.properties;
-              }
-            } else {
+            }
+          } else {
               const props = variant.properties as any;
               variantKey = props.key || '';
               variantLabel = variantKey || props.value1 || '';
@@ -512,7 +512,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               const props = JSON.parse(variant.properties);
               if (typeof props === 'string') {
                 key = props;
-              } else if (props.key) {
+            } else if (props.key) {
                 key = String(props.key);
               }
             } catch {
@@ -627,18 +627,18 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         } else {
           // Sinon, filtrer par couleurs connues (comportement original pour produits sans tailles)
           const colorLower = style.toLowerCase();
-          const knownColors = ['black', 'white', 'brown', 'gray', 'grey', 'blue', 'red', 'green', 'yellow', 'pink', 'purple', 'orange', 'khaki', 'beige', 'navy', 'tan', 'burgundy', 'wine', 'ivory', 'cream', 'gold', 'silver', 'platinum'];
-          
-          if (knownColors.includes(colorLower)) {
-            const existing = colorsMap.get(colorLower);
-            if (existing) {
-              existing.count++;
-            } else {
-              colorsMap.set(colorLower, {
+        const knownColors = ['black', 'white', 'brown', 'gray', 'grey', 'blue', 'red', 'green', 'yellow', 'pink', 'purple', 'orange', 'khaki', 'beige', 'navy', 'tan', 'burgundy', 'wine', 'ivory', 'cream', 'gold', 'silver', 'platinum'];
+        
+        if (knownColors.includes(colorLower)) {
+          const existing = colorsMap.get(colorLower);
+          if (existing) {
+            existing.count++;
+          } else {
+            colorsMap.set(colorLower, {
                 name: style.charAt(0).toUpperCase() + style.slice(1).toLowerCase(),
-                image: variant.image || '',
-                count: 1
-              });
+              image: variant.image || '',
+              count: 1
+            });
             }
           }
         }
@@ -764,10 +764,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 if (numericSizeMatch) {
                   size = numericSizeMatch[1];
                 } else {
-                  // Sinon, chercher une taille lettre ou autre à la fin
-                  const sizeMatch = props.match(/[- ]([A-Z0-9]+)$/i);
-                  if (sizeMatch) {
-                    size = sizeMatch[1];
+                  // 🔥 NOUVEAU : Formats numériques 1000-9999 à la fin (Puriv-3000, Puriv-4000)
+                  const formatNumericMatch = props.match(/[- ]([1-9][0-9]{3})$/);
+                  if (formatNumericMatch) {
+                    size = formatNumericMatch[1];
+                  } else {
+                    // Sinon, chercher une taille lettre ou autre à la fin
+                    const sizeMatch = props.match(/[- ]([A-Z0-9]+)$/i);
+                if (sizeMatch) {
+                  size = sizeMatch[1];
+                    }
                   }
                 }
               } else if (props.value2) {
@@ -788,22 +794,28 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                   } else {
                     // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
                     const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
-                    if (sizeMatch) {
-                      size = sizeMatch[1];
+                if (sizeMatch) {
+                  size = sizeMatch[1];
                     }
                   }
                 }
               }
             } catch {
               // Ce n'est pas du JSON, c'est une string directe
-              // Format: "Purple-S", "Black-M", "Beige Maroon Women-36"
+              // Format: "Purple-S", "Black-M", "Beige Maroon Women-36", "Puriv-3000"
               const numericSizeMatch = variant.properties.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
               if (numericSizeMatch) {
                 size = numericSizeMatch[1];
               } else {
-                const sizeMatch = variant.properties.match(/[- ]([A-Z0-9]+)$/i);
-                if (sizeMatch) {
-                  size = sizeMatch[1];
+                // 🔥 NOUVEAU : Formats numériques 1000-9999 (Puriv-3000, Puriv-4000)
+                const formatNumericMatch = variant.properties.match(/[- ]([1-9][0-9]{3})$/);
+                if (formatNumericMatch) {
+                  size = formatNumericMatch[1];
+                } else {
+                  const sizeMatch = variant.properties.match(/[- ]([A-Z0-9]+)$/i);
+              if (sizeMatch) {
+                size = sizeMatch[1];
+                  }
                 }
               }
             }
@@ -833,8 +845,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                   } else {
                     // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
                     const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|2XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
-                    if (sizeMatch) {
-                      size = sizeMatch[1];
+              if (sizeMatch) {
+                size = sizeMatch[1];
                     }
                   }
                 }
@@ -1078,7 +1090,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     let matchingVariant: ProductVariant | null = null;
     
-    if (selectedColor && selectedSize) {
+      if (selectedColor && selectedSize) {
       // PASS 1 : Chercher un match exact (couleur ET taille)
       matchingVariant = availableVariants.find(variant => {
         const { score, colorMatch, sizeMatch } = calculateMatchScore(variant);
@@ -1149,7 +1161,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         const { sizeMatch } = calculateMatchScore(variant);
         return sizeMatch;
       }) || null;
-    }
+      }
     
     if (matchingVariant) {
       console.log('✅ Variant trouvé:', { 
