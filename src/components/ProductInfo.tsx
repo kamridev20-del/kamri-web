@@ -369,6 +369,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     // Si pas de vraies tailles, afficher tous les variants comme options (comme CJ)
     if (!hasRealSizes) {
+      console.log('🚀🚀🚀 [availableColors] PAS DE VRAIES TAILLES - Mode options');
       availableVariants.forEach((variant) => {
         let variantLabel = '';
         let variantKey = '';
@@ -412,20 +413,31 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           variantLabel = nameParts.join(' ') || variant.name;
         }
         
+        // 🔥 NETTOYER LE LABEL AVANT DE LE STOCKER
         if (variantLabel) {
-          const labelKey = variantLabel.toLowerCase().trim();
+          const cleanedLabel = cleanColorNameUtil(variantLabel);
+          const labelKey = cleanedLabel.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
+          
           if (!colorsMap.has(labelKey)) {
+            const capitalizedLabel = cleanedLabel.split(' ').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            
             colorsMap.set(labelKey, {
-              name: variantLabel,
+              name: capitalizedLabel,
               image: variant.image || '',
               count: 1,
               variantKey: variantKey
             });
+          } else {
+            colorsMap.get(labelKey)!.count++;
           }
         }
       });
       
-      return Array.from(colorsMap.values());
+      const result = Array.from(colorsMap.values());
+      console.log('🚀🚀🚀 [availableColors] Mode options - Retour de', result.length, 'options');
+      return result;
     }
     
     // Sinon, logique normale d'extraction des couleurs/styles
