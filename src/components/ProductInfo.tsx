@@ -1062,15 +1062,23 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           ...calculateMatchScore(variant)
         })).filter(({ colorMatch, sizeMatch }) => colorMatch || sizeMatch);
         
-        // Trier par score décroissant, puis prioriser les matches de couleur
+        // Trier par score décroissant, puis prioriser les matches EXACTS (couleur ET taille)
         scoredVariants.sort((a, b) => {
           // D'abord par score
           if (b.score !== a.score) {
             return b.score - a.score;
           }
-          // Si même score, prioriser celui qui a un match de couleur
+          // Si même score, prioriser celui qui a les DEUX matches (couleur ET taille)
+          const aBothMatch = a.colorMatch && a.sizeMatch;
+          const bBothMatch = b.colorMatch && b.sizeMatch;
+          if (aBothMatch && !bBothMatch) return -1;
+          if (bBothMatch && !aBothMatch) return 1;
+          // Si aucun n'a les deux, prioriser celui qui a un match de couleur
           if (a.colorMatch && !b.colorMatch) return -1;
           if (b.colorMatch && !a.colorMatch) return 1;
+          // Si même score et même type de match, prioriser celui qui a un match de taille
+          if (a.sizeMatch && !b.sizeMatch) return -1;
+          if (b.sizeMatch && !a.sizeMatch) return 1;
           return 0;
         });
         
