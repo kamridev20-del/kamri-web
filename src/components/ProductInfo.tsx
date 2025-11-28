@@ -255,6 +255,51 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     
     const colorsMap = new Map<string, { name: string; image: string; count: number; variantKey?: string }>();
     
+    // 🔬 LOGS DE DIAGNOSTIC selon recommandation expert
+    // Note: availableSizes est calculé dans un autre useMemo, on doit le calculer ici aussi pour le diagnostic
+    const sizesFound: string[] = [];
+    availableVariants.forEach(variant => {
+      let size = '';
+      if (variant.properties) {
+        try {
+          if (typeof variant.properties === 'string') {
+            try {
+              const props = JSON.parse(variant.properties);
+              if (typeof props === 'string') {
+                const sizeMatch = props.match(/[-\s]([A-Z0-9]+)$/i);
+                if (sizeMatch) size = sizeMatch[1];
+              } else if (props.value2) {
+                size = props.value2;
+              }
+            } catch {
+              const sizeMatch = variant.properties.match(/[-\s]([A-Z0-9]+)$/i);
+              if (sizeMatch) size = sizeMatch[1];
+            }
+          } else {
+            const props = variant.properties as any;
+            if (props.value2) size = props.value2;
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+      if (size) {
+        const upper = size.toUpperCase();
+        const validSizeLetters = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        if (validSizeLetters.includes(upper)) {
+          if (!sizesFound.includes(upper)) sizesFound.push(upper);
+        } else {
+          const numSize = parseInt(upper, 10);
+          if (!isNaN(numSize) && numSize >= 30 && numSize <= 50) {
+            if (!sizesFound.includes(size)) sizesFound.push(size);
+          }
+        }
+      }
+    });
+    
+    console.log('🔬 [availableColors] Tailles trouvées dans variants:', sizesFound);
+    console.log('🔬 [availableColors] Nombre de tailles uniques:', sizesFound.length);
+    
     // D'abord, vérifier s'il y a des vraies tailles
     const hasRealSizes = availableVariants.some(variant => {
       let size = '';
@@ -291,6 +336,10 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       return false;
     });
+    
+    // 🔬 LOGS DE DIAGNOSTIC selon recommandation expert
+    console.log('🔬 [availableColors] hasRealSizes:', hasRealSizes);
+    console.log('🔬 [availableColors] Tailles trouvées:', sizesFound);
     
     // Si pas de vraies tailles, afficher tous les variants comme options (comme CJ)
     if (!hasRealSizes) {
