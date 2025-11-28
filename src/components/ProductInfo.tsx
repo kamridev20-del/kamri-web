@@ -154,11 +154,29 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
     }
     
     // 2. Si on a un variantKey avec genre, extraire le style SANS la taille
+    // Structure backend: variantKey = "Deep Rose Black Women-36" ou "Dark Gray Men-36"
     if (variantKey && hasGender) {
-      // Méthode simple et directe: split par tiret/espace et retirer la dernière partie si c'est un nombre 30-50
-      const parts = variantKey.split(/[- ]+/);
+      // Méthode principale: chercher un pattern "-36" ou " 36" à la fin et le retirer
+      // Pattern: cherche un tiret ou espace suivi d'un nombre 30-50 à la fin
+      const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/;
       
-      // Vérifier si la dernière partie est une taille numérique (30-50)
+      if (sizePattern.test(variantKey)) {
+        // Retirer la taille à la fin (tiret/espace + nombre)
+        let style = variantKey.replace(sizePattern, '').trim();
+        
+        // Nettoyage final: s'assurer qu'aucune taille ne reste ailleurs
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+        // Nettoyer les espaces multiples
+        style = style.replace(/\s+/g, ' ');
+        
+        if (style) {
+          console.log('✅ [extractStyle] Style extrait:', style, 'depuis variantKey:', variantKey);
+          return style;
+        }
+      }
+      
+      // Méthode alternative: split et vérifier la dernière partie
+      const parts = variantKey.split(/[- ]+/);
       if (parts.length > 1) {
         const lastPart = parts[parts.length - 1].trim();
         const isNumericSize = /^(3[0-9]|4[0-9]|5[0])$/.test(lastPart);
@@ -166,28 +184,16 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         if (isNumericSize) {
           // La dernière partie est une taille, prendre tout le reste comme style
           let style = parts.slice(0, -1).join(' ').trim();
-          // Nettoyage final pour s'assurer qu'aucune taille ne reste
           style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
           if (style) {
-            console.log('✅ [extractStyle] Style extrait:', style, 'depuis:', variantKey);
+            console.log('✅ [extractStyle] Style extrait (split):', style, 'depuis variantKey:', variantKey);
             return style;
           }
         }
       }
       
-      // Si pas de taille détectée à la fin, essayer avec regex
-      const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
-      if (sizePattern.test(variantKey)) {
-        let style = variantKey.replace(sizePattern, '').trim();
-        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-        if (style) {
-          console.log('✅ [extractStyle] Style extrait (regex):', style, 'depuis:', variantKey);
-          return style;
-        }
-      }
-      
-      // Si aucune taille n'est trouvée, retourner le variantKey tel quel (mais c'est suspect)
-      console.warn('⚠️ [extractStyle] Aucune taille détectée dans:', variantKey);
+      // Si aucune taille n'est trouvée, retourner le variantKey tel quel
+      console.warn('⚠️ [extractStyle] Aucune taille détectée dans variantKey:', variantKey);
       return variantKey;
     }
     
