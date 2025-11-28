@@ -517,29 +517,34 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 styleCleaned: cleanStyle,
                 capitalizedStyle: capitalizedStyle
               });
-              // Dernier nettoyage désespéré
-              const finalCleaned = capitalizedStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+              // Dernier nettoyage désespéré avec cleanColorNameUtil
+              const finalCleaned = cleanColorNameUtil(capitalizedStyle);
               if (finalCleaned) {
-                colorsMap.set(styleKey, {
+                // S'assurer que le styleKey correspond au nom nettoyé
+                const finalStyleKey = finalCleaned.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
+                colorsMap.set(finalStyleKey, {
                   name: finalCleaned,
                   image: variant.image || '',
                   count: 1
                 });
-                console.log(`✅ [availableColors] Style sauvegardé (après nettoyage d'urgence):`, finalCleaned);
+                console.log(`✅ [availableColors] Style sauvegardé (après nettoyage d'urgence): styleKey="${finalStyleKey}", name="${finalCleaned}"`);
               }
             } else {
               // Vérification finale: s'assurer qu'aucune taille n'est présente dans capitalizedStyle
-              const finalCheck = capitalizedStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+              // Utiliser cleanColorNameUtil pour garantir un nettoyage complet
+              const finalCheck = cleanColorNameUtil(capitalizedStyle);
               if (finalCheck !== capitalizedStyle) {
                 console.warn('⚠️ [availableColors] Taille détectée dans capitalizedStyle, nettoyage final:', capitalizedStyle, '→', finalCheck);
               }
-              colorsMap.set(styleKey, {
+              // S'assurer que le styleKey correspond au nom nettoyé
+              const finalStyleKey = finalCheck.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[-_]+/g, ' ');
+              colorsMap.set(finalStyleKey, {
                 name: finalCheck,
                 image: variant.image || '',
                 count: 1
               });
-              if (idx < 3) {
-                console.log(`✅ [availableColors] Nouveau style sauvegardé:`, styleKey, '→', finalCheck);
+              if (idx < 5) {
+                console.log(`✅ [availableColors] Nouveau style sauvegardé: styleKey="${finalStyleKey}", name="${finalCheck}"`);
               }
             }
           }
