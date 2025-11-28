@@ -1,11 +1,11 @@
 'use client';
 
 import { calculateDiscountPercentage, formatDiscountPercentage, getBadgeConfig } from '@kamri/lib';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { useToast } from '../contexts/ToastContext';
-import { useGeo } from '../contexts/GeoContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useGeo } from '../contexts/GeoContext';
+import { useToast } from '../contexts/ToastContext';
 import { apiClient } from '../lib/api';
 
 interface ProductVariant {
