@@ -373,7 +373,8 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               variantSize = sizeMatch ? sizeMatch[1] : '';
             }
           } else {
-            const props = variant.properties;
+            // TypeScript: properties peut être un objet dans certains cas
+            const props = variant.properties as any;
             variantColor = props.value1 || '';
             variantSize = props.value2 || '';
             variantKey = props.key || '';
