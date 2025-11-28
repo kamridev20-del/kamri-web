@@ -331,8 +331,9 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         // Pattern: "Dark Gray Men-36" → "Dark Gray Men"
         // Exclure la taille numérique à la fin (30-50) qui suit un tiret ou un espace
         
-        // Méthode 1: Regex pour retirer la taille à la fin
-        const sizePattern = /[- ](3[0-9]|4[0-9]|5[0])$/i;
+        // Méthode 1: Regex pour retirer la taille à la fin (tiret ou espace + nombre)
+        // Pattern amélioré pour capturer: "-36", " -36", "- 36", " 36"
+        const sizePattern = /[- ]\s*(3[0-9]|4[0-9]|5[0])$/i;
         if (sizePattern.test(variantKey)) {
           // Retirer la taille à la fin (tiret/espace + nombre)
           style = variantKey.replace(sizePattern, '').trim();
@@ -354,11 +355,12 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           }
         }
         
+        // Nettoyage final: retirer toute taille restante (au cas où)
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        
         // Debug: vérifier qu'on n'a pas de taille dans le style
         if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(style)) {
-          console.warn('⚠️ Taille détectée dans le style extrait:', { variantKey, style });
-          // Retirer toute taille restante
-          style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+          console.warn('⚠️ Taille détectée dans le style extrait après nettoyage:', { variantKey, style });
         }
       } else if (variantKey) {
         // Pas de genre, extraire juste la couleur (comme avant)
@@ -413,6 +415,14 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       }
       
       if (style) {
+        // Nettoyage final: s'assurer qu'aucune taille n'est présente
+        style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        
+        // Ne pas stocker si le style est vide après nettoyage
+        if (!style) {
+          console.warn('⚠️ Style vide après nettoyage:', { variantKey, variantName: variant.name });
+        } else {
+        
         const styleKey = style.toLowerCase().trim();
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
@@ -426,19 +436,28 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
             
-            // Debug: vérifier que le style ne contient pas de taille
+            // Vérification finale: s'assurer qu'aucune taille n'est présente
             if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(capitalizedStyle)) {
-              console.warn('⚠️ Style contient encore une taille:', { 
+              console.error('❌ ERREUR: Style contient encore une taille après tous les nettoyages:', { 
                 original: variantKey || variant.name, 
                 extracted: capitalizedStyle 
               });
+              // Retirer une dernière fois
+              const cleanedStyle = capitalizedStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+              if (cleanedStyle) {
+                colorsMap.set(styleKey, {
+                  name: cleanedStyle,
+                  image: variant.image || '',
+                  count: 1
+                });
+              }
+            } else {
+              colorsMap.set(styleKey, {
+                name: capitalizedStyle,
+                image: variant.image || '',
+                count: 1
+              });
             }
-            
-            colorsMap.set(styleKey, {
-              name: capitalizedStyle,
-              image: variant.image || '',
-              count: 1
-            });
           }
         } else {
           // Sinon, filtrer par couleurs connues (comportement original)
@@ -458,6 +477,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
             }
           }
         }
+        } // Fermeture du else pour le nettoyage
       }
     });
     
