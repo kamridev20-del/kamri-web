@@ -1233,15 +1233,31 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           <div className="flex flex-wrap gap-2">
             {availableColors.map((colorData, index) => {
               const cleanName = cleanColorName(colorData.name);
-              const isSelected = selectedColor === cleanName;
+              // Normaliser pour la comparaison (même logique que le filtrage)
+              const normalizedSelected = selectedColor ? cleanColorNameUtil(selectedColor).toLowerCase().trim().replace(/\s+/g, ' ') : '';
+              const normalizedCurrent = cleanName.toLowerCase().trim().replace(/\s+/g, ' ');
+              const isSelected = normalizedSelected === normalizedCurrent && normalizedSelected !== '';
+              
+              // Debug pour les premiers éléments
+              if (index < 3) {
+                console.log(`🔍 [Render] Carte [${index}]:`, {
+                  colorDataName: colorData.name,
+                  cleanName: cleanName,
+                  normalizedCurrent: normalizedCurrent,
+                  selectedColor: selectedColor,
+                  normalizedSelected: normalizedSelected,
+                  isSelected: isSelected
+                });
+              }
               
               return (
               <button
-                key={`${cleanName}-${index}`}
+                key={`style-${normalizedCurrent}-${index}`}
                 onClick={() => {
                   if (cleanName !== colorData.name) {
                     console.warn('⚠️ [Clic couleur] Nom nettoyé:', colorData.name, '→', cleanName);
                   }
+                  console.log(`🎯 [Clic] Style sélectionné: "${cleanName}" (normalized: "${normalizedCurrent}")`);
                   setSelectedColor(cleanName);
                 }}
                 className={`relative flex flex-col items-center p-1.5 rounded-lg border-2 transition-all duration-200 ${
@@ -1271,7 +1287,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                   </div>
                 )}
               </button>
-            );
+              );
             })}
           </div>
         </div>
