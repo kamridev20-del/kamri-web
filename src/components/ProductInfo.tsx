@@ -192,8 +192,31 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         }
       }
       
-      // Si aucune taille n'est trouvée, retourner le variantKey tel quel
-      console.warn('⚠️ [extractStyle] Aucune taille détectée dans variantKey:', variantKey);
+      // Si aucune taille n'est trouvée avec les méthodes précédentes, essayer une dernière fois
+      // Peut-être que le format est différent, essayons de retirer toute séquence numérique à la fin
+      const lastNumberMatch = variantKey.match(/(.+?)[- ]*(\d+)$/);
+      if (lastNumberMatch) {
+        const possibleSize = parseInt(lastNumberMatch[2], 10);
+        if (possibleSize >= 30 && possibleSize <= 50) {
+          let style = lastNumberMatch[1].trim();
+          style = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+          if (style) {
+            console.log('✅ [extractStyle] Style extrait (dernière méthode):', style, 'depuis variantKey:', variantKey);
+            return style;
+          }
+        }
+      }
+      
+      // Dernier recours: si on arrive ici, il n'y a probablement pas de taille
+      // Mais on ne doit JAMAIS retourner le variantKey complet s'il contient un nombre qui pourrait être une taille
+      const hasPotentialSize = /\d+/.test(variantKey);
+      if (hasPotentialSize) {
+        console.warn('⚠️ [extractStyle] VariantKey contient des nombres mais aucune taille détectée:', variantKey);
+        // Retirer quand même les nombres à la fin par sécurité
+        const cleaned = variantKey.replace(/[- ]*\d+$/, '').trim();
+        return cleaned || variantKey; // Retourner le cleaned ou le variantKey si cleaned est vide
+      }
+      
       return variantKey;
     }
     
@@ -414,42 +437,74 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       // Utiliser la fonction utilitaire pour extraire le style
       const style = extractStyleFromVariant(variant, hasGender);
       
+      // Debug: vérifier ce qui est extrait
+      if (idx < 3) {
+        console.log(`🔍 [availableColors] Variant ${idx}:`, {
+          variantName: variant.name,
+          properties: variant.properties,
+          styleExtracted: style
+        });
+      }
+      
       if (style) {
-        const styleKey = style.toLowerCase().trim();
+        // Nettoyage final strict: s'assurer qu'aucune taille n'est présente
+        let cleanStyle = style.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+        
+        // Si le style est vide après nettoyage, skip ce variant
+        if (!cleanStyle) {
+          console.warn('⚠️ [availableColors] Style vide après nettoyage pour variant:', variant.name);
+          return; // Skip ce variant
+        }
+        
+        const styleKey = cleanStyle.toLowerCase().trim();
         
         // Si on a des genres, accepter tous les styles (pas seulement les couleurs connues)
         if (hasGender) {
           const existing = colorsMap.get(styleKey);
           if (existing) {
             existing.count++;
+            if (idx < 3) {
+              console.log(`✅ [availableColors] Style existant trouvé, count incrémenté:`, styleKey, '→', existing.name);
+            }
           } else {
             // Capitaliser chaque mot du style
-            const capitalizedStyle = style.split(' ').map(word => 
+            const capitalizedStyle = cleanStyle.split(' ').map(word => 
               word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
             
-            // Vérification finale: s'assurer qu'aucune taille n'est présente
+            // Vérification finale absolue: s'assurer qu'aucune taille n'est présente
             if (/\b(3[0-9]|4[0-9]|5[0])\b/.test(capitalizedStyle)) {
-              console.error('❌ ERREUR: Style contient encore une taille après extraction:', { 
+              console.error('❌ ERREUR CRITIQUE: Style contient encore une taille après TOUS les nettoyages:', { 
                 variantName: variant.name,
                 properties: variant.properties,
-                extracted: capitalizedStyle 
+                styleOriginal: style,
+                styleCleaned: cleanStyle,
+                capitalizedStyle: capitalizedStyle
               });
-              // Retirer une dernière fois
-              const cleanedStyle = capitalizedStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
-              if (cleanedStyle) {
+              // Dernier nettoyage désespéré
+              const finalCleaned = capitalizedStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+              if (finalCleaned) {
                 colorsMap.set(styleKey, {
-                  name: cleanedStyle,
+                  name: finalCleaned,
                   image: variant.image || '',
                   count: 1
                 });
+                console.log(`✅ [availableColors] Style sauvegardé (après nettoyage d'urgence):`, finalCleaned);
               }
             } else {
+              // Vérification finale: s'assurer qu'aucune taille n'est présente dans capitalizedStyle
+              const finalCheck = capitalizedStyle.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim().replace(/\s+/g, ' ');
+              if (finalCheck !== capitalizedStyle) {
+                console.warn('⚠️ [availableColors] Taille détectée dans capitalizedStyle, nettoyage final:', capitalizedStyle, '→', finalCheck);
+              }
               colorsMap.set(styleKey, {
-                name: capitalizedStyle,
+                name: finalCheck,
                 image: variant.image || '',
                 count: 1
               });
+              if (idx < 3) {
+                console.log(`✅ [availableColors] Nouveau style sauvegardé:`, styleKey, '→', finalCheck);
+              }
             }
           }
         } else {
@@ -740,6 +795,18 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       return { variantColor, variantSize, variantKey };
     };
     
+    // Fonction pour nettoyer le selectedColor de toute taille restante
+    const cleanSelectedColor = (color: string | null): string => {
+      if (!color) return '';
+      // Retirer toute taille numérique (30-50) du selectedColor
+      let cleaned = color.replace(/\b(3[0-9]|4[0-9]|5[0])\b/g, '').trim();
+      // Retirer aussi les tirets/espaces avec nombres à la fin
+      cleaned = cleaned.replace(/[- ]*\d+$/, '').trim();
+      // Nettoyer les espaces multiples
+      cleaned = cleaned.replace(/\s+/g, ' ');
+      return cleaned;
+    };
+    
     // Fonction pour calculer le score de matching d'un variant
     const calculateMatchScore = (variant: ProductVariant) => {
       const { variantColor, variantSize, variantKey } = extractVariantInfo(variant);
@@ -751,9 +818,11 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       let sizeMatch = false;
       
       if (selectedColor) {
-        const selectedColorNormalized = normalizeColor(selectedColor);
+        // Nettoyer selectedColor pour retirer toute taille restante
+        const cleanedSelectedColor = cleanSelectedColor(selectedColor);
+        const selectedColorNormalized = normalizeColor(cleanedSelectedColor);
         const variantColorNormalized = normalizeColor(variantColor);
-        const selectedColorLower = selectedColor.toLowerCase();
+        const selectedColorLower = cleanedSelectedColor.toLowerCase();
         
         // Match exact du style/couleur extrait
         if (variantColorNormalized === selectedColorNormalized) {
