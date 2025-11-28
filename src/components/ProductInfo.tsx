@@ -724,14 +724,23 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 size = props.value2;
               } else if (props.key) {
                 const keyStr = String(props.key);
-                // Priorité aux tailles numériques (30-50) à la fin
-                const numericSizeMatch = keyStr.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
-                if (numericSizeMatch) {
-                  size = numericSizeMatch[1];
+                // 🔥 CORRECTION : Chercher la taille au DÉBUT (S-Black, M-Black) OU à la FIN
+                // Pattern 1: Taille au DÉBUT (S-Black, S Black, M-Orange, XL Army Green)
+                const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+                const matchStart = keyStr.match(sizeAtStart);
+                if (matchStart) {
+                  size = matchStart[1];
                 } else {
-                  const sizeMatch = keyStr.match(/[- ]([A-Z0-9]+)$/i);
-                  if (sizeMatch) {
-                    size = sizeMatch[1];
+                  // Pattern 2: Taille numérique à la fin (Black-36, Women-37)
+                  const numericSizeMatch = keyStr.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+                  if (numericSizeMatch) {
+                    size = numericSizeMatch[1];
+                  } else {
+                    // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
+                    const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
+                    if (sizeMatch) {
+                      size = sizeMatch[1];
+                    }
                   }
                 }
               }
@@ -755,14 +764,23 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               size = props.value2;
             } else if (props.key) {
               const keyStr = String(props.key);
-              // Priorité aux tailles numériques (30-50) à la fin
-              const numericSizeMatch = keyStr.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
-              if (numericSizeMatch) {
-                size = numericSizeMatch[1];
+              // 🔥 CORRECTION : Chercher la taille au DÉBUT (S-Black, M-Black) OU à la FIN
+              // Pattern 1: Taille au DÉBUT (S-Black, S Black, M-Orange, XL Army Green)
+              const sizeAtStart = /^(XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)[\s-]+/i;
+              const matchStart = keyStr.match(sizeAtStart);
+              if (matchStart) {
+                size = matchStart[1];
               } else {
-                const sizeMatch = keyStr.match(/[- ]([A-Z0-9]+)$/i);
-                if (sizeMatch) {
-                  size = sizeMatch[1];
+                // Pattern 2: Taille numérique à la fin (Black-36, Women-37)
+                const numericSizeMatch = keyStr.match(/[- ](3[0-9]|4[0-9]|5[0])$/i);
+                if (numericSizeMatch) {
+                  size = numericSizeMatch[1];
+                } else {
+                  // Pattern 3: Taille lettre à la fin (Black-S, Orange-XL)
+                  const sizeMatch = keyStr.match(/[- ](XXS|XS|S|M|L|XL|XXL|XXXL|3XL|4XL|5XL|6XL|XI)$/i);
+                  if (sizeMatch) {
+                    size = sizeMatch[1];
+                  }
                 }
               }
             }
