@@ -287,7 +287,7 @@ export default function HomeHero() {
 
           {/* Image - Colonne droite (dans le carrousel) */}
           <div className="hero-image relative order-1 lg:order-2">
-            <div className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] xl:h-[300px] overflow-hidden rounded-2xl shadow-2xl">
+            <div className="relative w-full max-w-sm mx-auto lg:max-w-md aspect-[2/3] h-[400px] sm:h-[480px] lg:h-[560px] xl:h-[600px] overflow-hidden rounded-2xl shadow-2xl">
               <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={`img-${currentImageSlide.id}`}
