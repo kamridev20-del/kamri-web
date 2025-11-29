@@ -6,6 +6,12 @@ import { apiClient } from '../lib/api';
 interface CartItem {
   id: string;
   productId: string;
+  variantId?: string | null;
+  variantDetails?: {
+    color?: string;
+    size?: string;
+    [key: string]: any;
+  } | null;
   quantity: number;
   product: {
     id: string;
@@ -22,13 +28,18 @@ interface CartItem {
     };
     images?: Array<{ url: string; alt?: string }>;
   };
+  variant?: {
+    id: string;
+    name: string | null;
+    properties: string | null;
+  } | null;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
   cartCount: number;
   loading: boolean;
-  addToCart: (productId: string, quantity?: number, variantId?: string) => Promise<void>;
+  addToCart: (productId: string, quantity?: number, variantId?: string, variantDetails?: any) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -85,15 +96,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children, userId }) 
     }
   }, [userId]);
 
-  const addToCart = useCallback(async (productId: string, quantity: number = 1, variantId?: string) => {
+  const addToCart = useCallback(async (productId: string, quantity: number = 1, variantId?: string, variantDetails?: any) => {
     if (!userId) {
       console.error('❌ [CartContext] Impossible d\'ajouter au panier: utilisateur non connecté');
       throw new Error('Vous devez être connecté pour ajouter au panier');
     }
     
     try {
-      console.log('🛒 [CartContext] Ajout au panier:', { productId, quantity, variantId, userId });
-      const response = await apiClient.addToCart(productId, quantity, variantId);
+      console.log('🛒 [CartContext] Ajout au panier:', { productId, quantity, variantId, variantDetails, userId });
+      const response = await apiClient.addToCart(productId, quantity, variantId, variantDetails);
       if (response.error) {
         throw new Error(response.error);
       }

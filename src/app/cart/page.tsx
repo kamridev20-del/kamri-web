@@ -831,6 +831,22 @@ export default function CartPage() {
                                   {item.productName}
                                 </h4>
                               </Link>
+                              {/* Afficher les détails du variant si disponibles */}
+                              {(() => {
+                                const cartItem = (cartItems || []).find(ci => ci.id === item.id);
+                                const variantDetails = cartItem?.variantDetails;
+                                if (variantDetails && (variantDetails.color || variantDetails.size)) {
+                                  const details = [];
+                                  if (variantDetails.color) details.push(`Couleur: ${variantDetails.color}`);
+                                  if (variantDetails.size) details.push(`Taille: ${variantDetails.size}`);
+                                  return (
+                                    <p className="text-sm text-[#4CAF50] font-medium mb-1">
+                                      {details.join(' • ')}
+                                    </p>
+                                  );
+                                }
+                                return null;
+                              })()}
                               <p className="text-sm text-gray-500 mb-2">${item.price.toFixed(2)} × {item.quantity}</p>
                               
                               {/* Contrôles quantité */}
@@ -970,6 +986,15 @@ export default function CartPage() {
                               {item.product.name}
                             </h3>
                           </Link>
+                          {/* Afficher les détails du variant si disponibles */}
+                          {item.variantDetails && (item.variantDetails.color || item.variantDetails.size) && (
+                            <p className="text-sm text-[#4CAF50] font-medium mb-1">
+                              {[
+                                item.variantDetails.color && `Couleur: ${item.variantDetails.color}`,
+                                item.variantDetails.size && `Taille: ${item.variantDetails.size}`
+                              ].filter(Boolean).join(' • ')}
+                            </p>
+                          )}
                           <p className="text-sm text-gray-500">
                             {item.product.category?.name || 'Non catégorisé'} • {item.product.supplier?.name || 'N/A'}
                           </p>

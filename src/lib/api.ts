@@ -374,10 +374,10 @@ export class ApiClient {
     return this.fetchWithAuth('/cart');
   }
 
-  async addToCart(productId: string, quantity: number = 1, variantId?: string): Promise<ApiResponse<any>> {
+  async addToCart(productId: string, quantity: number = 1, variantId?: string, variantDetails?: any): Promise<ApiResponse<any>> {
     return this.fetchWithAuth('/cart', {
       method: 'POST',
-      body: JSON.stringify({ productId, quantity, variantId }),
+      body: JSON.stringify({ productId, quantity, variantId, variantDetails }),
     });
   }
 

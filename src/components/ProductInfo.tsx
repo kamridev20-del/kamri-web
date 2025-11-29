@@ -1275,9 +1275,23 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       // ✅ Utiliser le variant sélectionné ou le variant unique s'il n'y en a qu'un
       const variantToUse = selectedVariant || (availableVariants.length === 1 ? availableVariants[0] : null);
       
-      // ✅ Envoyer le variantId si disponible
-      console.log('📤 [ProductInfo] Appel addToCart:', { productId: product.id, quantity, variantId: variantToUse?.id });
-      await addToCart(product.id, quantity, variantToUse?.id);
+      // ✅ Extraire les détails du variant (taille, couleur)
+      const variantDetails: any = {};
+      if (selectedColor) {
+        variantDetails.color = cleanColorNameUtil(selectedColor);
+      }
+      if (selectedSize) {
+        variantDetails.size = selectedSize;
+      }
+      
+      // ✅ Envoyer le variantId et les détails si disponibles
+      console.log('📤 [ProductInfo] Appel addToCart:', { 
+        productId: product.id, 
+        quantity, 
+        variantId: variantToUse?.id,
+        variantDetails 
+      });
+      await addToCart(product.id, quantity, variantToUse?.id, variantDetails);
       console.log('✅ [ProductInfo] Produit ajouté avec succès');
       toast?.success?.(`${quantity} article${quantity > 1 ? 's' : ''} ajouté${quantity > 1 ? 's' : ''} au panier`);
     } catch (error) {
