@@ -1,0 +1,107 @@
+{
+  "common": {
+    "search": "Search",
+    "search_placeholder": "Search for products...",
+    "add_to_cart": "Add to cart",
+    "price": "Price",
+    "add_to_wishlist": "Add to favorites",
+    "remove_from_wishlist": "Remove from favorites",
+    "view_details": "View details",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "no_results": "No results found"
+  },
+  "navigation": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "contact": "Contact",
+    "cart": "Cart",
+    "profile": "Profile",
+    "orders": "Orders",
+    "favorites": "Favorites",
+    "compare": "Compare",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "product": {
+    "title": "Product",
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "add_to_cart": "Add to cart",
+    "out_of_stock": "Out of stock",
+    "in_stock": "In stock",
+    "quantity": "Quantity",
+    "select_variant": "Select a variant",
+    "related_products": "Related products",
+    "recently_viewed": "Recently viewed",
+    "viewers_count": "person(s) viewing this product",
+    "rating": "Rating",
+    "reviews_count": "reviews",
+    "write_review": "Write a review",
+    "no_reviews": "No reviews for this product"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continue_shopping": "Continue shopping",
+    "remove_item": "Remove item",
+    "update_quantity": "Update quantity"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shipping_address": "Shipping address",
+    "payment_method": "Payment method",
+    "order_summary": "Order summary",
+    "place_order": "Place order",
+    "processing": "Processing...",
+    "order_confirmed": "Order confirmed"
+  },
+  "profile": {
+    "title": "My profile",
+    "personal_info": "Personal information",
+    "addresses": "Addresses",
+    "orders": "My orders",
+    "settings": "Settings",
+    "change_password": "Change password"
+  },
+  "footer": {
+    "about": "About",
+    "contact": "Contact",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy",
+    "follow_us": "Follow us",
+    "newsletter": "Newsletter",
+    "subscribe": "Subscribe"
+  },
+  "errors": {
+    "not_found": "Page not found",
+    "server_error": "Server error",
+    "network_error": "Network error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden"
+  },
+  "language": {
+    "french": "Français",
+    "english": "English",
+    "select_language": "Select language"
+  }
+}
+

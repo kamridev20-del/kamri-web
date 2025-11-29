@@ -11,6 +11,8 @@ import { apiClient } from '../lib/api';
 import AuthModal from './AuthModal';
 import CountrySelector from './CountrySelector';
 import CurrencySelector from './CurrencySelector';
+import LanguageSelector from './LanguageSelector';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface SearchResult {
   products: Array<{
@@ -48,6 +50,7 @@ export default function ModernHeader() {
   const { isAuthenticated, user, logout } = useAuth();
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
+  const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLFormElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -209,11 +212,12 @@ export default function ModernHeader() {
     };
   }, [lastScrollY]);
 
+  // Catégories avec traductions
   const categories = [
-    { name: 'Accueil', href: '/', icon: '🏠' },
-    { name: 'Produits', href: '/products', icon: '🛍️' },
-    { name: 'Catégories', href: '/categories', icon: '📋' },
-    { name: 'Contact', href: '/contact', icon: '📞' },
+    { name: t('navigation.home'), href: '/', icon: '🏠' },
+    { name: t('navigation.products'), href: '/products', icon: '🛍️' },
+    { name: t('navigation.categories'), href: '/categories', icon: '📋' },
+    { name: t('navigation.contact'), href: '/contact', icon: '📞' },
     { name: 'Promos', href: '/promotions', icon: '💸' },
   ];
 
@@ -283,7 +287,7 @@ export default function ModernHeader() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Rechercher des produits..."
+                  placeholder={t('common.search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {
@@ -473,6 +477,9 @@ export default function ModernHeader() {
                 <CountrySelector />
               </div>
 
+              {/* Sélecteur de langue */}
+              <LanguageSelector />
+
               {/* Favoris */}
               <Link href="/favorites" className="relative p-1.5 sm:p-2 lg:p-3 text-[#424242] hover:text-[#4CAF50] hover:bg-[#E8F5E8] rounded-full transition-all duration-300 ease-in-out hover:scale-110">
                 <svg className="h-5 w-5 sm:h-5 lg:h-6 lg:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -568,7 +575,7 @@ export default function ModernHeader() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Rechercher des produits..."
+                  placeholder={t('common.search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {

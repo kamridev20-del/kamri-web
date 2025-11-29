@@ -1,0 +1,107 @@
+{
+  "common": {
+    "search": "Rechercher",
+    "search_placeholder": "Rechercher des produits...",
+    "add_to_cart": "Ajouter au panier",
+    "price": "Prix",
+    "add_to_wishlist": "Ajouter aux favoris",
+    "remove_from_wishlist": "Retirer des favoris",
+    "view_details": "Voir les détails",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Envoyer",
+    "no_results": "Aucun résultat trouvé"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "products": "Produits",
+    "categories": "Catégories",
+    "contact": "Contact",
+    "cart": "Panier",
+    "profile": "Profil",
+    "orders": "Commandes",
+    "favorites": "Favoris",
+    "compare": "Comparer",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "Inscription"
+  },
+  "product": {
+    "title": "Produit",
+    "description": "Description",
+    "specifications": "Spécifications",
+    "reviews": "Avis",
+    "add_to_cart": "Ajouter au panier",
+    "out_of_stock": "Rupture de stock",
+    "in_stock": "En stock",
+    "quantity": "Quantité",
+    "select_variant": "Sélectionner une variante",
+    "related_products": "Produits similaires",
+    "recently_viewed": "Récemment consultés",
+    "viewers_count": "personne(s) regarde(nt) ce produit",
+    "rating": "Note",
+    "reviews_count": "avis",
+    "write_review": "Écrire un avis",
+    "no_reviews": "Aucun avis pour ce produit"
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "subtotal": "Sous-total",
+    "shipping": "Livraison",
+    "total": "Total",
+    "checkout": "Passer la commande",
+    "continue_shopping": "Continuer les achats",
+    "remove_item": "Retirer l'article",
+    "update_quantity": "Mettre à jour la quantité"
+  },
+  "checkout": {
+    "title": "Commande",
+    "shipping_address": "Adresse de livraison",
+    "payment_method": "Méthode de paiement",
+    "order_summary": "Résumé de la commande",
+    "place_order": "Passer la commande",
+    "processing": "Traitement en cours...",
+    "order_confirmed": "Commande confirmée"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "personal_info": "Informations personnelles",
+    "addresses": "Adresses",
+    "orders": "Mes commandes",
+    "settings": "Paramètres",
+    "change_password": "Changer le mot de passe"
+  },
+  "footer": {
+    "about": "À propos",
+    "contact": "Contact",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "follow_us": "Suivez-nous",
+    "newsletter": "Newsletter",
+    "subscribe": "S'abonner"
+  },
+  "errors": {
+    "not_found": "Page non trouvée",
+    "server_error": "Erreur serveur",
+    "network_error": "Erreur réseau",
+    "unauthorized": "Non autorisé",
+    "forbidden": "Accès interdit"
+  },
+  "language": {
+    "french": "Français",
+    "english": "English",
+    "select_language": "Sélectionner la langue"
+  }
+}
+

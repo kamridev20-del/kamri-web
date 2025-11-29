@@ -7,6 +7,7 @@ import { AuthProvider } from '../contexts/AuthContext'
 import { ToastProvider } from '../contexts/ToastContext'
 import { GeoProvider } from '../contexts/GeoContext'
 import { CurrencyProvider } from '../contexts/CurrencyContext'
+import { LanguageProvider } from '../contexts/LanguageContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -25,23 +26,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <GeoProvider>
-            <CurrencyProvider>
-              <AppProvider>
-                <CompareProvider>
-                  <ToastProvider>
-                    <ConnectedProviders>
-                      <div className="min-h-screen bg-[#F5F5F5]">
-                        <main>{children}</main>
-                      </div>
-                    </ConnectedProviders>
-                  </ToastProvider>
-                </CompareProvider>
-              </AppProvider>
-            </CurrencyProvider>
-          </GeoProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <GeoProvider>
+              <CurrencyProvider>
+                <AppProvider>
+                  <CompareProvider>
+                    <ToastProvider>
+                      <ConnectedProviders>
+                        <div className="min-h-screen bg-[#F5F5F5]">
+                          <main>{children}</main>
+                        </div>
+                      </ConnectedProviders>
+                    </ToastProvider>
+                  </CompareProvider>
+                </AppProvider>
+              </CurrencyProvider>
+            </GeoProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   )
