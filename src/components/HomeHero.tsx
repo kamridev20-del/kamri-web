@@ -67,7 +67,7 @@ interface HeroSlide {
 }
 
 export default function HomeHero() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -87,7 +87,7 @@ export default function HomeHero() {
         setLoadingProducts(true);
         
         // Charger tous les produits
-        const productsResponse = await apiClient.getProducts();
+        const productsResponse = await apiClient.getProducts(language as 'fr' | 'en');
         if (productsResponse.data) {
           const backendProductsData = (productsResponse.data as any).data || productsResponse.data;
           const allProducts = Array.isArray(backendProductsData) ? backendProductsData : [];

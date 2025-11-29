@@ -18,7 +18,7 @@ interface Category {
 }
 
 export default function ProductsPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -49,7 +49,7 @@ export default function ProductsPage() {
         }
 
         // Charger les produits
-        const productsResponse = await apiClient.getProducts();
+        const productsResponse = await apiClient.getProducts(language as 'fr' | 'en');
         if (productsResponse.data) {
           setProducts(productsResponse.data);
         }

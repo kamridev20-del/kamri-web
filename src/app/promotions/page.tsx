@@ -15,7 +15,7 @@ interface Category {
 }
 
 export default function PromotionsPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);

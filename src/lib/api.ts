@@ -212,11 +212,18 @@ export class ApiClient {
   }
 
 
-  private async fetchPublic(endpoint: string, options: RequestInit = {}): Promise<ApiResponse> {
+  private async fetchPublic(endpoint: string, options: RequestInit = {}, queryParams?: Record<string, string>): Promise<ApiResponse> {
     console.log('🌐 [API] fetchPublic appelé', { endpoint });
     
+    // Ajouter les query params à l'URL
+    let url = `${API_BASE_URL}${endpoint}`;
+    if (queryParams && Object.keys(queryParams).length > 0) {
+      const params = new URLSearchParams(queryParams);
+      url += `?${params.toString()}`;
+    }
+    
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const response = await fetch(url, {
         ...options,
         headers: {
           'Content-Type': 'application/json',
@@ -282,14 +289,18 @@ export class ApiClient {
   }
 
   // Produits
-  async getProducts(): Promise<ApiResponse<Product[]>> {
-    return this.fetchPublic('/products');
+  async getProducts(lang?: 'fr' | 'en'): Promise<ApiResponse<Product[]>> {
+    const queryParams: Record<string, string> = {};
+    if (lang) {
+      queryParams.lang = lang;
+    }
+    return this.fetchPublic('/products', {}, queryParams);
   }
 
   /**
    * Rechercher des produits et catégories
    */
-  async searchProducts(query: string, limit: number = 10, includePopular: boolean = false): Promise<ApiResponse<{
+  async searchProducts(query: string, limit: number = 10, includePopular: boolean = false, lang?: 'fr' | 'en'): Promise<ApiResponse<{
     products: Product[];
     categories: Array<{
       id: string;
@@ -313,6 +324,9 @@ export class ApiClient {
       if (includePopular) {
         params.append('popular', 'true');
       }
+      if (lang) {
+        params.append('lang', lang);
+      }
 
       const response = await fetch(`${API_BASE_URL}/products/search?${params.toString()}`, {
         method: 'GET',
@@ -335,8 +349,12 @@ export class ApiClient {
     }
   }
 
-  async getProduct(id: string): Promise<ApiResponse<Product>> {
-    return this.fetchPublic(`/products/${id}`);
+  async getProduct(id: string, lang?: 'fr' | 'en'): Promise<ApiResponse<Product>> {
+    const queryParams: Record<string, string> = {};
+    if (lang) {
+      queryParams.lang = lang;
+    }
+    return this.fetchPublic(`/products/${id}`, {}, queryParams);
   }
 
   // Catégories

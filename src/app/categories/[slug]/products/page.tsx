@@ -13,7 +13,7 @@ import { apiClient, Category, Product } from '../../../../lib/api';
 import { useTranslation } from '../../../../contexts/LanguageContext';
 
 export default function CategoryProductsPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const params = useParams();
   const slug = params.slug as string;
   
@@ -58,7 +58,7 @@ export default function CategoryProductsPage() {
             setCategory(foundCategory);
             
             // Charger tous les produits
-            const productsResponse = await apiClient.getProducts();
+            const productsResponse = await apiClient.getProducts(language as 'fr' | 'en');
             if (productsResponse.data) {
               // Même logique pour les produits
               const backendProductsData = (productsResponse.data as any).data || productsResponse.data;

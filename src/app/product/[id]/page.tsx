@@ -107,7 +107,8 @@ export default function ProductDetailsPage() {
         setLoading(true);
         
         // Charger le produit spécifique
-        const productResponse = await apiClient.getProduct(productId);
+        const language = typeof window !== 'undefined' ? (localStorage.getItem('language') || 'fr') : 'fr';
+        const productResponse = await apiClient.getProduct(productId, language as 'fr' | 'en');
         console.log('🔍 [ProductDetail] Response from API:', productResponse);
         
         if (productResponse.data) {
@@ -118,7 +119,7 @@ export default function ProductDetailsPage() {
           setProduct(backendData);
           
           // Charger tous les produits pour les produits similaires
-          const productsResponse = await apiClient.getProducts();
+          const productsResponse = await apiClient.getProducts(language as 'fr' | 'en');
           if (productsResponse.data) {
             // Même logique pour les produits - gérer les deux formats de réponse
             const backendProductsData = (productsResponse.data as any)?.data || productsResponse.data;

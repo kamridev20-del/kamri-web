@@ -22,7 +22,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const loadProducts = async () => {
     try {
-      const response = await apiClient.getProducts();
+      const language = typeof window !== 'undefined' ? (localStorage.getItem('language') || 'fr') : 'fr';
+      const response = await apiClient.getProducts(language as 'fr' | 'en');
       if (response.data) {
         setProducts(response.data);
       } else {

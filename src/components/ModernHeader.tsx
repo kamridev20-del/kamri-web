@@ -50,7 +50,7 @@ export default function ModernHeader() {
   const { isAuthenticated, user, logout } = useAuth();
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLFormElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -66,7 +66,7 @@ export default function ModernHeader() {
   // Charger les recherches populaires
   const loadPopularSearches = useCallback(async () => {
     try {
-      const response = await apiClient.searchProducts('', 8, true);
+      const response = await apiClient.searchProducts('', 8, true, language as 'fr' | 'en');
       if (response.data && response.data.popularSearches) {
         setSearchResults({
           products: [],
@@ -92,7 +92,7 @@ export default function ModernHeader() {
 
     setIsSearching(true);
     try {
-      const response = await apiClient.searchProducts(query.trim(), 8);
+      const response = await apiClient.searchProducts(query.trim(), 8, false, language as 'fr' | 'en');
       if (response.data) {
         setSearchResults(response.data);
         setShowSearchDropdown(true);

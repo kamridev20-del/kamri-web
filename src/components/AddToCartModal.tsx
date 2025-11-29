@@ -86,7 +86,7 @@ const getAllImages = (image: string | string[] | null | undefined): string[] => 
 };
 
 export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }: AddToCartModalProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { addToCart } = useCart();
   const toast = useToast();
   const { isAuthenticated } = useAuth();
@@ -107,7 +107,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
     if (isOpen && product) {
       const loadProductDetails = async () => {
         try {
-          const response = await apiClient.getProduct(product.id);
+          const response = await apiClient.getProduct(product.id, language as 'fr' | 'en');
           if (response.data) {
             const fullProduct = response.data as any;
             // Gérer les deux formats de réponse possibles
