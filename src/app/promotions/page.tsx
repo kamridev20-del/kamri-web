@@ -40,7 +40,7 @@ export default function PromotionsPage() {
         }
 
         // Charger les produits
-        const productsResponse = await apiClient.getProducts();
+        const productsResponse = await apiClient.getProducts(language as 'fr' | 'en');
         if (productsResponse.data) {
           setProducts(productsResponse.data);
         }
@@ -52,7 +52,7 @@ export default function PromotionsPage() {
     };
 
     loadData();
-  }, []);
+  }, [language]); // ✅ Recharger quand la langue change
 
   // Filtrage des produits - SEULEMENT les produits en promotion
   useEffect(() => {

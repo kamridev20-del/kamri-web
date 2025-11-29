@@ -14,6 +14,7 @@ import ProductStats from '../../../components/ProductStats';
 import ProductFAQ from '../../../components/ProductFAQ';
 import RecommendedProducts from '../../../components/RecommendedProducts';
 import { apiClient } from '../../../lib/api';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 
 interface ProductVariant {
@@ -93,6 +94,7 @@ function getRecommendedProducts(allProducts: Product[], currentId: string, limit
 export default function ProductDetailsPage() {
   const params = useParams();
   const productId = params.id as string;
+  const { language } = useTranslation(); // ✅ Utiliser le contexte de langue
   
   const [product, setProduct] = useState<Product | null>(null);
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
@@ -107,7 +109,6 @@ export default function ProductDetailsPage() {
         setLoading(true);
         
         // Charger le produit spécifique
-        const language = typeof window !== 'undefined' ? (localStorage.getItem('language') || 'fr') : 'fr';
         const productResponse = await apiClient.getProduct(productId, language as 'fr' | 'en');
         console.log('🔍 [ProductDetail] Response from API:', productResponse);
         
@@ -149,7 +150,7 @@ export default function ProductDetailsPage() {
     if (productId) {
       loadProductData();
     }
-  }, [productId]);
+  }, [productId, language]); // ✅ Recharger quand la langue ou le produit change
 
   if (loading) {
     return (

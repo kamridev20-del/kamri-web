@@ -61,7 +61,7 @@ export default function ProductsPage() {
     };
 
     loadData();
-  }, []);
+  }, [language]); // ✅ Recharger quand la langue change
 
   // Filtrage des produits
   useEffect(() => {

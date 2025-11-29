@@ -79,7 +79,7 @@ export default function CategoryProductsPage() {
     };
 
     loadCategoryProducts();
-  }, [slug]);
+  }, [slug, language]); // ✅ Recharger quand la langue ou le slug change
 
   // Filtrage des produits
   useEffect(() => {

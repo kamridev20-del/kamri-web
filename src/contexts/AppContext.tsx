@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { apiClient, Category, Product } from '../lib/api';
+import { useTranslation } from './LanguageContext';
 
 interface AppContextType {
   products: Product[];
@@ -19,10 +20,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { language } = useTranslation(); // ✅ Utiliser le contexte de langue
 
   const loadProducts = async () => {
     try {
-      const language = typeof window !== 'undefined' ? (localStorage.getItem('language') || 'fr') : 'fr';
       const response = await apiClient.getProducts(language as 'fr' | 'en');
       if (response.data) {
         setProducts(response.data);
@@ -75,7 +76,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadData();
-  }, []);
+  }, [language]); // ✅ Recharger quand la langue change
 
   const value = {
     products,

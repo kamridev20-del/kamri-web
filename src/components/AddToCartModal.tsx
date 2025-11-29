@@ -135,7 +135,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
       
       loadProductDetails();
     }
-  }, [isOpen, product]);
+  }, [isOpen, product, language]); // ✅ Recharger quand la langue change
 
   // Réinitialiser les sélections quand la modale s'ouvre
   useEffect(() => {

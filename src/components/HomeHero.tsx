@@ -154,7 +154,7 @@ export default function HomeHero() {
     };
 
     loadModeProducts();
-  }, []);
+  }, [language]); // ✅ Recharger quand la langue change
 
   // Auto-play du carrousel background (change toutes les 15 secondes)
   useEffect(() => {
