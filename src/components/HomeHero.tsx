@@ -468,22 +468,6 @@ export default function HomeHero() {
             />
           </div>
         </div>
-
-        {/* Indicateurs de points (dots) pour le carrousel hero */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`transition-all duration-300 rounded-full ${
-                index === currentImageIndex
-                  ? 'w-8 h-2 bg-[#4CAF50]'
-                  : 'w-2 h-2 bg-[#4CAF50]/50 hover:bg-[#4CAF50]/75'
-              }`}
-              aria-label={`Aller au slide ${index + 1}`}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Éléments décoratifs animés en arrière-plan */}
