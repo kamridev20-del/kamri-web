@@ -5,9 +5,10 @@ import { ArrowRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-re
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { apiClient, Product } from '../lib/api';
 
-// Slides du carrousel hero complet (texte + image + background)
-const HERO_SLIDES = [
+// Slides statiques par défaut (fallback)
+const DEFAULT_HERO_SLIDES = [
   {
     id: 1,
     badge: 'Nouvelle collection 2025',
@@ -17,7 +18,7 @@ const HERO_SLIDES = [
     subtitle: 'Collection exclusive de vêtements et accessoires de qualité supérieure',
     image: '/images/hero-slide-1.jpg',
     imageAlt: 'Modèle KAMRI portant des vêtements de la collection',
-    background: '/images/hero-slide-1.jpg', // Image de background pour ce slide
+    background: '/images/hero-slide-1.jpg',
     ctaPrimary: { text: 'Explorer maintenant', href: '/products' },
     ctaSecondary: { text: 'Voir les promos', href: '/promotions' },
   },
@@ -30,7 +31,7 @@ const HERO_SLIDES = [
     subtitle: 'Du style graffiti au style graphique',
     image: '/images/hero-slide-2.jpg',
     imageAlt: 'Collection printemps 2025',
-    background: '/images/hero-slide-2.jpg', // Image de background pour ce slide
+    background: '/images/hero-slide-2.jpg',
     ctaPrimary: { text: 'Je personnalise', href: '/products' },
     ctaSecondary: { text: 'Je découvre', href: '/products' },
   },
@@ -43,11 +44,26 @@ const HERO_SLIDES = [
     subtitle: 'Découvrez notre sélection de produits tendance',
     image: '/images/hero-slide-3.jpg',
     imageAlt: 'Nouveautés tendances',
-    background: '/images/hero-slide-3.jpg', // Image de background pour ce slide
+    background: '/images/hero-slide-3.jpg',
     ctaPrimary: { text: 'Découvrir', href: '/products' },
     ctaSecondary: { text: 'En savoir plus', href: '/about' },
   },
 ];
+
+interface HeroSlide {
+  id: number;
+  badge: string;
+  title: string;
+  titleHighlight: string;
+  titleEnd: string;
+  subtitle: string;
+  image: string;
+  imageAlt: string;
+  background: string;
+  ctaPrimary: { text: string; href: string };
+  ctaSecondary: { text: string; href: string };
+  productId?: string; // ID du produit pour le lien
+}
 
 export default function HomeHero() {
   const [isVisible, setIsVisible] = useState(false);
@@ -55,20 +71,96 @@ export default function HomeHero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO_SLIDES);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
+  // Charger les produits de la catégorie "mode" pour le carrousel
+  useEffect(() => {
+    const loadModeProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        
+        // Charger tous les produits
+        const productsResponse = await apiClient.getProducts();
+        if (productsResponse.data) {
+          const backendProductsData = (productsResponse.data as any).data || productsResponse.data;
+          const allProducts = Array.isArray(backendProductsData) ? backendProductsData : [];
+          
+          // Filtrer les produits de la catégorie "mode" (insensible à la casse)
+          const modeProducts = allProducts.filter((product: Product) => {
+            const categoryName = product.category?.name?.toLowerCase() || '';
+            return categoryName === 'mode' || categoryName.includes('mode');
+          });
+          
+          console.log('🛍️ [HomeHero] Produits mode trouvés:', modeProducts.length);
+          
+          // Créer des slides dynamiques à partir des produits mode
+          if (modeProducts.length > 0) {
+            const dynamicSlides: HeroSlide[] = modeProducts
+              .slice(0, 6) // Prendre maximum 6 produits
+              .map((product: Product, index: number) => {
+                // Utiliser la première image disponible
+                const productImage = product.images?.[0] || product.image || '/images/hero-slide-1.jpg';
+                
+                return {
+                  id: index + 1,
+                  badge: product.badge || 'Nouveautés',
+                  title: 'Découvrez',
+                  titleHighlight: product.name.substring(0, 20) || 'nos produits',
+                  titleEnd: '',
+                  subtitle: product.description?.substring(0, 80) || 'Collection exclusive de qualité supérieure',
+                  image: productImage,
+                  imageAlt: product.name || 'Produit mode',
+                  background: productImage,
+                  ctaPrimary: { text: 'Voir le produit', href: `/product/${product.id}` },
+                  ctaSecondary: { text: 'Explorer', href: '/products' },
+                  productId: product.id,
+                };
+              });
+            
+            // Si on a au moins 3 produits, utiliser les slides dynamiques
+            if (dynamicSlides.length >= 3) {
+              setHeroSlides(dynamicSlides);
+              console.log('✅ [HomeHero] Slides dynamiques chargés:', dynamicSlides.length);
+            } else {
+              // Mélanger les slides dynamiques avec les slides par défaut
+              const mixedSlides = [
+                ...dynamicSlides,
+                ...DEFAULT_HERO_SLIDES.slice(0, 3 - dynamicSlides.length)
+              ];
+              setHeroSlides(mixedSlides);
+              console.log('⚠️ [HomeHero] Slides mixtes (dynamiques + défaut):', mixedSlides.length);
+            }
+          } else {
+            console.log('⚠️ [HomeHero] Aucun produit mode trouvé, utilisation des slides par défaut');
+            setHeroSlides(DEFAULT_HERO_SLIDES);
+          }
+        }
+      } catch (error) {
+        console.error('❌ [HomeHero] Erreur lors du chargement des produits mode:', error);
+        // En cas d'erreur, utiliser les slides par défaut
+        setHeroSlides(DEFAULT_HERO_SLIDES);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadModeProducts();
+  }, []);
+
   // Auto-play du carrousel background (change toutes les 15 secondes)
   useEffect(() => {
-    if (!isAutoPlaying) {
+    if (!isAutoPlaying || heroSlides.length === 0) {
       return;
     }
 
     const interval = setInterval(() => {
       setCurrentBackgroundIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % HERO_SLIDES.length;
+        const nextIndex = (prevIndex + 1) % heroSlides.length;
         return nextIndex;
       });
     }, 15000); // Change toutes les 15 secondes
@@ -76,7 +168,7 @@ export default function HomeHero() {
     return () => {
       clearInterval(interval);
     };
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, heroSlides.length]);
 
   // Auto-play du carrousel image (change toutes les 15 secondes, mais décalé de 7.5 secondes)
   useEffect(() => {
@@ -90,7 +182,7 @@ export default function HomeHero() {
     const initialTimeout = setTimeout(() => {
       interval = setInterval(() => {
         setCurrentImageIndex((prevIndex) => {
-          const nextIndex = (prevIndex + 1) % HERO_SLIDES.length;
+          const nextIndex = (prevIndex + 1) % heroSlides.length;
           return nextIndex;
         });
       }, 15000); // Change toutes les 15 secondes
@@ -102,7 +194,7 @@ export default function HomeHero() {
         clearInterval(interval);
       }
     };
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, heroSlides.length]);
 
   const goToSlide = (index: number) => {
     setCurrentBackgroundIndex(index);
@@ -113,10 +205,10 @@ export default function HomeHero() {
 
   const goToPrevious = () => {
     setCurrentBackgroundIndex((prevIndex) => 
-      prevIndex === 0 ? HERO_SLIDES.length - 1 : prevIndex - 1
+      prevIndex === 0 ? heroSlides.length - 1 : prevIndex - 1
     );
     setCurrentImageIndex((prevIndex) => 
-      prevIndex === 0 ? HERO_SLIDES.length - 1 : prevIndex - 1
+      prevIndex === 0 ? heroSlides.length - 1 : prevIndex - 1
     );
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 20000);
@@ -124,17 +216,17 @@ export default function HomeHero() {
 
   const goToNext = () => {
     setCurrentBackgroundIndex((prevIndex) => 
-      (prevIndex + 1) % HERO_SLIDES.length
+      (prevIndex + 1) % heroSlides.length
     );
     setCurrentImageIndex((prevIndex) => 
-      (prevIndex + 1) % HERO_SLIDES.length
+      (prevIndex + 1) % heroSlides.length
     );
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 20000);
   };
 
-  const currentBackgroundSlide = HERO_SLIDES[currentBackgroundIndex];
-  const currentImageSlide = HERO_SLIDES[currentImageIndex];
+  const currentBackgroundSlide = heroSlides[currentBackgroundIndex];
+  const currentImageSlide = heroSlides[currentImageIndex];
 
   return (
     <section 
@@ -377,7 +469,7 @@ export default function HomeHero() {
 
         {/* Indicateurs de points (dots) pour le carrousel hero */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {HERO_SLIDES.map((_, index) => (
+          {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
