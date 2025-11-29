@@ -1,4 +1,10 @@
+'use client';
+
+import { useTranslation } from '../contexts/LanguageContext';
+
 export default function HomeFooter() {
+  const { t } = useTranslation();
+  
   return (
     <footer className="bg-[#E8F5E8] text-[#424242]">
       {/* Top Section */}
@@ -11,41 +17,41 @@ export default function HomeFooter() {
               
               {/* Nous connaître */}
               <div>
-                <h3 className="text-lg font-bold mb-4 text-[#424242]">Nous connaître</h3>
+                <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.about_us')}</h3>
                 <ul className="space-y-3 text-sm text-[#81C784]">
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">À propos de KAMRI</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">KAMRI - Mode et Style</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Programme d'affiliation</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Contactez-nous</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Mentions légales</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Carrières</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Presse</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.about_kamri')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.kamri_style')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.affiliate_program')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.contact_us')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.legal_notice')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.careers')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.press')}</a></li>
                 </ul>
               </div>
 
               {/* Service client */}
               <div>
-                <h3 className="text-lg font-bold mb-4 text-[#424242]">Service client</h3>
+                <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.customer_service')}</h3>
                 <ul className="space-y-3 text-sm text-[#81C784]">
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Politique de retour</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Politique de confidentialité</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Informations de livraison</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Alertes sécurité</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Signaler un problème</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Montant minimum</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.return_policy')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.privacy_policy')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.shipping_info')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.security_alerts')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.report_issue')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.minimum_amount')}</a></li>
                 </ul>
               </div>
 
               {/* Aide */}
               <div>
-                <h3 className="text-lg font-bold mb-4 text-[#424242]">Aide</h3>
+                <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.help')}</h3>
                 <ul className="space-y-3 text-sm text-[#81C784]">
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Centre d'aide</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">FAQ</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Centre de sécurité</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Protection des achats</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Devenir partenaire</a></li>
-                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Accessibilité</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.help_center')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.faq')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.security_center')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.purchase_protection')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.become_partner')}</a></li>
+                  <li><a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.accessibility')}</a></li>
                 </ul>
               </div>
             </div>
@@ -56,25 +62,25 @@ export default function HomeFooter() {
             
             {/* App Download */}
             <div>
-              <h3 className="text-lg font-bold mb-4 text-[#424242]">Téléchargez l'app KAMRI</h3>
+              <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.download_app')}</h3>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2 text-sm text-[#81C784]">
                   <span className="w-4 h-4 bg-[#4CAF50] rounded-full flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>
                   </span>
-                  <span>Alertes de promotions</span>
+                  <span>{t('footer.promo_alerts')}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-[#81C784]">
                   <span className="w-4 h-4 bg-[#4CAF50] rounded-full flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>
                   </span>
-                  <span>Paiement sécurisé</span>
+                  <span>{t('footer.secure_payment')}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-[#81C784]">
                   <span className="w-4 h-4 bg-[#4CAF50] rounded-full flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>
                   </span>
-                  <span>Suivi des commandes</span>
+                  <span>{t('footer.order_tracking')}</span>
                 </div>
               </div>
               
@@ -85,7 +91,7 @@ export default function HomeFooter() {
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                   </svg>
                   <div className="text-left">
-                    <div className="text-xs text-white">Télécharger dans</div>
+                    <div className="text-xs text-white">{t('footer.download_app_store')}</div>
                     <div className="text-sm font-semibold text-white">App Store</div>
                   </div>
                 </button>
@@ -95,7 +101,7 @@ export default function HomeFooter() {
                     <path d="M3.609 1.814L13.792 12 3.609 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.353 2.353a1 1 0 010 1.414l-2.353 2.353a1 1 0 01-1.414 0l-2.353-2.353a1 1 0 010-1.414l2.353-2.353a1 1 0 011.414 0z"/>
                   </svg>
                   <div className="text-left">
-                    <div className="text-xs text-white">Disponible sur</div>
+                    <div className="text-xs text-white">{t('footer.available_google_play')}</div>
                     <div className="text-sm font-semibold text-white">Google Play</div>
                   </div>
                 </button>
@@ -104,7 +110,7 @@ export default function HomeFooter() {
 
             {/* Social Media */}
             <div>
-              <h3 className="text-lg font-bold mb-4 text-[#424242]">Connectez-vous avec KAMRI</h3>
+              <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.connect_with_kamri')}</h3>
               <div className="flex space-x-3">
                 <button className="w-10 h-10 bg-[#4CAF50] rounded-full flex items-center justify-center hover:bg-[#45A049] transition-all duration-300 ease-in-out font-['Inter']">
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -149,23 +155,23 @@ export default function HomeFooter() {
             
             {/* Security Certificates */}
             <div>
-              <h3 className="text-lg font-bold mb-4 text-[#424242]">Certificats de sécurité</h3>
+              <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.security_certificates')}</h3>
               <div className="flex flex-wrap gap-4">
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">SSL Sécurisé</div>
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">PCI DSS</div>
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">Paiement Sécurisé</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.ssl_secure')}</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.pci_dss')}</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.secure_payment_badge')}</div>
               </div>
             </div>
 
             {/* Payment Methods */}
             <div>
-              <h3 className="text-lg font-bold mb-4 text-[#424242]">Nous acceptons</h3>
+              <h3 className="text-lg font-bold mb-4 text-[#424242]">{t('footer.we_accept')}</h3>
               <div className="flex flex-wrap gap-4">
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">VISA</div>
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">Mastercard</div>
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">PayPal</div>
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">Apple Pay</div>
-                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">Google Pay</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.visa')}</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.mastercard')}</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.paypal')}</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.apple_pay')}</div>
+                <div className="bg-[#4CAF50] px-3 py-2 rounded text-sm text-white">{t('footer.google_pay')}</div>
               </div>
             </div>
           </div>
@@ -176,11 +182,11 @@ export default function HomeFooter() {
       <div className="border-t border-[#81C784] py-6">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-[#81C784]">© 2024 KAMRI. Tous droits réservés.</p>
+            <p className="text-sm text-[#81C784]">{t('footer.copyright')}</p>
             <div className="flex space-x-6 text-sm text-[#81C784]">
-              <a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Conditions d'utilisation</a>
-              <a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Politique de confidentialité</a>
-              <a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">Mentions légales</a>
+              <a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.terms_of_service')}</a>
+              <a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.privacy_policy')}</a>
+              <a href="#" className="hover:text-[#4CAF50] transition-all duration-300 ease-in-out font-['Inter']">{t('footer.legal_notice')}</a>
             </div>
           </div>
         </div>
