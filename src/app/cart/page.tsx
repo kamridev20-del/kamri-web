@@ -835,16 +835,26 @@ export default function CartPage() {
                               {(() => {
                                 const cartItem = (cartItems || []).find(ci => ci.id === item.id);
                                 const variantDetails = cartItem?.variantDetails;
+                                console.log('🛒 [CartPage] Affichage variantDetails pour item:', {
+                                  itemId: item.id,
+                                  cartItemId: cartItem?.id,
+                                  variantDetails,
+                                  variantDetailsType: typeof variantDetails,
+                                  hasVariantDetails: !!variantDetails,
+                                  variantDetailsKeys: variantDetails ? Object.keys(variantDetails) : []
+                                });
                                 if (variantDetails && (variantDetails.color || variantDetails.size)) {
                                   const details = [];
                                   if (variantDetails.color) details.push(`Couleur: ${variantDetails.color}`);
                                   if (variantDetails.size) details.push(`Taille: ${variantDetails.size}`);
+                                  console.log('✅ [CartPage] Détails à afficher:', details);
                                   return (
                                     <p className="text-sm text-[#4CAF50] font-medium mb-1">
                                       {details.join(' • ')}
                                     </p>
                                   );
                                 }
+                                console.log('⚠️ [CartPage] Aucun variantDetails à afficher pour item:', item.id);
                                 return null;
                               })()}
                               <p className="text-sm text-gray-500 mb-2">${item.price.toFixed(2)} × {item.quantity}</p>
@@ -987,14 +997,29 @@ export default function CartPage() {
                             </h3>
                           </Link>
                           {/* Afficher les détails du variant si disponibles */}
-                          {item.variantDetails && (item.variantDetails.color || item.variantDetails.size) && (
-                            <p className="text-sm text-[#4CAF50] font-medium mb-1">
-                              {[
+                          {(() => {
+                            console.log('🛒 [CartPage] Affichage variantDetails (fallback):', {
+                              itemId: item.id,
+                              variantDetails: item.variantDetails,
+                              variantDetailsType: typeof item.variantDetails,
+                              hasVariantDetails: !!item.variantDetails,
+                              variantDetailsKeys: item.variantDetails ? Object.keys(item.variantDetails) : []
+                            });
+                            if (item.variantDetails && (item.variantDetails.color || item.variantDetails.size)) {
+                              const details = [
                                 item.variantDetails.color && `Couleur: ${item.variantDetails.color}`,
                                 item.variantDetails.size && `Taille: ${item.variantDetails.size}`
-                              ].filter(Boolean).join(' • ')}
-                            </p>
-                          )}
+                              ].filter(Boolean);
+                              console.log('✅ [CartPage] Détails à afficher (fallback):', details);
+                              return (
+                                <p className="text-sm text-[#4CAF50] font-medium mb-1">
+                                  {details.join(' • ')}
+                                </p>
+                              );
+                            }
+                            console.log('⚠️ [CartPage] Aucun variantDetails à afficher (fallback) pour item:', item.id);
+                            return null;
+                          })()}
                           <p className="text-sm text-gray-500">
                             {item.product.category?.name || 'Non catégorisé'} • {item.product.supplier?.name || 'N/A'}
                           </p>

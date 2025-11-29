@@ -84,7 +84,20 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children, userId }) 
       setLoading(true);
       const response = await apiClient.getCart();
       if (response.data) {
-        setCartItems(Array.isArray(response.data) ? response.data : []);
+        const items = Array.isArray(response.data) ? response.data : [];
+        console.log('🛒 [CartContext] Panier reçu:', items.length, 'articles');
+        items.forEach((item, index) => {
+          console.log(`🛒 [CartContext] Article ${index + 1}:`, {
+            id: item.id,
+            productId: item.productId,
+            productName: item.product?.name,
+            variantId: item.variantId,
+            variantDetails: item.variantDetails,
+            hasVariantDetails: !!item.variantDetails,
+            variantDetailsKeys: item.variantDetails ? Object.keys(item.variantDetails) : []
+          });
+        });
+        setCartItems(items);
       } else {
         setCartItems([]);
       }
@@ -103,12 +116,24 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children, userId }) 
     }
     
     try {
-      console.log('🛒 [CartContext] Ajout au panier:', { productId, quantity, variantId, variantDetails, userId });
+      console.log('🛒 [CartContext] Ajout au panier:', { 
+        productId, 
+        quantity, 
+        variantId, 
+        variantDetails,
+        variantDetailsType: typeof variantDetails,
+        variantDetailsKeys: variantDetails ? Object.keys(variantDetails) : [],
+        userId 
+      });
       const response = await apiClient.addToCart(productId, quantity, variantId, variantDetails);
       if (response.error) {
         throw new Error(response.error);
       }
-      console.log('✅ [CartContext] Produit ajouté avec succès');
+      console.log('✅ [CartContext] Produit ajouté avec succès, réponse:', {
+        data: response.data,
+        hasVariantDetails: !!response.data?.variantDetails,
+        variantDetails: response.data?.variantDetails
+      });
       await refreshCart();
     } catch (error) {
       console.error('❌ [CartContext] Erreur lors de l\'ajout au panier:', error);

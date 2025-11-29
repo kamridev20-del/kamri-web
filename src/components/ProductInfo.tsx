@@ -1289,9 +1289,13 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         productId: product.id, 
         quantity, 
         variantId: variantToUse?.id,
-        variantDetails 
+        variantDetails,
+        selectedColor,
+        selectedSize,
+        hasVariantDetails: Object.keys(variantDetails).length > 0
       });
       await addToCart(product.id, quantity, variantToUse?.id, variantDetails);
+      console.log('✅ [ProductInfo] addToCart terminé, variantDetails envoyés:', variantDetails);
       console.log('✅ [ProductInfo] Produit ajouté avec succès');
       toast?.success?.(`${quantity} article${quantity > 1 ? 's' : ''} ajouté${quantity > 1 ? 's' : ''} au panier`);
     } catch (error) {
