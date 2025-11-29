@@ -100,8 +100,10 @@ export default function HomeHero() {
           
           // Créer des slides dynamiques à partir des produits mode
           if (modeProducts.length > 0) {
-            const dynamicSlides: HeroSlide[] = modeProducts
-              .slice(0, 6) // Prendre maximum 6 produits
+            // Prendre les 30 premiers produits mode (ou tous si moins de 30)
+            const selectedProducts = modeProducts.slice(0, 30);
+            
+            const dynamicSlides: HeroSlide[] = selectedProducts
               .map((product: Product, index: number) => {
                 // Utiliser la première image disponible
                 const productImage = product.images?.[0] || product.image || '/images/hero-slide-1.jpg';
@@ -125,7 +127,7 @@ export default function HomeHero() {
             // Si on a au moins 3 produits, utiliser les slides dynamiques
             if (dynamicSlides.length >= 3) {
               setHeroSlides(dynamicSlides);
-              console.log('✅ [HomeHero] Slides dynamiques chargés:', dynamicSlides.length);
+              console.log('✅ [HomeHero] Slides dynamiques chargés:', dynamicSlides.length, 'produits mode');
             } else {
               // Mélanger les slides dynamiques avec les slides par défaut
               const mixedSlides = [
