@@ -51,6 +51,11 @@ export default function ModernHeader() {
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLFormElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // État pour gérer la visibilité du header au scroll
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Log pour debug
   console.log('📊 [Header] wishlistCount:', wishlistCount, 'cartCount:', cartCount);
@@ -159,6 +164,51 @@ export default function ModernHeader() {
     setShowMobileSearch(false);
   }, [pathname]);
 
+  // Gestion du scroll : cacher le header en scrollant vers le bas, le montrer en scrollant vers le haut
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Si on est tout en haut, toujours afficher le header
+      if (currentScrollY < 10) {
+        setIsHeaderVisible(true);
+        setLastScrollY(currentScrollY);
+        return;
+      }
+
+      // Si on scroll vers le bas (plus bas que la position précédente)
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Cacher le header seulement si on a scrollé assez
+        setIsHeaderVisible(false);
+      } 
+      // Si on scroll vers le haut
+      else if (currentScrollY < lastScrollY) {
+        // Montrer le header immédiatement
+        setIsHeaderVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    // Throttle pour améliorer les performances
+    let ticking = false;
+    const throttledHandleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+    };
+  }, [lastScrollY]);
+
   const categories = [
     { name: 'Accueil', href: '/', icon: '🏠' },
     { name: 'Produits', href: '/products', icon: '🛍️' },
@@ -169,8 +219,8 @@ export default function ModernHeader() {
 
   return (
     <>
-      {/* Mini-bande promotionnelle */}
-      <div className="bg-gradient-to-r from-[#E8F5E8] to-[#F0F8F0] py-1.5 sm:py-2 px-3 sm:px-4 text-center">
+      {/* Mini-bande promotionnelle - Toujours visible (sticky) */}
+      <div className="sticky top-0 z-[9999] bg-gradient-to-r from-[#E8F5E8] to-[#F0F8F0] py-1.5 sm:py-2 px-3 sm:px-4 text-center">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 lg:gap-6 text-[10px] sm:text-xs lg:text-sm text-[#424242]">
           <span className="flex items-center gap-1">
             <span className="text-xs sm:text-sm">🚚</span>
@@ -191,8 +241,13 @@ export default function ModernHeader() {
         </div>
       </div>
 
-      {/* Header principal */}
-      <header className="bg-white/95 backdrop-blur-md shadow-lg border-b border-[#E8F5E8] relative z-[9998]">
+      {/* Header principal - Se cache au scroll vers le bas, réapparaît au scroll vers le haut */}
+      <header 
+        ref={headerRef}
+        className={`bg-white/95 backdrop-blur-md shadow-lg border-b border-[#E8F5E8] sticky top-[38px] sm:top-[42px] z-[9998] transition-transform duration-300 ease-in-out ${
+          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           {/* Ligne principale */}
           <div className="flex items-center justify-between gap-2 sm:gap-4 py-3 lg:py-0 lg:h-20">
