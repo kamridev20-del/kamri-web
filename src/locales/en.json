@@ -143,6 +143,180 @@
     "french": "Français",
     "english": "English",
     "select_language": "Select language"
+  },
+  "promo_bar": {
+    "free_shipping": "Free shipping",
+    "easy_returns": "Easy returns",
+    "returns": "Returns",
+    "support_24_7": "Support 24/7",
+    "support": "Support"
+  },
+  "filters": {
+    "title": "Filters",
+    "reset": "Reset",
+    "reset_filters": "Reset filters",
+    "sort_by": "Sort by",
+    "most_popular": "Most popular",
+    "newest": "Newest",
+    "price_low_to_high": "Price: Low to High",
+    "price_high_to_low": "Price: High to Low",
+    "best_rated": "Best rated",
+    "price": "Price",
+    "min": "Min",
+    "max": "Max",
+    "brands": "Brands",
+    "minimum_rating": "Minimum rating",
+    "and_more": "and more",
+    "quick_filters": "Quick filters",
+    "promotions": "Promotions",
+    "new_products": "New products",
+    "bestsellers": "Bestsellers",
+    "show_filters": "Show filters",
+    "hide_filters": "Hide filters"
+  },
+  "products": {
+    "title": "Products",
+    "search_placeholder": "Search for a product, brand...",
+    "search_in_category": "Search in this category...",
+    "products_found": "product found",
+    "products_found_plural": "products found",
+    "no_products": "No products found",
+    "loading_products": "Loading products...",
+    "view_grid": "Grid view",
+    "view_list": "List view",
+    "active_filters": "Active filters",
+    "category": "Category",
+    "search": "Search",
+    "badges": "Badges",
+    "page": "Page",
+    "of": "of",
+    "previous_page": "Previous page",
+    "next_page": "Next page"
+  },
+  "categories": {
+    "title": "Categories",
+    "all_categories": "All categories",
+    "view_all": "View all"
+  },
+  "promotions": {
+    "title": "Promotions",
+    "subtitle": "Discover our best offers"
+  },
+  "cart_page": {
+    "title": "Cart",
+    "empty_title": "Your cart is empty",
+    "empty_description": "Add products to start shopping"
+  },
+  "checkout_page": {
+    "title": "Checkout",
+    "step_address": "Address",
+    "step_shipping": "Shipping",
+    "step_payment": "Payment",
+    "step_review": "Review"
+  },
+  "contact_page": {
+    "title": "Contact us",
+    "subtitle": "We're here to help",
+    "support_available": "24/7 support available"
+  },
+  "product_card": {
+    "free_shipping": "Free shipping",
+    "low_stock": "Low stock",
+    "new": "New",
+    "sale": "Sale",
+    "arrival": "Arrival",
+    "days": "days"
+  },
+  "hero": {
+    "exclusive_collection": "Exclusive collection of high-quality clothing and accessories",
+    "free_shipping": "Free shipping",
+    "free_returns": "Free returns within 30 days",
+    "secure_payment": "Secure payment",
+    "average_rating": "Average rating"
+  },
+  "product_info": {
+    "free_shipping": "Free shipping",
+    "arrival": "Arrival",
+    "days": "days"
+  },
+  "contact_form": {
+    "title": "Send us a message",
+    "full_name": "Full name",
+    "email": "Email address",
+    "phone": "Phone",
+    "optional": "(optional)",
+    "subject": "Subject",
+    "select_subject": "Select a subject",
+    "order_number": "Order number",
+    "message": "Message",
+    "attach_files": "Attach files",
+    "max_files": "Maximum {count} files allowed",
+    "max_size": "Maximum size of 5MB",
+    "remove_file": "Remove",
+    "characters_remaining": "characters remaining",
+    "send": "Send message",
+    "sending": "Sending...",
+    "subjects": {
+      "general": "General question",
+      "order_issue": "Problem with my order",
+      "return": "Product return",
+      "suggestion": "Improvement suggestion",
+      "partnership": "Partnership",
+      "other": "Other"
+    },
+    "errors": {
+      "name_required": "Name is required",
+      "name_min": "Name must contain at least 2 characters",
+      "email_required": "Email is required",
+      "email_invalid": "Email is not valid",
+      "phone_invalid": "Phone number is not valid",
+      "subject_required": "Subject is required",
+      "message_required": "Message is required",
+      "message_min": "Message must contain at least 10 characters",
+      "message_max": "Message must not exceed {count} characters"
+    },
+    "placeholders": {
+      "name": "Your full name",
+      "email": "your@email.com",
+      "phone": "+1 234 567 8900",
+      "order_number": "ORD-123456",
+      "message": "Describe your request..."
+    }
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "Quickly find answers to your questions",
+    "search_placeholder": "Search in FAQ...",
+    "search_label": "Search in FAQ",
+    "clear_search": "Clear search",
+    "all_categories": "All",
+    "popular_questions": "Most asked questions",
+    "no_results": "No questions found",
+    "helpful": "Helpful",
+    "not_helpful": "Not helpful",
+    "categories": {
+      "orders": "Orders",
+      "returns": "Returns",
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "account": "Account",
+      "warranty": "Warranty",
+      "contact": "Contact"
+    }
+  },
+  "contact_info": {
+    "email": "Email",
+    "response_time": "Response within 24h",
+    "send_email": "Send email",
+    "hours": "Hours",
+    "online_now": "Online now",
+    "offline": "Offline",
+    "phone": "Phone",
+    "free_call": "Free call",
+    "call_now": "Call now",
+    "address": "Address",
+    "headquarters": "Headquarters",
+    "view_map": "View on map"
   }
 }
 

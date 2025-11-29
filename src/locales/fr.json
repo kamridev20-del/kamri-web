@@ -143,6 +143,180 @@
     "french": "Français",
     "english": "English",
     "select_language": "Sélectionner la langue"
+  },
+  "promo_bar": {
+    "free_shipping": "Livraison gratuite",
+    "easy_returns": "Retours faciles",
+    "returns": "Retours",
+    "support_24_7": "Support 24/7",
+    "support": "Support"
+  },
+  "filters": {
+    "title": "Filtres",
+    "reset": "Réinitialiser",
+    "reset_filters": "Réinitialiser les filtres",
+    "sort_by": "Trier par",
+    "most_popular": "Plus populaire",
+    "newest": "Nouveautés",
+    "price_low_to_high": "Prix croissant",
+    "price_high_to_low": "Prix décroissant",
+    "best_rated": "Mieux notés",
+    "price": "Prix",
+    "min": "Min",
+    "max": "Max",
+    "brands": "Marques",
+    "minimum_rating": "Note minimum",
+    "and_more": "et plus",
+    "quick_filters": "Filtres rapides",
+    "promotions": "Promotions",
+    "new_products": "Nouveautés",
+    "bestsellers": "Bestsellers",
+    "show_filters": "Afficher les filtres",
+    "hide_filters": "Masquer les filtres"
+  },
+  "products": {
+    "title": "Produits",
+    "search_placeholder": "Rechercher un produit, une marque...",
+    "search_in_category": "Rechercher dans cette catégorie...",
+    "products_found": "produit trouvé",
+    "products_found_plural": "produits trouvés",
+    "no_products": "Aucun produit trouvé",
+    "loading_products": "Chargement des produits...",
+    "view_grid": "Vue grille",
+    "view_list": "Vue liste",
+    "active_filters": "Filtres actifs",
+    "category": "Catégorie",
+    "search": "Recherche",
+    "badges": "Badges",
+    "page": "Page",
+    "of": "sur",
+    "previous_page": "Page précédente",
+    "next_page": "Page suivante"
+  },
+  "categories": {
+    "title": "Catégories",
+    "all_categories": "Toutes les catégories",
+    "view_all": "Voir tout"
+  },
+  "promotions": {
+    "title": "Promotions",
+    "subtitle": "Découvrez nos meilleures offres"
+  },
+  "cart_page": {
+    "title": "Panier",
+    "empty_title": "Votre panier est vide",
+    "empty_description": "Ajoutez des produits pour commencer vos achats"
+  },
+  "checkout_page": {
+    "title": "Commande",
+    "step_address": "Adresse",
+    "step_shipping": "Livraison",
+    "step_payment": "Paiement",
+    "step_review": "Récapitulatif"
+  },
+  "contact_page": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous aider",
+    "support_available": "Support 24/7 disponible"
+  },
+  "product_card": {
+    "free_shipping": "Livraison gratuite",
+    "low_stock": "Stock faible",
+    "new": "Nouveau",
+    "sale": "Promo",
+    "arrival": "Arrivée",
+    "days": "jours"
+  },
+  "hero": {
+    "exclusive_collection": "Collection exclusive de vêtements et accessoires de qualité supérieure",
+    "free_shipping": "Livraison gratuite",
+    "free_returns": "Retours gratuits sous 30 jours",
+    "secure_payment": "Paiement sécurisé",
+    "average_rating": "Note moyenne"
+  },
+  "product_info": {
+    "free_shipping": "Livraison gratuite",
+    "arrival": "Arrivée",
+    "days": "jours"
+  },
+  "contact_form": {
+    "title": "Envoyez-nous un message",
+    "full_name": "Nom complet",
+    "email": "Adresse email",
+    "phone": "Téléphone",
+    "optional": "(optionnel)",
+    "subject": "Sujet",
+    "select_subject": "Sélectionnez un sujet",
+    "order_number": "Numéro de commande",
+    "message": "Message",
+    "attach_files": "Joindre des fichiers",
+    "max_files": "Maximum {count} fichiers autorisés",
+    "max_size": "Taille maximale de 5MB",
+    "remove_file": "Retirer",
+    "characters_remaining": "caractères restants",
+    "send": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "subjects": {
+      "general": "Question générale",
+      "order_issue": "Problème avec ma commande",
+      "return": "Retour de produit",
+      "suggestion": "Suggestion d'amélioration",
+      "partnership": "Partenariat",
+      "other": "Autre"
+    },
+    "errors": {
+      "name_required": "Le nom est requis",
+      "name_min": "Le nom doit contenir au moins 2 caractères",
+      "email_required": "L'email est requis",
+      "email_invalid": "L'email n'est pas valide",
+      "phone_invalid": "Le numéro de téléphone n'est pas valide",
+      "subject_required": "Le sujet est requis",
+      "message_required": "Le message est requis",
+      "message_min": "Le message doit contenir au moins 10 caractères",
+      "message_max": "Le message ne doit pas dépasser {count} caractères"
+    },
+    "placeholders": {
+      "name": "Votre nom complet",
+      "email": "votre@email.com",
+      "phone": "+33 1 23 45 67 89",
+      "order_number": "CMD-123456",
+      "message": "Décrivez votre demande..."
+    }
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "subtitle": "Trouvez rapidement les réponses à vos questions",
+    "search_placeholder": "Rechercher dans la FAQ...",
+    "search_label": "Rechercher dans la FAQ",
+    "clear_search": "Effacer la recherche",
+    "all_categories": "Toutes",
+    "popular_questions": "Questions les plus posées",
+    "no_results": "Aucune question trouvée",
+    "helpful": "Utile",
+    "not_helpful": "Pas utile",
+    "categories": {
+      "orders": "Commandes",
+      "returns": "Retours",
+      "shipping": "Livraison",
+      "payment": "Paiement",
+      "account": "Compte",
+      "warranty": "Garantie",
+      "contact": "Contact"
+    }
+  },
+  "contact_info": {
+    "email": "Email",
+    "response_time": "Réponse sous 24h",
+    "send_email": "Envoyer un email",
+    "hours": "Horaires",
+    "online_now": "En ligne maintenant",
+    "offline": "Hors ligne",
+    "phone": "Téléphone",
+    "free_call": "Appel gratuit",
+    "call_now": "Appeler maintenant",
+    "address": "Adresse",
+    "headquarters": "Siège social",
+    "view_map": "Voir sur la carte"
   }
 }
 

@@ -9,6 +9,7 @@ import { useCart } from '../contexts/CartContext';
 import { useCompare } from '../contexts/CompareContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useGeo } from '../contexts/GeoContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import { useToast } from '../contexts/ToastContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useProductViewers } from '../hooks/useProductViewers';
@@ -64,6 +65,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { t } = useTranslation();
   const { formatPrice } = useCurrency();
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -361,7 +363,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
                 <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
               </svg>
-              Livraison gratuite
+              {t('product_card.free_shipping')}
             </span>
           )}
           
@@ -380,7 +382,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <>
               {/* Badge NOUVEAU */}
               <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[9px] font-semibold bg-[#FF9800] text-white">
-                🆕 NOUVEAU
+                🆕 {t('product_card.new')}
               </span>
               {/* Étoiles + avis */}
               <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-semibold bg-[#FFF8E1] text-[#F57F17] gap-0.5">
@@ -419,7 +421,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           ) : (
             /* Badge NOUVEAU uniquement (pas d'avis et pas de badge BDD) */
             <span className="inline-flex items-center px-1 py-0.5 rounded-full text-[9px] font-semibold bg-[#FF9800] text-white">
-              🆕 NOUVEAU
+              🆕 {t('product_card.new')}
             </span>
           )}
           

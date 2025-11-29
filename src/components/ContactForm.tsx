@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Phone, FileText, ShoppingBag, X, Upload, Send } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface ContactFormProps {
   onSubmit: (formData: any) => void;
@@ -13,6 +14,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_FILES = 3;
 
 export default function ContactForm({ onSubmit }: ContactFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,12 +30,12 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const subjects = [
-    'Question générale',
-    'Problème avec ma commande',
-    'Retour de produit',
-    'Suggestion d\'amélioration',
-    'Partenariat',
-    'Autre'
+    t('contact_form.subjects.general'),
+    t('contact_form.subjects.order_issue'),
+    t('contact_form.subjects.return'),
+    t('contact_form.subjects.suggestion'),
+    t('contact_form.subjects.partnership'),
+    t('contact_form.subjects.other')
   ];
 
   // Sauvegarder dans localStorage
@@ -69,31 +71,31 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Le nom est requis';
+      newErrors.name = t('contact_form.errors.name_required');
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Le nom doit contenir au moins 2 caractères';
+      newErrors.name = t('contact_form.errors.name_min');
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'L\'email est requis';
+      newErrors.email = t('contact_form.errors.email_required');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'L\'email n\'est pas valide';
+      newErrors.email = t('contact_form.errors.email_invalid');
     }
 
     if (formData.phone && !/^[\d\s\-\+\(\)]+$/.test(formData.phone)) {
-      newErrors.phone = 'Le numéro de téléphone n\'est pas valide';
+      newErrors.phone = t('contact_form.errors.phone_invalid');
     }
 
     if (!formData.subject) {
-      newErrors.subject = 'Le sujet est requis';
+      newErrors.subject = t('contact_form.errors.subject_required');
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = 'Le message est requis';
+      newErrors.message = t('contact_form.errors.message_required');
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Le message doit contenir au moins 10 caractères';
+      newErrors.message = t('contact_form.errors.message_min');
     } else if (formData.message.length > MAX_MESSAGE_LENGTH) {
-      newErrors.message = `Le message ne doit pas dépasser ${MAX_MESSAGE_LENGTH} caractères`;
+      newErrors.message = t('contact_form.errors.message_max', { count: MAX_MESSAGE_LENGTH });
     }
 
     setErrors(newErrors);
@@ -138,12 +140,12 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
 
     files.forEach((file, index) => {
       if (attachments.length + validFiles.length >= MAX_FILES) {
-        newErrors.push(`Maximum ${MAX_FILES} fichiers autorisés`);
+        newErrors.push(t('contact_form.max_files', { count: MAX_FILES }));
         return;
       }
 
       if (file.size > MAX_FILE_SIZE) {
-        newErrors.push(`${file.name}: Taille maximale de 5MB`);
+        newErrors.push(`${file.name}: ${t('contact_form.max_size')}`);
         return;
       }
 
@@ -169,14 +171,14 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
       <h2 className="text-xl sm:text-2xl font-bold text-[#424242] mb-4 sm:mb-6">
-        Envoyez-nous un message
+        {t('contact_form.title')}
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6" noValidate>
         {/* Nom */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-[#424242] mb-2">
-            Nom complet *
+            {t('contact_form.full_name')} *
           </label>
           <input
             type="text"
@@ -187,7 +189,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300 ${
               errors.name ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="Votre nom complet"
+            placeholder={t('contact_form.placeholders.name')}
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -197,7 +199,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
         {/* Email */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-[#424242] mb-2">
-            Adresse email *
+            {t('contact_form.email')} *
           </label>
           <input
             type="email"
@@ -208,7 +210,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300 text-sm sm:text-base ${
               errors.email ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="votre@email.com"
+            placeholder={t('contact_form.placeholders.email')}
             aria-invalid={errors.email ? 'true' : 'false'}
             aria-describedby={errors.email ? 'email-error' : undefined}
           />
@@ -223,7 +225,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-[#424242] mb-2">
             <Phone className="w-4 h-4 inline mr-1" />
-            Téléphone <span className="text-gray-400 text-xs">(optionnel)</span>
+            {t('contact_form.phone')} <span className="text-gray-400 text-xs">{t('contact_form.optional')}</span>
           </label>
           <input
             type="tel"
@@ -234,7 +236,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300 text-sm sm:text-base ${
               errors.phone ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="+33 1 23 45 67 89"
+            placeholder={t('contact_form.placeholders.phone')}
             aria-invalid={errors.phone ? 'true' : 'false'}
             aria-describedby={errors.phone ? 'phone-error' : undefined}
           />
@@ -248,7 +250,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
         {/* Sujet */}
         <div>
           <label htmlFor="subject" className="block text-sm font-medium text-[#424242] mb-2">
-            Sujet *
+            {t('contact_form.subject')} *
           </label>
           <select
             id="subject"
@@ -261,7 +263,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             aria-invalid={errors.subject ? 'true' : 'false'}
             aria-describedby={errors.subject ? 'subject-error' : undefined}
           >
-            <option value="">Sélectionnez un sujet</option>
+            <option value="">{t('contact_form.select_subject')}</option>
             {subjects.map((subject) => (
               <option key={subject} value={subject}>
                 {subject}
@@ -276,7 +278,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
         </div>
 
         {/* Numéro de commande (si sujet lié à commande) */}
-        {(formData.subject === 'Problème avec ma commande' || formData.subject === 'Retour de produit') && (
+        {(formData.subject === t('contact_form.subjects.order_issue') || formData.subject === t('contact_form.subjects.return')) && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -284,7 +286,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
           >
             <label htmlFor="orderNumber" className="block text-sm font-medium text-[#424242] mb-2">
               <ShoppingBag className="w-4 h-4 inline mr-1" />
-              Numéro de commande <span className="text-gray-400 text-xs">(optionnel)</span>
+              {t('contact_form.order_number')} <span className="text-gray-400 text-xs">{t('contact_form.optional')}</span>
             </label>
             <input
               type="text"
@@ -293,7 +295,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
               value={formData.orderNumber}
               onChange={handleChange}
               className="w-full px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300 text-sm sm:text-base"
-              placeholder="CMD-123456"
+              placeholder={t('contact_form.placeholders.order_number')}
             />
           </motion.div>
         )}
@@ -324,7 +326,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all duration-300 resize-none text-sm sm:text-base ${
               errors.message ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="Décrivez votre question ou votre problème..."
+            placeholder={t('contact_form.placeholders.message')}
             aria-invalid={errors.message ? 'true' : 'false'}
             aria-describedby={errors.message ? 'message-error' : 'message-help'}
           />
@@ -345,7 +347,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             </p>
           )}
           <p id="message-help" className="mt-1 text-xs text-gray-500">
-            Minimum 10 caractères requis
+            {t('contact_form.errors.message_min')}
           </p>
         </div>
 
@@ -353,7 +355,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
         <div>
           <label className="block text-sm font-medium text-[#424242] mb-2">
             <FileText className="w-4 h-4 inline mr-1" />
-            Pièces jointes <span className="text-gray-400 text-xs">(optionnel, max {MAX_FILES} fichiers, 5MB chacun)</span>
+            {t('contact_form.attach_files')} <span className="text-gray-400 text-xs">({t('contact_form.optional')}, max {MAX_FILES} fichiers, 5MB chacun)</span>
           </label>
           <input
             ref={fileInputRef}
@@ -369,7 +371,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
             className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#4CAF50] hover:bg-[#E8F5E8] transition-all duration-300 text-sm sm:text-base"
           >
             <Upload className="w-5 h-5 text-[#4CAF50]" />
-            <span className="text-[#424242]">Cliquez pour ajouter des fichiers</span>
+            <span className="text-[#424242]">{t('contact_form.attach_files')}</span>
           </label>
           
           {/* Liste des fichiers */}
@@ -391,7 +393,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
                     type="button"
                     onClick={() => removeAttachment(index)}
                     className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
-                    aria-label={`Supprimer ${file.name}`}
+                    aria-label={`${t('common.delete')} ${file.name}`}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -427,12 +429,12 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
-              <span>Envoi en cours...</span>
+              <span>{t('contact_form.sending')}</span>
             </>
           ) : (
             <>
               <Send className="w-5 h-5" />
-              <span>Envoyer le message</span>
+              <span>{t('contact_form.send')}</span>
             </>
           )}
         </motion.button>

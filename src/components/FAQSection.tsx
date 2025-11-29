@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import { Search, ChevronDown, HelpCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface FAQ {
   question: string;
@@ -14,6 +15,7 @@ interface FAQ {
 }
 
 export default function FAQSection() {
+  const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -116,10 +118,10 @@ export default function FAQSection() {
     <div>
       <div className="text-center mb-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-[#4CAF50] mb-2 sm:mb-4">
-          Questions fréquentes
+          {t('faq.title')}
         </h2>
         <p className="text-sm sm:text-base lg:text-lg text-[#424242] mb-6 sm:mb-8">
-          Trouvez rapidement les réponses à vos questions
+          {t('faq.subtitle')}
         </p>
 
         {/* Barre de recherche */}
@@ -128,17 +130,17 @@ export default function FAQSection() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Rechercher dans la FAQ..."
+              placeholder={t('faq.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 sm:pl-14 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] text-sm sm:text-base"
-              aria-label="Rechercher dans la FAQ"
+              aria-label={t('faq.search_label')}
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                aria-label="Effacer la recherche"
+                aria-label={t('faq.clear_search')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -160,7 +162,7 @@ export default function FAQSection() {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {category === 'all' ? 'Toutes' : category}
+              {category === 'all' ? t('faq.all_categories') : category}
             </button>
           ))}
         </div>
@@ -171,7 +173,7 @@ export default function FAQSection() {
         <div className="mb-8">
           <h3 className="text-lg sm:text-xl font-semibold text-[#424242] mb-4 flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-[#4CAF50]" />
-            Questions les plus posées
+            {t('faq.popular_questions')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             {popularFAQs.map((faq, index) => (
@@ -209,10 +211,10 @@ export default function FAQSection() {
           <div className="text-center py-12">
             <HelpCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <p className="text-lg font-semibold text-[#424242] mb-2">
-              Aucune question trouvée
+              {t('faq.no_results')}
             </p>
             <p className="text-sm text-gray-500">
-              Essayez avec d'autres mots-clés ou une autre catégorie
+              {t('common.no_results')}
             </p>
           </div>
         ) : (

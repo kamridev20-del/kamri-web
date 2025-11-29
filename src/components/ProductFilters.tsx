@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface ProductFiltersProps {
   priceRange: [number, number];
@@ -26,6 +27,7 @@ export default function ProductFilters({
   setSelectedBadges,
   resetFilters
 }: ProductFiltersProps) {
+  const { t } = useTranslation();
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
     sort: true,
     price: true,
@@ -39,11 +41,11 @@ export default function ProductFilters({
   };
 
   const sortOptions = [
-    { value: 'populaire', label: 'Plus populaire', icon: '🔥' },
-    { value: 'nouveautes', label: 'Nouveautés', icon: '✨' },
-    { value: 'prix_croissant', label: 'Prix croissant', icon: '⬆️' },
-    { value: 'prix_decroissant', label: 'Prix décroissant', icon: '⬇️' },
-    { value: 'note', label: 'Mieux notés', icon: '⭐' },
+    { value: 'populaire', label: t('filters.most_popular'), icon: '🔥' },
+    { value: 'nouveautes', label: t('filters.newest'), icon: '✨' },
+    { value: 'prix_croissant', label: t('filters.price_low_to_high'), icon: '⬆️' },
+    { value: 'prix_decroissant', label: t('filters.price_high_to_low'), icon: '⬇️' },
+    { value: 'note', label: t('filters.best_rated'), icon: '⭐' },
   ];
 
   const brands = ['KAMRI', 'TechBrand', 'GameTech', 'Luxury', 'HomeStyle'];
@@ -51,13 +53,13 @@ export default function ProductFilters({
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-[#424242]">Filtres</h3>
+        <h3 className="text-base font-semibold text-[#424242]">{t('filters.title')}</h3>
         {resetFilters && (
           <button
             onClick={resetFilters}
             className="text-xs text-[#4CAF50] hover:text-[#2E7D32] transition-colors"
           >
-            Réinitialiser
+            {t('filters.reset')}
           </button>
         )}
       </div>
@@ -68,7 +70,7 @@ export default function ProductFilters({
           onClick={() => toggleSection('sort')}
           className="w-full flex items-center justify-between text-sm font-medium text-[#424242] mb-2"
         >
-          <span>Trier par</span>
+          <span>{t('filters.sort_by')}</span>
           {openSections.sort ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {openSections.sort && (
@@ -97,7 +99,7 @@ export default function ProductFilters({
           onClick={() => toggleSection('price')}
           className="w-full flex items-center justify-between text-sm font-medium text-[#424242] mb-2"
         >
-          <span>Prix</span>
+          <span>{t('filters.price')}</span>
           {openSections.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {openSections.price && (
@@ -108,7 +110,7 @@ export default function ProductFilters({
                   type="number"
                   min="0"
                   max={priceRange[1]}
-                  placeholder="Min"
+                  placeholder={t('filters.min')}
                   value={priceRange[0] === 0 ? '' : priceRange[0]}
                   onChange={(e) => {
                     const value = Math.max(0, Math.min(priceRange[1], Number(e.target.value) || 0));
@@ -128,7 +130,7 @@ export default function ProductFilters({
                 <input
                   type="number"
                   min={priceRange[0]}
-                  placeholder="Max"
+                  placeholder={t('filters.max')}
                   value={priceRange[1] === 2000 ? '' : priceRange[1]}
                   onChange={(e) => {
                     const value = Math.max(priceRange[0], Number(e.target.value) || 2000);
@@ -157,7 +159,7 @@ export default function ProductFilters({
           onClick={() => toggleSection('brands')}
           className="w-full flex items-center justify-between text-sm font-medium text-[#424242] mb-2"
         >
-          <span>Marques</span>
+          <span>{t('filters.brands')}</span>
           {openSections.brands ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {openSections.brands && (
@@ -181,7 +183,7 @@ export default function ProductFilters({
           onClick={() => toggleSection('rating')}
           className="w-full flex items-center justify-between text-sm font-medium text-[#424242] mb-2"
         >
-          <span>Note minimum</span>
+          <span>{t('filters.minimum_rating')}</span>
           {openSections.rating ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {openSections.rating && (
@@ -204,7 +206,7 @@ export default function ProductFilters({
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
-                  <span className="ml-1 text-xs text-[#424242]">et plus</span>
+                  <span className="ml-1 text-xs text-[#424242]">{t('filters.and_more')}</span>
                 </div>
               </label>
             ))}
@@ -218,15 +220,15 @@ export default function ProductFilters({
           onClick={() => toggleSection('badges')}
           className="w-full flex items-center justify-between text-sm font-medium text-[#424242] mb-2"
         >
-          <span>Filtres rapides</span>
+          <span>{t('filters.quick_filters')}</span>
           {openSections.badges ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {openSections.badges && (
           <div className="flex flex-wrap gap-2">
             {[
-              { value: 'promo', label: 'Promotions', icon: '🔥' },
-              { value: 'nouveau', label: 'Nouveautés', icon: '✨' },
-              { value: 'bestseller', label: 'Bestsellers', icon: '⭐' },
+              { value: 'promo', label: t('filters.promotions'), icon: '🔥' },
+              { value: 'nouveau', label: t('filters.new_products'), icon: '✨' },
+              { value: 'bestseller', label: t('filters.bestsellers'), icon: '⭐' },
             ].map((badge) => (
               <button
                 key={badge.value}
@@ -259,7 +261,7 @@ export default function ProductFilters({
           onClick={resetFilters}
           className="w-full bg-[#E8F5E8] text-[#424242] py-2 px-4 rounded-lg hover:bg-[#4CAF50] hover:text-white transition-all duration-300"
         >
-          Réinitialiser les filtres
+          {t('filters.reset_filters')}
         </button>
       )}
     </div>

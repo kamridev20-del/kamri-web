@@ -5,6 +5,7 @@ import { ArrowRight, Shield, Sparkles, Star, TrendingUp, Truck } from 'lucide-re
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslation } from '../contexts/LanguageContext';
 import { apiClient, Product } from '../lib/api';
 
 // Slides statiques par défaut (fallback)
@@ -66,6 +67,7 @@ interface HeroSlide {
 }
 
 export default function HomeHero() {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -307,15 +309,15 @@ export default function HomeHero() {
               >
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                  <span>Livraison gratuite </span>
+                  <span>{t('hero.free_shipping')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                  <span>Retours gratuits sous 30 jours</span>
+                  <span>{t('hero.free_returns')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                  <span>Paiement sécurisé</span>
+                  <span>{t('hero.secure_payment')}</span>
                 </li>
               </ul>
 
@@ -336,7 +338,7 @@ export default function HomeHero() {
                   </div>
                   <div>
                     <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">4.8/5</div>
-                    <div className="text-xs sm:text-sm text-[#4B6254]">Note moyenne</div>
+                    <div className="text-xs sm:text-sm text-[#4B6254]">{t('hero.average_rating')}</div>
                   </div>
                 </div>
               </div>

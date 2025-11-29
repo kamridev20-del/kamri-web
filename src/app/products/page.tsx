@@ -10,6 +10,7 @@ import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
 import { Product, apiClient } from '../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface Category {
   id: string;
@@ -17,6 +18,7 @@ interface Category {
 }
 
 export default function ProductsPage() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -137,12 +139,12 @@ export default function ProductsPage() {
   const activeFilters = [
     selectedCategory !== 'tous' && { 
       type: 'category', 
-      label: categories.find(c => c.id === selectedCategory)?.name || 'Catégorie', 
+      label: categories.find(c => c.id === selectedCategory)?.name || t('products.category'), 
       value: selectedCategory 
     },
-    searchQuery && { type: 'search', label: 'Recherche', value: searchQuery },
-    (priceRange[0] > 0 || priceRange[1] < 2000) && { type: 'price', label: 'Prix', value: `${priceRange[0]}$ - ${priceRange[1]}$` },
-    selectedBadges.length > 0 && { type: 'badges', label: 'Badges', value: selectedBadges.join(', ') },
+    searchQuery && { type: 'search', label: t('products.search'), value: searchQuery },
+    (priceRange[0] > 0 || priceRange[1] < 2000) && { type: 'price', label: t('filters.price'), value: `${priceRange[0]}$ - ${priceRange[1]}$` },
+    selectedBadges.length > 0 && { type: 'badges', label: t('products.badges'), value: selectedBadges.join(', ') },
   ].filter(Boolean) as Array<{ type: string; label: string; value: string }>;
 
   return (
@@ -156,7 +158,7 @@ export default function ProductsPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Rechercher un produit, une marque..."
+              placeholder={t('products.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] text-[#424242]"
@@ -186,7 +188,7 @@ export default function ProductsPage() {
               <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-[#424242]">Filtres</h3>
+                    <h3 className="text-lg font-semibold text-[#424242]">{t('filters.title')}</h3>
                     <button
                       onClick={() => setShowFilters(false)}
                       className="p-2 hover:bg-gray-100 rounded-full"
@@ -224,7 +226,7 @@ export default function ProductsPage() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">
                   <h2 className="text-lg font-bold text-[#424242]">
-                    {loading ? 'Chargement...' : `${filteredProducts.length} produit${filteredProducts.length > 1 ? 's' : ''} trouvé${filteredProducts.length > 1 ? 's' : ''}`}
+                    {loading ? t('common.loading') : `${filteredProducts.length} ${filteredProducts.length > 1 ? t('products.products_found_plural') : t('products.products_found')}`}
                   </h2>
                   
                   {/* Filtres actifs */}
@@ -259,7 +261,7 @@ export default function ProductsPage() {
                       className={`p-2 rounded transition-colors ${
                         viewMode === 'grid' ? 'bg-[#4CAF50] text-white' : 'text-gray-600'
                       }`}
-                      aria-label="Vue grille"
+                      aria-label={t('products.view_grid')}
                     >
                       <Grid className="w-4 h-4" />
                     </button>
@@ -268,7 +270,7 @@ export default function ProductsPage() {
                       className={`p-2 rounded transition-colors ${
                         viewMode === 'list' ? 'bg-[#4CAF50] text-white' : 'text-gray-600'
                       }`}
-                      aria-label="Vue liste"
+                      aria-label={t('products.view_list')}
                     >
                       <List className="w-4 h-4" />
                     </button>
@@ -280,7 +282,7 @@ export default function ProductsPage() {
                     onClick={() => setShowFilters(!showFilters)}
                   >
                     <SlidersHorizontal className="w-4 h-4" />
-                    Filtres
+                    {t('filters.title')}
                   </button>
                 </div>
               </div>
@@ -294,10 +296,10 @@ export default function ProductsPage() {
                 <div className="text-center py-16">
                   <div className="text-6xl mb-4">⏳</div>
                   <h3 className="text-xl font-semibold text-[#424242] mb-2">
-                    Chargement des produits...
+                    {t('products.loading_products')}
                   </h3>
                   <p className="text-[#81C784]">
-                    Veuillez patienter
+                    {t('common.loading')}
                   </p>
                 </div>
               ) : (
@@ -420,7 +422,7 @@ export default function ProductsPage() {
                         disabled={currentPage === totalPages}
                         className="px-4 py-2 bg-white border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                       >
-                        Suivant
+                        {t('common.next')}
                       </button>
                     </div>
                   )}
@@ -434,16 +436,16 @@ export default function ProductsPage() {
                     >
                       <div className="text-6xl mb-4">🔍</div>
                       <h3 className="text-xl font-semibold text-[#424242] mb-2">
-                        Aucun produit trouvé
+                        {t('products.no_products')}
                       </h3>
                       <p className="text-[#81C784] mb-4">
-                        Essayez de modifier vos critères de recherche
+                        {t('common.no_results')}
                       </p>
                       <button
                         onClick={resetFilters}
                         className="px-6 py-2 bg-[#4CAF50] text-white rounded-lg hover:bg-[#2E7D32] transition-colors"
                       >
-                        Réinitialiser les filtres
+                        {t('filters.reset_filters')}
                       </button>
                     </motion.div>
                   )}

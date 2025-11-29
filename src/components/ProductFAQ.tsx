@@ -2,6 +2,7 @@
 
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface FAQItem {
   question: string;
@@ -40,6 +41,7 @@ interface ProductFAQProps {
 }
 
 export default function ProductFAQ({ customFAQs }: ProductFAQProps) {
+  const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const faqs = customFAQs || defaultFAQs;
 
@@ -49,7 +51,7 @@ export default function ProductFAQ({ customFAQs }: ProductFAQProps) {
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow-md p-4">
-      <h2 className="text-xl font-bold text-[#424242] mb-4">Questions fréquentes</h2>
+      <h2 className="text-xl font-bold text-[#424242] mb-4">{t('faq.title')}</h2>
       
       <div className="space-y-2">
         {faqs.map((faq, index) => (

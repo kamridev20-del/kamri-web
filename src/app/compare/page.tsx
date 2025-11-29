@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCompare } from '../../contexts/CompareContext';
 import { useCart } from '../../contexts/CartContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import ModernHeader from '../../components/ModernHeader';
@@ -54,6 +55,7 @@ const getProperty = (product: any, key: string): string | number | null => {
 };
 
 export default function ComparePage() {
+  const { t } = useTranslation();
   const { compareItems, removeFromCompare, clearCompare } = useCompare();
   const { addToCart } = useCart();
   const toast = useToast();
@@ -123,7 +125,7 @@ export default function ComparePage() {
     { key: 'category', label: 'Catégorie', type: 'text' },
     { key: 'brand', label: 'Marque', type: 'text' },
     { key: 'supplier', label: 'Fournisseur', type: 'text' },
-    { key: 'isFreeShipping', label: 'Livraison gratuite', type: 'boolean' },
+    { key: 'isFreeShipping', label: t('product_card.free_shipping'), type: 'boolean' },
     { key: 'deliveryCycle', label: 'Délai de livraison', type: 'text' },
   ];
 

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useGeo } from '../contexts/GeoContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import { useToast } from '../contexts/ToastContext';
 import { apiClient } from '../lib/api';
 
@@ -145,6 +146,7 @@ function extractColorFromVariantKey(variantKey: string): string {
 }
 
 export default function ProductInfo({ product, onVariantChange }: ProductInfoProps) {
+  const { t } = useTranslation();
   const { addToCart } = useCart();
   const toast = useToast();
   const { country } = useGeo();
@@ -1375,14 +1377,14 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-          <span className="font-medium">Livraison gratuite</span>
+          <span className="font-medium">{t('product_info.free_shipping')}</span>
         </div>
         {product.deliveryCycle && (
           <div className="flex items-center gap-1.5 text-xs text-[#616161] mt-1">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
-            <span>Arrivée: {product.deliveryCycle} jours</span>
+            <span>{t('product_info.arrival')}: {product.deliveryCycle} {t('product_info.days')}</span>
           </div>
         )}
       </div>

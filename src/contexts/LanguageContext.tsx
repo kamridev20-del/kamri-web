@@ -11,7 +11,7 @@ type Translations = typeof frTranslations;
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   translations: Translations;
 }
 
@@ -83,9 +83,20 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     }
   };
 
-  // Fonction de traduction
-  const t = (key: string): string => {
-    return getNestedValue(translations, key);
+  // Fonction de traduction avec support des paramètres
+  const t = (key: string, params?: Record<string, string | number>): string => {
+    let translation = getNestedValue(translations, key);
+    
+    // Remplacer les paramètres dans la traduction
+    if (params) {
+      Object.keys(params).forEach(paramKey => {
+        const paramValue = String(params[paramKey]);
+        // Remplacer {paramKey} dans la traduction
+        translation = translation.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramValue);
+      });
+    }
+    
+    return translation;
   };
 
   // ✅ Détecter la langue au montage si pas de préférence sauvegardée

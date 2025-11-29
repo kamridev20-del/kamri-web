@@ -10,9 +10,11 @@ import HomeFooter from '../../components/HomeFooter';
 import ModernHeader from '../../components/ModernHeader';
 import SupportWidget from '../../components/SupportWidget';
 import { apiClient } from '../../lib/api';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { useToast } from '../../contexts/ToastContext';
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   const [showSuccess, setShowSuccess] = useState(false);
   const [ticketNumber, setTicketNumber] = useState<string | null>(null);
   const toast = useToast();
@@ -77,7 +79,7 @@ export default function ContactPage() {
             >
               <MessageCircle className="w-4 h-4 text-[#4CAF50]" />
               <span className="text-sm sm:text-base font-semibold text-[#4CAF50]">
-                Support 24/7 disponible
+                {t('contact_page.support_available')}
               </span>
             </motion.div>
 

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Mail, Clock, Phone, MapPin, ExternalLink, Download, Copy, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 import { apiClient } from '../lib/api';
 
 interface CompanyInfo {
@@ -13,6 +14,7 @@ interface CompanyInfo {
 }
 
 export default function ContactInfo() {
+  const { t } = useTranslation();
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
@@ -63,36 +65,36 @@ export default function ContactInfo() {
   const contactMethods = [
     {
       icon: <Mail className="w-5 h-5 sm:w-6 sm:h-6" />,
-      title: 'Email',
+      title: t('contact_info.email'),
       content: companyInfo?.companyEmail || 'support@kamri.com',
-      description: 'Réponse sous 24h',
+      description: t('contact_info.response_time'),
       action: 'mailto',
-      actionLabel: 'Envoyer un email'
+      actionLabel: t('contact_info.send_email')
     },
     {
       icon: <Clock className="w-5 h-5 sm:w-6 sm:h-6" />,
-      title: 'Horaires',
+      title: t('contact_info.hours'),
       content: 'Lun-Ven, 9h-18h (CET)',
-      description: isOnline ? `En ligne maintenant (${getCurrentTime()})` : 'Hors ligne',
+      description: isOnline ? `${t('contact_info.online_now')} (${getCurrentTime()})` : t('contact_info.offline'),
       status: isOnline ? 'online' : 'offline',
       action: null,
       actionLabel: null
     },
     {
       icon: <Phone className="w-5 h-5 sm:w-6 sm:h-6" />,
-      title: 'Téléphone',
+      title: t('contact_info.phone'),
       content: companyInfo?.companyPhone || '+33 1 23 45 67 89',
-      description: 'Appel gratuit',
+      description: t('contact_info.free_call'),
       action: 'tel',
-      actionLabel: 'Appeler maintenant'
+      actionLabel: t('contact_info.call_now')
     },
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
-      title: 'Adresse',
+      title: t('contact_info.address'),
       content: companyInfo?.companyAddress || '123 Rue de la Paix, 75001 Paris',
-      description: 'Siège social',
+      description: t('contact_info.headquarters'),
       action: 'map',
-      actionLabel: 'Voir sur la carte'
+      actionLabel: t('contact_info.view_map')
     }
   ];
 

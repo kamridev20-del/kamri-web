@@ -10,8 +10,10 @@ import ModernHeader from '../../../../components/ModernHeader';
 import ProductCard from '../../../../components/ProductCard';
 import ProductFilters from '../../../../components/ProductFilters';
 import { apiClient, Category, Product } from '../../../../lib/api';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 export default function CategoryProductsPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const slug = params.slug as string;
   
@@ -142,9 +144,9 @@ export default function CategoryProductsPage() {
 
   // Obtenir les filtres actifs
   const activeFilters = [
-    searchQuery && { type: 'search', label: 'Recherche', value: searchQuery },
-    (priceRange[0] > 0 || priceRange[1] < 2000) && { type: 'price', label: 'Prix', value: `${priceRange[0]}$ - ${priceRange[1]}$` },
-    selectedBadges.length > 0 && { type: 'badges', label: 'Badges', value: selectedBadges.join(', ') },
+    searchQuery && { type: 'search', label: t('products.search'), value: searchQuery },
+    (priceRange[0] > 0 || priceRange[1] < 2000) && { type: 'price', label: t('filters.price'), value: `${priceRange[0]}$ - ${priceRange[1]}$` },
+    selectedBadges.length > 0 && { type: 'badges', label: t('products.badges'), value: selectedBadges.join(', ') },
   ].filter(Boolean) as Array<{ type: string; label: string; value: string }>;
 
   if (loading) {
@@ -154,7 +156,7 @@ export default function CategoryProductsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <div className="text-6xl mb-4">⏳</div>
-            <h2 className="text-2xl font-semibold text-[#424242]">Chargement...</h2>
+            <h2 className="text-2xl font-semibold text-[#424242]">{t('common.loading')}</h2>
           </div>
         </div>
         <HomeFooter />
@@ -197,7 +199,7 @@ export default function CategoryProductsPage() {
               <span>Accueil</span>
             </Link>
             <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
-            <Link href="/categories" className="text-[#4CAF50] hover:text-[#2E7D32]">Catégories</Link>
+            <Link href="/categories" className="text-[#4CAF50] hover:text-[#2E7D32]">{t('navigation.categories')}</Link>
             <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
             <span className="text-gray-600 font-medium">{category.name}</span>
           </nav>
@@ -221,7 +223,7 @@ export default function CategoryProductsPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Rechercher dans cette catégorie..."
+              placeholder={t('products.search_in_category')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-2.5 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] text-sm text-[#424242]"
@@ -251,7 +253,7 @@ export default function CategoryProductsPage() {
               <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-[#424242]">Filtres</h3>
+                    <h3 className="text-lg font-semibold text-[#424242]">{t('filters.title')}</h3>
                     <button
                       onClick={() => setShowFilters(false)}
                       className="p-2 hover:bg-gray-100 rounded-full"
@@ -314,7 +316,7 @@ export default function CategoryProductsPage() {
                       className={`p-2 rounded transition-colors ${
                         viewMode === 'grid' ? 'bg-[#4CAF50] text-white' : 'text-gray-600'
                       }`}
-                      aria-label="Vue grille"
+                      aria-label={t('products.view_grid')}
                     >
                       <Grid className="w-4 h-4" />
                     </button>
@@ -323,7 +325,7 @@ export default function CategoryProductsPage() {
                       className={`p-2 rounded transition-colors ${
                         viewMode === 'list' ? 'bg-[#4CAF50] text-white' : 'text-gray-600'
                       }`}
-                      aria-label="Vue liste"
+                      aria-label={t('products.view_list')}
                     >
                       <List className="w-4 h-4" />
                     </button>
@@ -335,7 +337,7 @@ export default function CategoryProductsPage() {
                     onClick={() => setShowFilters(!showFilters)}
                   >
                     <SlidersHorizontal className="w-4 h-4" />
-                    Filtres
+                    {t('filters.title')}
                   </button>
                 </div>
               </div>
@@ -346,10 +348,10 @@ export default function CategoryProductsPage() {
               <div className="text-center py-16">
                 <div className="text-6xl mb-4">⏳</div>
                 <h3 className="text-xl font-semibold text-[#424242] mb-2">
-                  Chargement des produits...
+                  {t('products.loading_products')}
                 </h3>
                 <p className="text-[#81C784]">
-                  Veuillez patienter
+                  {t('common.loading')}
                 </p>
               </div>
             ) : (

@@ -228,19 +228,19 @@ export default function ModernHeader() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 lg:gap-6 text-[10px] sm:text-xs lg:text-sm text-[#424242]">
           <span className="flex items-center gap-1">
             <span className="text-xs sm:text-sm">🚚</span>
-            <span>Livraison gratuite</span>
+            <span>{t('promo_bar.free_shipping')}</span>
           </span>
           <span className="hidden sm:inline">|</span>
           <span className="flex items-center gap-1">
             <span className="text-xs sm:text-sm">🔄</span>
-            <span className="hidden sm:inline">Retours faciles</span>
-            <span className="sm:hidden">Retours</span>
+            <span className="hidden sm:inline">{t('promo_bar.easy_returns')}</span>
+            <span className="sm:hidden">{t('promo_bar.returns')}</span>
           </span>
           <span className="hidden sm:inline">|</span>
           <span className="flex items-center gap-1">
             <span className="text-xs sm:text-sm">💬</span>
-            <span className="hidden sm:inline">Support 24/7</span>
-            <span className="sm:hidden">Support</span>
+            <span className="hidden sm:inline">{t('promo_bar.support_24_7')}</span>
+            <span className="sm:hidden">{t('promo_bar.support')}</span>
           </span>
         </div>
       </div>

@@ -7,6 +7,7 @@ import ModernHeader from '../../components/ModernHeader';
 import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
 import { Product, apiClient } from '../../lib/api';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface Category {
   id: string;
@@ -14,6 +15,7 @@ interface Category {
 }
 
 export default function PromotionsPage() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -101,7 +103,7 @@ export default function PromotionsPage() {
       <ModernHeader />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-[#424242] mb-8 text-center">🔥 Promotions</h1>
+        <h1 className="text-3xl font-bold text-[#424242] mb-8 text-center">🔥 {t('promotions.title')}</h1>
 
         <div className="flex gap-8">
           {/* Sidebar avec filtres */}
@@ -129,13 +131,13 @@ export default function PromotionsPage() {
             <div className="mt-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-[#424242]">
-                  {loading ? 'Chargement...' : `${filteredProducts.length} produits en promotion trouvés`}
+                  {loading ? t('common.loading') : `${filteredProducts.length} ${t('promotions.title')} ${t('products.products_found_plural')}`}
                 </h2>
                 <button 
                   className="lg:hidden bg-[#4CAF50] text-white px-4 py-2 rounded-lg"
                   onClick={() => setShowFilters(!showFilters)}
                 >
-                  Filtres
+                  {t('filters.title')}
                 </button>
               </div>
 
@@ -144,10 +146,10 @@ export default function PromotionsPage() {
                 <div className="text-center py-16">
                   <div className="text-6xl mb-4">⏳</div>
                   <h3 className="text-xl font-semibold text-[#424242] mb-2">
-                    Chargement des promotions...
+                    {t('products.loading_products')}
                   </h3>
                   <p className="text-[#81C784]">
-                    Veuillez patienter
+                    {t('common.loading')}
                   </p>
                 </div>
               ) : (
@@ -164,10 +166,10 @@ export default function PromotionsPage() {
                     <div className="text-center py-20">
                       <div className="text-6xl mb-4">🔍</div>
                       <h2 className="text-2xl font-bold text-[#424242] mb-2">
-                        Aucune promotion trouvée
+                        {t('products.no_products')}
                       </h2>
                       <p className="text-lg text-[#81C784]">
-                        Essayez de modifier vos critères de recherche
+                        {t('common.no_results')}
                       </p>
                     </div>
                   )}
