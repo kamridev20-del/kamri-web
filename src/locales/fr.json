@@ -207,7 +207,14 @@
     "categories_available": "catégories disponibles",
     "search_placeholder": "Rechercher une catégorie...",
     "popular": "Populaires:",
-    "view_all_categories": "Voir toutes les catégories"
+    "view_all_categories": "Voir toutes les catégories",
+    "popular_categories": "Catégories populaires",
+    "trending_title": "🌟 Tendances du moment",
+    "trending_subtitle": "Découvrez les catégories qui font sensation en ce moment",
+    "discover_all_trends": "Découvrir toutes les tendances",
+    "popular_badge": "Populaire",
+    "products": "produits",
+    "explore": "Explorer"
   },
   "promotions": {
     "title": "Promotions",

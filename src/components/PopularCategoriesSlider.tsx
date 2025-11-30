@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface Category {
   id: number;
@@ -19,6 +20,7 @@ interface PopularCategoriesSliderProps {
 }
 
 export default function PopularCategoriesSlider({ categories }: PopularCategoriesSliderProps) {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -190,7 +192,7 @@ export default function PopularCategoriesSlider({ categories }: PopularCategorie
                   
                   {/* Badge populaire */}
                   <div className="absolute top-4 right-4 bg-[#FF6B6B] text-white px-3 py-1 rounded-full text-xs font-bold text-white">
-                    Populaire
+                    {t('categories.popular_badge')}
                   </div>
                 </div>
 
@@ -202,7 +204,7 @@ export default function PopularCategoriesSlider({ categories }: PopularCategorie
                   
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500">
-                      {category.count} produits
+                      {category.count} {t('categories.products')}
                     </span>
                     
                     <motion.button
@@ -211,7 +213,7 @@ export default function PopularCategoriesSlider({ categories }: PopularCategorie
                       onClick={(e) => handleExploreClick(e, category)}
                       className="bg-[#4CAF50] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#45a049] transition-colors duration-300"
                     >
-                      Explorer
+                      {t('categories.explore')}
                     </motion.button>
                   </div>
                 </div>

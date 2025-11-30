@@ -549,7 +549,7 @@ export default function CategoriesPage() {
           className="mb-16"
         >
           <h2 className="text-2xl font-bold text-[#424242] mb-8 text-center">
-            Catégories populaires
+            {t('categories.popular_categories')}
           </h2>
           <PopularCategoriesSlider categories={categories.slice(0, 6)} />
         </motion.section>

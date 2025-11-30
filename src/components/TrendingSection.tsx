@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 const trendingItems = [
   {
@@ -47,6 +48,7 @@ const trendingItems = [
 ];
 
 export default function TrendingSection() {
+  const { t } = useTranslation();
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
   return (
@@ -58,10 +60,10 @@ export default function TrendingSection() {
         className="text-center mb-12"
       >
         <h2 className="text-3xl font-bold text-[#4CAF50] mb-4">
-          🌟 Tendances du moment
+          {t('categories.trending_title')}
         </h2>
         <p className="text-lg text-[#424242] max-w-2xl mx-auto">
-          Découvrez les catégories qui font sensation en ce moment
+          {t('categories.trending_subtitle')}
         </p>
       </motion.div>
 
@@ -113,7 +115,7 @@ export default function TrendingSection() {
                 {/* Compteur */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-500">
-                    {item.count} produits
+                    {item.count} {t('categories.products')}
                   </span>
                   
                   <motion.div
@@ -159,7 +161,7 @@ export default function TrendingSection() {
           whileTap={{ scale: 0.95 }}
           className="bg-[#4CAF50] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#45a049] transition-colors duration-300 shadow-lg hover:shadow-xl"
         >
-          Découvrir toutes les tendances
+          {t('categories.discover_all_trends')}
         </motion.button>
       </motion.div>
     </div>
