@@ -196,7 +196,18 @@
   "categories": {
     "title": "Categories",
     "all_categories": "All categories",
-    "view_all": "View all"
+    "view_all": "View all",
+    "explore_categories": "Explore our categories",
+    "discover_selection": "Discover a carefully organized selection of products for all your needs",
+    "organized_by_type": "Organized by product type",
+    "easy_navigation": "Easy and intuitive navigation",
+    "fast_search": "Fast and precise search",
+    "categories_label": "Categories",
+    "products_label": "Products",
+    "categories_available": "categories available",
+    "search_placeholder": "Search a category...",
+    "popular": "Popular:",
+    "view_all_categories": "View all categories"
   },
   "promotions": {
     "title": "Promotions",
@@ -217,7 +228,18 @@
   "contact_page": {
     "title": "Contact us",
     "subtitle": "We're here to help",
-    "support_available": "24/7 support available"
+    "support_available": "24/7 support available",
+    "description": "A question, a problem or a suggestion? Write to us, our team will respond within 24 hours.",
+    "response_time": "Response time",
+    "customer_satisfaction": "Customer satisfaction",
+    "availability": "Availability",
+    "response_24h": "Response within 24h",
+    "multilingual_support": "Multilingual support",
+    "available_7d": "Available 7 days a week",
+    "fill_form": "Fill out the form",
+    "contact_info": "Contact information",
+    "online": "Online",
+    "offline": "Offline"
   },
   "product_card": {
     "free_shipping": "Free shipping",
@@ -228,11 +250,32 @@
     "days": "days"
   },
   "hero": {
+    "new_collection_2025": "New Collection 2025",
+    "discover_trends": "Discover the latest trends",
     "exclusive_collection": "Exclusive collection of high-quality clothing and accessories",
     "free_shipping": "Free shipping",
     "free_returns": "Free returns within 30 days",
     "secure_payment": "Secure payment",
-    "average_rating": "Average rating"
+    "fast_delivery": "Fast delivery",
+    "average_rating": "Average rating",
+    "discount_30": "-30% on everything",
+    "clients_5000": "5000+",
+    "satisfied_clients": "Satisfied customers",
+    "explore_now": "Explore now",
+    "view_promos": "View promos"
+  },
+  "home": {
+    "our_products": "Our products",
+    "sales": "sales",
+    "view_all_products": "View all products",
+    "top_sales": "Top Sales",
+    "most_sold_products": "Our best-selling products",
+    "best_offers": "Best Offers",
+    "exclusive_promotions": "Discover our exclusive promotions",
+    "view_more_products": "View more products",
+    "view_all_promos": "View all promos",
+    "loading_products": "Loading products...",
+    "no_products_available": "No products available at the moment"
   },
   "product_info": {
     "free_shipping": "Free shipping",
@@ -294,6 +337,7 @@
     "no_results": "No questions found",
     "helpful": "Helpful",
     "not_helpful": "Not helpful",
+    "was_helpful": "Was this answer helpful?",
     "categories": {
       "orders": "Orders",
       "returns": "Returns",
@@ -302,6 +346,64 @@
       "account": "Account",
       "warranty": "Warranty",
       "contact": "Contact"
+    },
+    "questions": {
+      "where_is_order": {
+        "question": "Where is my order?",
+        "answer": "You can track your order in real time from your customer area. We also send you email notifications at each stage of shipping. If you can't find your order, contact our customer service."
+      },
+      "how_to_return": {
+        "question": "How to return a product?",
+        "answer": "Returns are simple and free! Log in to your account, select the order in question and click \"Return\". We will send you a prepaid return label. You have 30 days to make your return."
+      },
+      "delivery_times": {
+        "question": "What are the delivery times?",
+        "answer": "Standard delivery is 2-3 business days in mainland France. For express delivery, count 24 hours. International deliveries take 5-7 business days depending on the destination."
+      },
+      "payment_methods": {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, Google Pay and bank transfers. All payments are secured by SSL encryption."
+      },
+      "modify_cancel_order": {
+        "question": "Can I modify or cancel my order?",
+        "answer": "You can modify or cancel your order within 2 hours of validation. After this time, the order is being prepared and can no longer be modified. Contact us in case of emergency."
+      },
+      "create_account": {
+        "question": "How to create an account?",
+        "answer": "Click on \"Login\" at the top of the page, then on \"Create an account\". Fill out the form with your email and a secure password. You will receive a confirmation email."
+      },
+      "reset_password": {
+        "question": "How to reset my password?",
+        "answer": "On the login page, click \"Forgot password\". Enter your email address and you will receive a link to reset your password."
+      },
+      "warranty": {
+        "question": "Are products guaranteed?",
+        "answer": "Yes, all our products come with a one-year warranty against manufacturing defects. If you have a problem, contact our customer service with your order number."
+      },
+      "international_delivery": {
+        "question": "Do you offer international delivery?",
+        "answer": "Yes, we deliver to many countries. Delivery times and fees vary by destination. Check our delivery page for more details."
+      },
+      "contact_support": {
+        "question": "How to contact customer service?",
+        "answer": "You can contact us via the contact form on this page, by email at support@kamri.com, or by phone at +33 1 23 45 67 89 (Mon-Fri, 9am-6pm)."
+      },
+      "return_policy": {
+        "question": "What is your return policy?",
+        "answer": "We accept returns within 30 days of receipt. Items must be in their original condition, unworn and with their tags. Returns are free for orders over $50."
+      },
+      "track_order": {
+        "question": "How can I track my order?",
+        "answer": "Once your order is shipped, you will receive an email with a tracking number. You can track your package in real time on our site or via the carrier."
+      },
+      "free_shipping": {
+        "question": "Do you offer free shipping?",
+        "answer": "Yes! Shipping is free for all orders over $50. For lower orders, standard shipping fees apply."
+      },
+      "defective_product": {
+        "question": "What to do if my product is defective?",
+        "answer": "If you receive a defective product, contact us immediately. We will send you a replacement product free of charge or proceed with a full refund according to your preference."
+      }
     }
   },
   "contact_info": {

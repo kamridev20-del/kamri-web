@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from '../contexts/LanguageContext';
 import { apiClient } from '../lib/api';
 import ProductCard from './ProductCard';
 
 export default function TopSales() {
+  const { t } = useTranslation();
   const [topSales, setTopSales] = useState<any[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -48,10 +50,10 @@ export default function TopSales() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-[#424242] mb-4 tracking-tight">
-            Top Ventes
+            {t('home.top_sales')}
           </h2>
           <p className="text-xl text-[#81C784] font-light">
-            Nos produits les plus vendus
+            {t('home.most_sold_products')}
           </p>
         </div>
         
@@ -68,7 +70,7 @@ export default function TopSales() {
               href="/products"
               className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#4CAF50] to-[#66BB6A] text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
-              <span>Voir plus de produits</span>
+              <span>{t('home.view_more_products')}</span>
               <svg 
                 className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
                 fill="none" 

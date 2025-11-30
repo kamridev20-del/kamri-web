@@ -90,7 +90,7 @@ export default function ContactPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A3C2E] mb-4 sm:mb-6 leading-tight"
             >
-              Contactez-nous
+              {t('contact_page.title')}
             </motion.h1>
 
             {/* Sous-titre */}
@@ -100,7 +100,7 @@ export default function ContactPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-base sm:text-lg md:text-xl text-[#4B6254] mb-8 sm:mb-12 max-w-3xl mx-auto"
             >
-              Une question, un problème ou une suggestion ? Écrivez-nous, notre équipe vous répond sous 24h.
+              {t('contact_page.description')}
             </motion.p>
 
             {/* Statistiques */}
@@ -113,17 +113,17 @@ export default function ContactPage() {
               <div className="flex flex-col items-center p-4 bg-white/80 backdrop-blur-sm rounded-xl shadow-md">
                 <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-[#4CAF50] mb-2" />
                 <div className="text-xl sm:text-2xl font-bold text-[#1A3C2E]">24h</div>
-                <div className="text-xs sm:text-sm text-[#4B6254]">Temps de réponse</div>
+                <div className="text-xs sm:text-sm text-[#4B6254]">{t('contact_page.response_time')}</div>
               </div>
               <div className="flex flex-col items-center p-4 bg-white/80 backdrop-blur-sm rounded-xl shadow-md">
                 <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#4CAF50] mb-2" />
                 <div className="text-xl sm:text-2xl font-bold text-[#1A3C2E]">98%</div>
-                <div className="text-xs sm:text-sm text-[#4B6254]">Satisfaction client</div>
+                <div className="text-xs sm:text-sm text-[#4B6254]">{t('contact_page.customer_satisfaction')}</div>
               </div>
               <div className="flex flex-col items-center p-4 bg-white/80 backdrop-blur-sm rounded-xl shadow-md">
                 <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-[#4CAF50] mb-2" />
                 <div className="text-xl sm:text-2xl font-bold text-[#1A3C2E]">7j/7</div>
-                <div className="text-xs sm:text-sm text-[#4B6254]">Disponibilité</div>
+                <div className="text-xs sm:text-sm text-[#4B6254]">{t('contact_page.availability')}</div>
               </div>
             </motion.div>
 
@@ -136,15 +136,15 @@ export default function ContactPage() {
             >
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                <span>Réponse sous 24h</span>
+                <span>{t('contact_page.response_24h')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                <span>Support multilingue</span>
+                <span>{t('contact_page.multilingual_support')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                <span>Disponible 7j/7</span>
+                <span>{t('contact_page.available_7d')}</span>
               </li>
             </motion.ul>
 
@@ -159,7 +159,7 @@ export default function ContactPage() {
               className="inline-flex items-center gap-2 text-[#4CAF50] hover:text-[#2E7D32] font-semibold text-sm sm:text-base group"
               aria-label="Aller au formulaire de contact"
             >
-              <span>Remplir le formulaire</span>
+              <span>{t('contact_page.fill_form')}</span>
               <motion.div
                 animate={{ y: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}

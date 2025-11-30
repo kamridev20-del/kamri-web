@@ -235,7 +235,7 @@ export default function HomeHero() {
   return (
     <section 
       className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[360px] w-full overflow-hidden shadow-lg"
-      aria-label="Section hero - Découvrez les tendances"
+      aria-label={`Section hero - ${t('hero.discover_trends')}`}
     >
       {/* Carrousel de backgrounds */}
       <div className="absolute inset-0 z-0">
@@ -272,7 +272,7 @@ export default function HomeHero() {
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#4CAF50]/10 rounded-full border border-[#4CAF50]/20 mb-2">
                   <Sparkles className="w-4 h-4 text-[#4CAF50]" />
                   <span className="text-sm sm:text-base font-semibold text-[#4CAF50]">
-                    Nouvelle collection 2025
+                    {t('hero.new_collection_2025')}
                   </span>
                 </div>
               </div>
@@ -282,17 +282,28 @@ export default function HomeHero() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Découvrez les{' '}
-                <span className="relative inline-block">
-                  <span className="relative z-10 text-[#4CAF50]">tendances</span>
-                  <motion.span
-                    className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
-                    initial={{ width: 0 }}
-                    animate={{ width: '100%' }}
-                    transition={{ duration: 0.8, delay: 0.5 }}
-                  />
-                </span>{' '}
-                du moment
+                {(() => {
+                  const text = t('hero.discover_trends');
+                  const words = text.split(' ');
+                  const highlightWords = language === 'fr' ? ['tendances'] : ['trends'];
+                  return words.map((word, index) => {
+                    const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
+                    if (highlightWords.some(hw => cleanWord.includes(hw.toLowerCase()))) {
+                      return (
+                        <span key={index} className="relative inline-block">
+                          <span className="relative z-10 text-[#4CAF50]">{word}</span>
+                          <motion.span
+                            className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 0.8, delay: 0.5 }}
+                          />
+                        </span>
+                      );
+                    }
+                    return <span key={index}>{word} </span>;
+                  });
+                })()}
               </h1>
 
               {/* Sous-titre */}
@@ -300,7 +311,7 @@ export default function HomeHero() {
                 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#4B6254] font-light leading-relaxed max-w-xl"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Collection exclusive de vêtements et accessoires de qualité supérieure
+                {t('hero.exclusive_collection')}
               </p>
 
               {/* Points clés */}
@@ -328,8 +339,8 @@ export default function HomeHero() {
                     <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-[#4CAF50]" />
                   </div>
                   <div>
-                    <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">5000+</div>
-                    <div className="text-xs sm:text-sm text-[#4B6254]">Clients satisfaits</div>
+                    <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">{t('hero.clients_5000')}</div>
+                    <div className="text-xs sm:text-sm text-[#4B6254]">{t('hero.satisfied_clients')}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -350,7 +361,7 @@ export default function HomeHero() {
                   className="group relative inline-flex items-center justify-center gap-2 bg-[#4CAF50] text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:bg-[#2E7D32] transform hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  <span className="relative z-10">Explorer maintenant</span>
+                  <span className="relative z-10">{t('hero.explore_now')}</span>
                   <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-[#66BB6A] to-[#4CAF50] opacity-0 group-hover:opacity-100"
@@ -364,7 +375,7 @@ export default function HomeHero() {
                   className="inline-flex items-center justify-center gap-2 bg-white text-[#4CAF50] px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg border-2 border-[#4CAF50] shadow-sm hover:bg-[#E8F5E8] hover:shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  Voir les promos
+                  {t('hero.view_promos')}
                 </Link>
               </div>
 
@@ -372,11 +383,11 @@ export default function HomeHero() {
               <div className="flex flex-wrap items-center gap-4 pt-4">
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4B6254]">
                   <Shield className="w-4 h-4 text-[#4CAF50]" />
-                  <span>Paiement sécurisé</span>
+                  <span>{t('hero.secure_payment')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4B6254]">
                   <Truck className="w-4 h-4 text-[#4CAF50]" />
-                  <span>Livraison rapide</span>
+                  <span>{t('hero.fast_delivery')}</span>
                 </div>
               </div>
             </div>
@@ -434,7 +445,7 @@ export default function HomeHero() {
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-[#4CAF50] rounded-full animate-pulse" />
                       <span className="text-xs sm:text-sm font-semibold text-[#1A3C2E]">
-                        -30% sur tout
+                        {t('hero.discount_30')}
                       </span>
                     </div>
                   </motion.div>

@@ -23,54 +23,54 @@ export default function FAQSection() {
 
   const faqs: FAQ[] = [
     {
-      question: 'Où est ma commande ?',
-      answer: 'Vous pouvez suivre votre commande en temps réel depuis votre espace client. Nous vous envoyons également des notifications par email à chaque étape de l\'expédition. Si vous ne trouvez pas votre commande, contactez notre service client.',
-      category: 'Commandes'
+      question: t('faq.questions.where_is_order.question'),
+      answer: t('faq.questions.where_is_order.answer'),
+      category: t('faq.categories.orders')
     },
     {
-      question: 'Comment retourner un produit ?',
-      answer: 'Le retour est simple et gratuit ! Connectez-vous à votre compte, sélectionnez la commande concernée et cliquez sur "Retourner". Nous vous enverrons une étiquette de retour prépayée. Vous avez 30 jours pour effectuer votre retour.',
-      category: 'Retours'
+      question: t('faq.questions.how_to_return.question'),
+      answer: t('faq.questions.how_to_return.answer'),
+      category: t('faq.categories.returns')
     },
     {
-      question: 'Quels sont les délais de livraison ?',
-      answer: 'La livraison standard est de 2-3 jours ouvrés en France métropolitaine. Pour les livraisons express, comptez 24h. Les livraisons à l\'étranger prennent 5-7 jours ouvrés selon la destination.',
-      category: 'Livraison'
+      question: t('faq.questions.delivery_times.question'),
+      answer: t('faq.questions.delivery_times.answer'),
+      category: t('faq.categories.shipping')
     },
     {
-      question: 'Quels modes de paiement acceptez-vous ?',
-      answer: 'Nous acceptons toutes les cartes bancaires (Visa, Mastercard, American Express), PayPal, Apple Pay, Google Pay et les virements bancaires. Tous les paiements sont sécurisés par cryptage SSL.',
-      category: 'Paiement'
+      question: t('faq.questions.payment_methods.question'),
+      answer: t('faq.questions.payment_methods.answer'),
+      category: t('faq.categories.payment')
     },
     {
-      question: 'Puis-je modifier ou annuler ma commande ?',
-      answer: 'Vous pouvez modifier ou annuler votre commande dans les 2 heures suivant la validation. Passé ce délai, la commande est en cours de préparation et ne peut plus être modifiée. Contactez-nous en cas d\'urgence.',
-      category: 'Commandes'
+      question: t('faq.questions.modify_cancel_order.question'),
+      answer: t('faq.questions.modify_cancel_order.answer'),
+      category: t('faq.categories.orders')
     },
     {
-      question: 'Comment créer un compte ?',
-      answer: 'Cliquez sur "Connexion" en haut de la page, puis sur "Créer un compte". Remplissez le formulaire avec votre email et un mot de passe sécurisé. Vous recevrez un email de confirmation.',
-      category: 'Compte'
+      question: t('faq.questions.create_account.question'),
+      answer: t('faq.questions.create_account.answer'),
+      category: t('faq.categories.account')
     },
     {
-      question: 'Comment réinitialiser mon mot de passe ?',
-      answer: 'Sur la page de connexion, cliquez sur "Mot de passe oublié". Entrez votre adresse email et vous recevrez un lien pour réinitialiser votre mot de passe.',
-      category: 'Compte'
+      question: t('faq.questions.reset_password.question'),
+      answer: t('faq.questions.reset_password.answer'),
+      category: t('faq.categories.account')
     },
     {
-      question: 'Les produits sont-ils garantis ?',
-      answer: 'Oui, tous nos produits bénéficient d\'une garantie d\'un an contre les défauts de fabrication. En cas de problème, contactez notre service client avec votre numéro de commande.',
-      category: 'Garantie'
+      question: t('faq.questions.warranty.question'),
+      answer: t('faq.questions.warranty.answer'),
+      category: t('faq.categories.warranty')
     },
     {
-      question: 'Proposez-vous la livraison internationale ?',
-      answer: 'Oui, nous livrons dans de nombreux pays. Les délais et frais de livraison varient selon la destination. Consultez notre page de livraison pour plus de détails.',
-      category: 'Livraison'
+      question: t('faq.questions.international_delivery.question'),
+      answer: t('faq.questions.international_delivery.answer'),
+      category: t('faq.categories.shipping')
     },
     {
-      question: 'Comment contacter le service client ?',
-      answer: 'Vous pouvez nous contacter via le formulaire de contact sur cette page, par email à support@kamri.com, ou par téléphone au +33 1 23 45 67 89 (Lun-Ven, 9h-18h).',
-      category: 'Contact'
+      question: t('faq.questions.contact_support.question'),
+      answer: t('faq.questions.contact_support.answer'),
+      category: t('faq.categories.contact')
     }
   ];
 
@@ -271,7 +271,7 @@ export default function FAQSection() {
                         
                         {/* Feedback utile */}
                         <div className="flex items-center gap-4 pt-3 border-t border-gray-200">
-                          <span className="text-xs sm:text-sm text-gray-600">Cette réponse était-elle utile ?</span>
+                          <span className="text-xs sm:text-sm text-gray-600">{t('faq.was_helpful')}</span>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => {

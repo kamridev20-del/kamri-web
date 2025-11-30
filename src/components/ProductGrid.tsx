@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import { Product } from '../lib/api';
 import ProductCard from './ProductCard';
 
@@ -40,6 +41,7 @@ function ProductCardSkeleton() {
 
 export default function ProductGrid() {
   const { products, isLoading, error } = useApp();
+  const { t } = useTranslation();
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [rotationIndex, setRotationIndex] = useState(0);
 
@@ -103,10 +105,10 @@ export default function ProductGrid() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold text-[#424242] mb-3 tracking-tight font-['Inter']">
-              Nos produits
+              {t('home.our_products')}
             </h2>
             <p className="text-base text-[#81C784] font-light font-['Inter']">
-              Chargement des produits...
+              {t('home.loading_products')}
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
@@ -125,7 +127,7 @@ export default function ProductGrid() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-[#424242] mb-4 tracking-tight font-['Inter']">
-              Nos produits
+              {t('home.our_products')}
             </h2>
             <p className="text-base text-red-500 font-light font-['Inter']">
               Erreur: {error}
@@ -147,7 +149,7 @@ export default function ProductGrid() {
         
         {displayedProducts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-base text-gray-500">Aucun produit disponible pour le moment</p>
+            <p className="text-base text-gray-500">{t('home.no_products_available')}</p>
           </div>
         ) : (
           <>
@@ -164,7 +166,7 @@ export default function ProductGrid() {
                   href="/products"
                   className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#4CAF50] to-[#66BB6A] text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
                 >
-                  <span>Voir tous les produits</span>
+                  <span>{t('home.view_all_products')}</span>
                   <svg 
                     className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
                     fill="none" 

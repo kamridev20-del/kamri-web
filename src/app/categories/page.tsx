@@ -8,6 +8,7 @@ import ModernHeader from '../../components/ModernHeader';
 import PopularCategoriesSlider from '../../components/PopularCategoriesSlider';
 import TrendingSection from '../../components/TrendingSection';
 import { apiClient } from '../../lib/api';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface Category {
   id: string;
@@ -33,6 +34,7 @@ const getCategoryConfig = (category: any) => {
 };
 
 export default function CategoriesPage() {
+  const { t, language } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,7 +96,7 @@ export default function CategoriesPage() {
       {/* Hero Section - Amélioré */}
       <section 
         className="relative min-h-[600px] sm:min-h-[700px] lg:min-h-[800px] bg-gradient-to-br from-[#EAF3EE] via-[#F5F9F6] to-[#FFFFFF] w-full overflow-hidden shadow-lg"
-        aria-label="Section hero - Explorez nos catégories"
+        aria-label={`Section hero - ${t('categories.explore_categories')}`}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <motion.div
@@ -125,7 +127,7 @@ export default function CategoriesPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                   </svg>
                   <span className="text-sm sm:text-base font-semibold text-[#4CAF50]">
-                    {categories.length} catégories disponibles
+                    {categories.length} {t('categories.categories_available')}
                   </span>
                 </div>
               </motion.div>
@@ -138,9 +140,28 @@ export default function CategoriesPage() {
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Explorez nos{' '}
-                <span className="relative inline-block">
-                  <span className="relative z-10 text-[#4CAF50]">catégories</span>
+                {(() => {
+                  const text = t('categories.explore_categories');
+                  const words = text.split(' ');
+                  const highlightWord = language === 'fr' ? 'catégories' : 'categories';
+                  return words.map((word, index) => {
+                    const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
+                    if (cleanWord === highlightWord.toLowerCase()) {
+                      return (
+                        <span key={index} className="relative inline-block">
+                          <span className="relative z-10 text-[#4CAF50]">{word}</span>
+                          <motion.span
+                            className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 0.8, delay: 0.5 }}
+                          />
+                        </span>
+                      );
+                    }
+                    return <span key={index}>{word} </span>;
+                  });
+                })()}
                   <motion.span
                     className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
                     initial={{ width: 0 }}
@@ -158,7 +179,7 @@ export default function CategoriesPage() {
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#4B6254] font-light leading-relaxed max-w-xl"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Découvrez une sélection soigneusement organisée de produits pour tous vos besoins
+                {t('categories.discover_selection')}
               </motion.p>
 
               {/* Points clés */}
@@ -170,15 +191,15 @@ export default function CategoriesPage() {
               >
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                  <span>Organisé par type de produit</span>
+                  <span>{t('categories.organized_by_type')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                  <span>Navigation facile et intuitive</span>
+                  <span>{t('categories.easy_navigation')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] flex-shrink-0" />
-                  <span>Recherche rapide et précise</span>
+                  <span>{t('categories.fast_search')}</span>
                 </li>
               </motion.ul>
 
@@ -199,7 +220,7 @@ export default function CategoriesPage() {
                     <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">
                       {categories.length}+
                     </div>
-                    <div className="text-xs sm:text-sm text-[#4B6254]">Catégories</div>
+                    <div className="text-xs sm:text-sm text-[#4B6254]">{t('categories.categories_label')}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -212,7 +233,7 @@ export default function CategoriesPage() {
                     <div className="text-lg sm:text-xl font-bold text-[#1A3C2E]">
                       {categories.reduce((sum, cat) => sum + (cat.count || 0), 0)}+
                     </div>
-                    <div className="text-xs sm:text-sm text-[#4B6254]">Produits</div>
+                    <div className="text-xs sm:text-sm text-[#4B6254]">{t('categories.products_label')}</div>
                   </div>
                 </div>
               </motion.div>
@@ -227,7 +248,7 @@ export default function CategoriesPage() {
                 <div className="relative group">
                   <input
                     type="text"
-                    placeholder="Rechercher une catégorie..."
+                    placeholder={t('categories.search_placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full px-6 py-4 pl-14 pr-4 border-2 border-[#4CAF50]/20 rounded-full focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-[#4CAF50] transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl text-sm sm:text-base"
@@ -265,7 +286,7 @@ export default function CategoriesPage() {
                     transition={{ delay: 0.7 }}
                     className="mt-3 flex flex-wrap gap-2"
                   >
-                    <span className="text-xs text-[#4B6254]">Populaires:</span>
+                    <span className="text-xs text-[#4B6254]">{t('categories.popular')}</span>
                     {categories.slice(0, 3).map((cat) => (
                       <button
                         key={cat.id}
@@ -292,7 +313,7 @@ export default function CategoriesPage() {
                   }}
                   className="inline-flex items-center gap-2 text-[#4CAF50] hover:text-[#2E7D32] font-semibold text-sm sm:text-base group"
                 >
-                  <span>Voir toutes les catégories</span>
+                  <span>{t('categories.view_all_categories')}</span>
                   <motion.svg
                     className="w-5 h-5"
                     fill="none"
@@ -490,7 +511,7 @@ export default function CategoriesPage() {
           className="mb-16"
         >
           <h2 className="text-2xl font-bold text-[#424242] mb-8 text-center">
-            Toutes les catégories
+            {t('categories.all_categories')}
           </h2>
           
           {loading ? (

@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from '../contexts/LanguageContext';
 import { apiClient } from '../lib/api';
 import ProductCard from './ProductCard';
 
 export default function BestOffers() {
+  const { t } = useTranslation();
   const [bestOffers, setBestOffers] = useState<any[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -47,10 +49,10 @@ export default function BestOffers() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-[#424242] mb-4 tracking-tight">
-            Meilleures Offres
+            {t('home.best_offers')}
           </h2>
           <p className="text-xl text-[#81C784] font-light">
-            Découvrez nos promotions exclusives
+            {t('home.exclusive_promotions')}
           </p>
         </div>
         
@@ -67,7 +69,7 @@ export default function BestOffers() {
               href="/promotions"
               className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#E53935] to-[#EF5350] text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
-              <span>Voir toutes les promos</span>
+              <span>{t('home.view_all_promos')}</span>
               <svg 
                 className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
                 fill="none" 

@@ -9,30 +9,31 @@ interface FAQItem {
   answer: string;
 }
 
-const defaultFAQs: FAQItem[] = [
+// Les FAQs par défaut seront créées dynamiquement avec les traductions
+const getDefaultFAQs = (t: (key: string) => string): FAQItem[] => [
   {
-    question: 'Quels sont les délais de livraison ?',
-    answer: 'Les délais de livraison varient selon votre localisation. En général, comptez entre 7 et 15 jours ouvrés pour la livraison standard. Les commandes sont expédiées sous 24-48h après confirmation du paiement.',
+    question: t('faq.questions.delivery_times.question'),
+    answer: t('faq.questions.delivery_times.answer'),
   },
   {
-    question: 'Quelle est votre politique de retour ?',
-    answer: 'Nous acceptons les retours sous 30 jours après réception. Les articles doivent être dans leur état d\'origine, non portés et avec leurs étiquettes. Les retours sont gratuits pour les commandes de plus de 50$.',
+    question: t('faq.questions.return_policy.question'),
+    answer: t('faq.questions.return_policy.answer'),
   },
   {
-    question: 'Comment puis-je suivre ma commande ?',
-    answer: 'Une fois votre commande expédiée, vous recevrez un email avec un numéro de suivi. Vous pourrez suivre votre colis en temps réel sur notre site ou via le transporteur.',
+    question: t('faq.questions.track_order.question'),
+    answer: t('faq.questions.track_order.answer'),
   },
   {
-    question: 'Quels modes de paiement acceptez-vous ?',
-    answer: 'Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, et les virements bancaires. Tous les paiements sont sécurisés et cryptés.',
+    question: t('faq.questions.payment_methods.question'),
+    answer: t('faq.questions.payment_methods.answer'),
   },
   {
-    question: 'Offrez-vous la livraison gratuite ?',
-    answer: 'Oui ! La livraison est gratuite pour toutes les commandes de plus de 50$. Pour les commandes inférieures, des frais de livraison standard s\'appliquent.',
+    question: t('faq.questions.free_shipping.question'),
+    answer: t('faq.questions.free_shipping.answer'),
   },
   {
-    question: 'Que faire si mon produit est défectueux ?',
-    answer: 'Si vous recevez un produit défectueux, contactez-nous immédiatement. Nous vous enverrons un produit de remplacement gratuitement ou procéderons à un remboursement complet selon votre préférence.',
+    question: t('faq.questions.defective_product.question'),
+    answer: t('faq.questions.defective_product.answer'),
   },
 ];
 
@@ -43,7 +44,7 @@ interface ProductFAQProps {
 export default function ProductFAQ({ customFAQs }: ProductFAQProps) {
   const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const faqs = customFAQs || defaultFAQs;
+  const faqs = customFAQs || getDefaultFAQs(t);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);

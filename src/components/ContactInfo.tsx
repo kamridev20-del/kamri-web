@@ -190,7 +190,7 @@ export default function ContactInfo() {
       {/* Informations de contact */}
       <div className="bg-white rounded-lg sm:rounded-2xl shadow-lg p-6 sm:p-8">
         <h2 className="text-xl sm:text-2xl font-bold text-[#424242] mb-4 sm:mb-6">
-          Informations de contact
+          {t('contact_page.contact_info')}
         </h2>
         
         <div className="space-y-4 sm:space-y-6">
@@ -218,7 +218,7 @@ export default function ContactInfo() {
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {method.status === 'online' ? 'En ligne' : 'Hors ligne'}
+                      {method.status === 'online' ? t('contact_page.online') : t('contact_page.offline')}
                     </span>
                   )}
                 </div>
