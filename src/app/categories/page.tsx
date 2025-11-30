@@ -140,39 +140,26 @@ export default function CategoriesPage() {
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A3C2E] leading-tight tracking-tight"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                {(() => {
-                  const text = t('categories.explore_categories');
-                  const words = text.split(' ');
+                {t('categories.explore_categories').split(' ').map((word, index, words) => {
+                  const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
                   const highlightWord = language === 'fr' ? 'catégories' : 'categories';
-                  return (
-                    <>
-                      {words.map((word, index) => {
-                        const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
-                        if (cleanWord === highlightWord.toLowerCase()) {
-                          return (
-                            <span key={index} className="relative inline-block">
-                              <span className="relative z-10 text-[#4CAF50]">{word}</span>
-                              <motion.span
-                                className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
-                                initial={{ width: 0 }}
-                                animate={{ width: '100%' }}
-                                transition={{ duration: 0.8, delay: 0.5 }}
-                              />
-                            </span>
-                          );
-                        }
-                        return <span key={index}>{word} </span>;
-                      })}
-                    </>
-                  );
-                })()}
-                  <motion.span
-                    className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
-                    initial={{ width: 0 }}
-                    animate={{ width: '100%' }}
-                    transition={{ duration: 0.8, delay: 0.5 }}
-                  />
-                </span>
+                  const isHighlighted = cleanWord === highlightWord.toLowerCase();
+                  
+                  if (isHighlighted) {
+                    return (
+                      <span key={index} className="relative inline-block">
+                        <span className="relative z-10 text-[#4CAF50]">{word}</span>
+                        <motion.span
+                          className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{ duration: 0.8, delay: 0.5 }}
+                        />
+                      </span>
+                    );
+                  }
+                  return <span key={index}>{word} </span>;
+                })}
               </motion.h1>
 
               {/* Sous-titre */}
