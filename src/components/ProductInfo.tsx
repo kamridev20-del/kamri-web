@@ -1398,10 +1398,10 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
         <div>
           <h3 className="text-xs font-semibold text-[#424242] mb-1.5">
             {availableSizes.length === 0 
-              ? 'Variante' + (selectedColor ? ` (${selectedColor})` : '')
+              ? t('product.select_variant') + (selectedColor ? ` (${selectedColor})` : '')
               : hasGenderInVariants 
                 ? 'Style' + (selectedColor ? ` (${selectedColor})` : '')
-                : 'Couleur' + (selectedColor ? ` (${selectedColor})` : '')
+                : t('product.color') + (selectedColor ? ` (${selectedColor})` : '')
             }
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -1474,7 +1474,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
       {availableSizes.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-[#424242] mb-1.5">
-            Taille{selectedSize ? ` (${selectedSize})` : ''}
+            {t('product.size')}{selectedSize ? ` (${selectedSize})` : ''}
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {availableSizes.map((size) => (
@@ -1567,7 +1567,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                <span>Ajouter au panier</span>
+                <span>{t('product.add_to_cart')}</span>
               </>
             )}
           </button>
@@ -1583,7 +1583,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
               : 'bg-white text-[#4CAF50] border-[#4CAF50] hover:bg-[#4CAF50] hover:text-white'
           }`}
         >
-          {isShippable === false ? 'Non livrable' : '⚡ Acheter maintenant'}
+          {isShippable === false ? t('product.not_shippable') : `⚡ ${t('product.buy_now')}`}
         </button>
       </div>
 
@@ -1597,7 +1597,7 @@ export default function ProductInfo({ product, onVariantChange }: ProductInfoPro
           )}
         </svg>
         <span className="font-semibold">
-          {displayStock > 0 ? 'En stock' : 'Rupture de stock'}
+          {displayStock > 0 ? t('product.in_stock') : t('product.out_of_stock')}
         </span>
       </div>
       

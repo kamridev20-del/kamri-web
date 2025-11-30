@@ -297,7 +297,7 @@ export default function ComparePage() {
                                           : 'bg-red-100 text-red-800'
                                       }`}
                                     >
-                                      {stock > 0 ? `${stock} en stock` : 'Rupture'}
+                                      {stock > 0 ? `${stock} ${t('product.in_stock_count')}` : t('product.out_of_stock')}
                                     </span>
                                   );
 
@@ -418,7 +418,7 @@ export default function ComparePage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="text-sm font-semibold text-[#424242] mb-2">En stock</h3>
+              <h3 className="text-sm font-semibold text-[#424242] mb-2">{t('product.in_stock')}</h3>
               {(() => {
                 const inStock = compareItems.filter(p => (p.stock || 0) > 0);
                 return (

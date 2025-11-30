@@ -617,7 +617,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold text-[#424242]">Ajouter au panier</h2>
+          <h2 className="text-xl font-bold text-[#424242]">{t('product.add_to_cart')}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -701,7 +701,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
               {/* Sélection de couleur - utilise availableColors (comme ProductInfo) */}
               {availableColors.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-[#424242] mb-1.5">Couleur</h3>
+                  <h3 className="text-sm font-semibold text-[#424242] mb-1.5">{t('product.color')}</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {availableColors.map((colorData) => (
                       <button
@@ -723,7 +723,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
               {/* Sélection de taille - utilise availableSizes (comme ProductInfo) */}
               {availableSizes.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-[#424242] mb-1.5">Taille</h3>
+                  <h3 className="text-sm font-semibold text-[#424242] mb-1.5">{t('product.size')}</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {availableSizes.map((size) => {
                       // Vérifier si cette taille est disponible pour la couleur sélectionnée
@@ -839,7 +839,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                   )}
                 </svg>
                 <span className="font-medium">
-                  {displayStock > 0 ? `${displayStock} en stock` : 'Rupture de stock'}
+                  {displayStock > 0 ? `${displayStock} ${t('product.in_stock_count')}` : t('product.out_of_stock')}
                 </span>
               </div>
 
@@ -909,7 +909,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
                     ? `Ce produit n'est pas livrable en ${country?.countryName || 'votre région'}`
                     : availableVariants.length > 0 && !selectedVariant
                     ? 'Veuillez sélectionner toutes les options'
-                    : 'Ajouter au panier'
+                    : t('product.add_to_cart')
               }
             >
               {isAddingToCart ? (
@@ -923,7 +923,7 @@ export default function AddToCartModal({ product, isOpen, onClose, onAddToCart }
               ) : (
                 <>
                   <ShoppingCart className="h-5 w-5" />
-                  Ajouter au panier
+                  {t('product.add_to_cart')}
                 </>
               )}
             </button>
