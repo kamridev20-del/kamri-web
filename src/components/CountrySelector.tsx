@@ -1,10 +1,23 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useGeo } from '../contexts/GeoContext';
-import { useCurrency } from '../contexts/CurrencyContext';
-import { useLanguage } from '../contexts/LanguageContext';
 import { Globe } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { useGeo } from '../contexts/GeoContext';
+import { useLanguage } from '../contexts/LanguageContext';
+
+const CURRENCIES = [
+  { code: 'USD', symbol: '$', name: 'Dollar US' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'XAF', symbol: 'FCFA', name: 'Franc CFA (XAF)' },
+  { code: 'XOF', symbol: 'FCFA', name: 'Franc CFA (XOF)' },
+  { code: 'CNY', symbol: '¥', name: 'Yuan Chinois' },
+  { code: 'GBP', symbol: '£', name: 'Livre Sterling' },
+  { code: 'CAD', symbol: '$', name: 'Dollar Canadien' },
+  { code: 'AUD', symbol: '$', name: 'Dollar Australien' },
+  { code: 'JPY', symbol: '¥', name: 'Yen Japonais' },
+  { code: 'CHF', symbol: 'CHF', name: 'Franc Suisse' },
+] as const;
 
 const COUNTRIES = [
   { code: 'AR', name: 'Argentine', flag: '🇦🇷' },
@@ -79,6 +92,10 @@ export default function CountrySelector() {
   const [showHoverDropdown, setShowHoverDropdown] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Trouver le symbole de la devise actuelle
+  const currentCurrencyInfo = CURRENCIES.find(c => c.code === currency) || CURRENCIES.find(c => c.code === 'EUR');
+  const currencySymbol = currentCurrencyInfo?.symbol || '€';
 
   // Fermer le menu quand on clique ailleurs
   useEffect(() => {
@@ -180,7 +197,7 @@ export default function CountrySelector() {
           {/* Section Devise */}
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1">Devise</p>
-            <p className="text-xs text-gray-700">{currency}: €</p>
+            <p className="text-xs text-gray-700">{currency}: {currencySymbol}</p>
           </div>
 
           {/* Message pays détecté */}
@@ -250,7 +267,7 @@ export default function CountrySelector() {
           {/* Section Devise */}
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1">Devise</p>
-            <p className="text-xs text-gray-700">{currency}: €</p>
+            <p className="text-xs text-gray-700">{currency}: {currencySymbol}</p>
           </div>
 
           <div className="px-3 py-2 border-b border-gray-100 sticky top-0 bg-white">
