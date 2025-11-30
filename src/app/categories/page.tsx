@@ -144,23 +144,27 @@ export default function CategoriesPage() {
                   const text = t('categories.explore_categories');
                   const words = text.split(' ');
                   const highlightWord = language === 'fr' ? 'catégories' : 'categories';
-                  return words.map((word, index) => {
-                    const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
-                    if (cleanWord === highlightWord.toLowerCase()) {
-                      return (
-                        <span key={index} className="relative inline-block">
-                          <span className="relative z-10 text-[#4CAF50]">{word}</span>
-                          <motion.span
-                            className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 0.8, delay: 0.5 }}
-                          />
-                        </span>
-                      );
-                    }
-                    return <span key={index}>{word} </span>;
-                  });
+                  return (
+                    <>
+                      {words.map((word, index) => {
+                        const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
+                        if (cleanWord === highlightWord.toLowerCase()) {
+                          return (
+                            <span key={index} className="relative inline-block">
+                              <span className="relative z-10 text-[#4CAF50]">{word}</span>
+                              <motion.span
+                                className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
+                                initial={{ width: 0 }}
+                                animate={{ width: '100%' }}
+                                transition={{ duration: 0.8, delay: 0.5 }}
+                              />
+                            </span>
+                          );
+                        }
+                        return <span key={index}>{word} </span>;
+                      })}
+                    </>
+                  );
                 })()}
                   <motion.span
                     className="absolute bottom-0 left-0 right-0 h-3 bg-[#4CAF50]/20 -z-0"
