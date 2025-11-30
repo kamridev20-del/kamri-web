@@ -224,23 +224,23 @@ export default function ModernHeader() {
   return (
     <>
       {/* Mini-bande promotionnelle - Toujours visible (sticky) */}
-      <div className="sticky top-0 z-[9999] bg-gradient-to-r from-[#E8F5E8] to-[#F0F8F0] py-1.5 sm:py-2 px-3 sm:px-4 text-center">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 lg:gap-6 text-[10px] sm:text-xs lg:text-sm text-[#424242]">
-          <span className="flex items-center gap-1">
-            <span className="text-xs sm:text-sm">🚚</span>
-            <span>{t('promo_bar.free_shipping')}</span>
+      <div className="sticky top-0 z-[9999] bg-gradient-to-r from-[#E8F5E8] to-[#F0F8F0] py-1.5 sm:py-2 px-2 sm:px-4 text-center">
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-center gap-1.5 sm:gap-3 lg:gap-6 text-[9px] sm:text-xs lg:text-sm text-[#424242] whitespace-nowrap overflow-x-auto">
+          <span className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <span className="text-[10px] sm:text-sm">🚚</span>
+            <span className="whitespace-nowrap">{t('promo_bar.free_shipping')}</span>
           </span>
-          <span className="hidden sm:inline">|</span>
-          <span className="flex items-center gap-1">
-            <span className="text-xs sm:text-sm">🔄</span>
-            <span className="hidden sm:inline">{t('promo_bar.easy_returns')}</span>
-            <span className="sm:hidden">{t('promo_bar.returns')}</span>
+          <span className="text-[#424242]/40 flex-shrink-0">|</span>
+          <span className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <span className="text-[10px] sm:text-sm">🔄</span>
+            <span className="hidden sm:inline whitespace-nowrap">{t('promo_bar.easy_returns')}</span>
+            <span className="sm:hidden whitespace-nowrap">{t('promo_bar.returns')}</span>
           </span>
-          <span className="hidden sm:inline">|</span>
-          <span className="flex items-center gap-1">
-            <span className="text-xs sm:text-sm">💬</span>
-            <span className="hidden sm:inline">{t('promo_bar.support_24_7')}</span>
-            <span className="sm:hidden">{t('promo_bar.support')}</span>
+          <span className="text-[#424242]/40 flex-shrink-0">|</span>
+          <span className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <span className="text-[10px] sm:text-sm">💬</span>
+            <span className="hidden sm:inline whitespace-nowrap">{t('promo_bar.support_24_7')}</span>
+            <span className="sm:hidden whitespace-nowrap">{t('promo_bar.support')}</span>
           </span>
         </div>
       </div>

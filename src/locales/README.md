@@ -96,3 +96,4 @@ Le sélecteur est déjà intégré dans le header (`ModernHeader`). Il affiche :
 
 Cliquer sur le bouton bascule entre les deux langues.
 
+
