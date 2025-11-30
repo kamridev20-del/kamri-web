@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../contexts/LanguageContext';
 import { Product } from '../lib/api';
@@ -60,7 +60,7 @@ export default function ProductGrid() {
     });
   }, [products]);
 
-  // Limiter à 50 produits et rotation toutes les 2 minutes
+  // Limiter à 75 produits et rotation toutes les 2 minutes
   useEffect(() => {
     // Si pas de produits, réinitialiser
     if (safeProducts.length === 0) {
@@ -69,13 +69,13 @@ export default function ProductGrid() {
       return;
     }
 
-    const PRODUCTS_TO_SHOW = 50;
+    const PRODUCTS_TO_SHOW = 75;
     const ROTATION_INTERVAL = 2 * 60 * 1000; // 2 minutes en millisecondes
 
-    // Calculer le nombre de "pages" de 50 produits
+    // Calculer le nombre de "pages" de 75 produits
     const totalPages = Math.ceil(safeProducts.length / PRODUCTS_TO_SHOW);
     
-    // Si moins de 50 produits, afficher tous
+    // Si moins de 75 produits, afficher tous
     if (totalPages <= 1) {
       setDisplayedProducts(safeProducts.slice(0, PRODUCTS_TO_SHOW));
       setRotationIndex(0);
@@ -169,8 +169,8 @@ export default function ProductGrid() {
               ))}
             </div>
 
-            {/* Bouton Voir Plus - Affiché uniquement si au moins 50 produits */}
-            {safeProducts.length >= 50 && (
+            {/* Bouton Voir Plus - Affiché uniquement si au moins 75 produits */}
+            {safeProducts.length >= 75 && (
               <div className="flex justify-center mt-12">
                 <a
                   href="/products"
