@@ -448,9 +448,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <p className="text-[10px] text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</p>
               )}
             </div>
-            <span className="text-[9px] text-[#9CA3AF] font-medium">
-              {product.sales || 0} vente{(product.sales || 0) !== 1 ? 's' : ''}
-            </span>
+            {(product.sales || 0) >= 100 && (
+              <span className="text-[9px] text-[#9CA3AF] font-medium">
+                {product.sales} vente{product.sales !== 1 ? 's' : ''}
+              </span>
+            )}
           </div>
           
           {/* Bouton d'ajout au panier - petit et compact */}

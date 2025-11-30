@@ -23,7 +23,7 @@ export default function ProductStats({ views, sales, listedNum }: ProductStatsPr
         </div>
       )}
       
-      {displaySales > 0 && (
+      {displaySales >= 100 && (
         <div className="flex items-center gap-1.5 text-gray-600">
           <ShoppingCart className="w-3.5 h-3.5 text-[#4CAF50]" />
           <span>{displaySales.toLocaleString()} ventes</span>
