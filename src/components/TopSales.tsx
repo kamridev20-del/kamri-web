@@ -31,7 +31,16 @@ export default function TopSales() {
               product.badge === 'top-ventes' || 
               product.sales > 0
             )
-            .sort((a: any, b: any) => (b.sales || 0) - (a.sales || 0))
+            .sort((a: any, b: any) => {
+              // Priorité 1 : Rating décroissant (plus d'étoiles en premier)
+              const ratingA = a.rating || 0;
+              const ratingB = b.rating || 0;
+              if (ratingA !== ratingB) {
+                return ratingB - ratingA;
+              }
+              // Priorité 2 : Si même rating, trier par ventes décroissant
+              return (b.sales || 0) - (a.sales || 0);
+            })
             .slice(0, 6); // Limiter à 6 produits
           setTopSales(topProducts);
         }

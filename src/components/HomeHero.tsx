@@ -98,12 +98,23 @@ export default function HomeHero() {
             return categoryName === 'mode' || categoryName.includes('mode');
           });
           
-          console.log('🛍️ [HomeHero] Produits mode trouvés:', modeProducts.length);
+          // Trier par rating décroissant (plus d'étoiles en premier)
+          const sortedModeProducts = [...modeProducts].sort((a: Product, b: Product) => {
+            const ratingA = a.rating || 0;
+            const ratingB = b.rating || 0;
+            // Si même rating, trier par nombre de reviews décroissant
+            if (ratingA === ratingB) {
+              return (b.reviews || 0) - (a.reviews || 0);
+            }
+            return ratingB - ratingA;
+          });
+          
+          console.log('🛍️ [HomeHero] Produits mode trouvés:', sortedModeProducts.length);
           
           // Créer des slides dynamiques à partir des produits mode
-          if (modeProducts.length > 0) {
-            // Prendre les 30 premiers produits mode (ou tous si moins de 30)
-            const selectedProducts = modeProducts.slice(0, 30);
+          if (sortedModeProducts.length > 0) {
+            // Prendre les 30 premiers produits mode triés par rating (ou tous si moins de 30)
+            const selectedProducts = sortedModeProducts.slice(0, 30);
             
             const dynamicSlides: HeroSlide[] = selectedProducts
               .map((product: Product, index: number) => {

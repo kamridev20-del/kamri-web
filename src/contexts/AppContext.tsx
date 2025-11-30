@@ -26,7 +26,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await apiClient.getProducts(language as 'fr' | 'en');
       if (response.data) {
-        setProducts(response.data);
+        // Trier les produits par rating décroissant (plus d'étoiles en premier)
+        const sortedProducts = Array.isArray(response.data) 
+          ? [...response.data].sort((a: Product, b: Product) => {
+              const ratingA = a.rating || 0;
+              const ratingB = b.rating || 0;
+              // Si même rating, trier par nombre de reviews décroissant
+              if (ratingA === ratingB) {
+                return (b.reviews || 0) - (a.reviews || 0);
+              }
+              return ratingB - ratingA;
+            })
+          : response.data;
+        setProducts(sortedProducts);
       } else {
         setError(response.error || 'Erreur lors du chargement des produits');
       }

@@ -45,9 +45,19 @@ export default function ProductGrid() {
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [rotationIndex, setRotationIndex] = useState(0);
 
-  // S'assurer que products est toujours un tableau (mémorisé pour éviter les re-rendus)
+  // S'assurer que products est toujours un tableau et trier par rating (mémorisé pour éviter les re-rendus)
   const safeProducts = useMemo(() => {
-    return Array.isArray(products) ? products : [];
+    const productsArray = Array.isArray(products) ? products : [];
+    // Trier par rating décroissant (plus d'étoiles en premier)
+    return [...productsArray].sort((a: Product, b: Product) => {
+      const ratingA = a.rating || 0;
+      const ratingB = b.rating || 0;
+      // Si même rating, trier par nombre de reviews décroissant
+      if (ratingA === ratingB) {
+        return (b.reviews || 0) - (a.reviews || 0);
+      }
+      return ratingB - ratingA;
+    });
   }, [products]);
 
   // Limiter à 50 produits et rotation toutes les 2 minutes

@@ -31,6 +31,18 @@ export default function BestOffers() {
               product.badge === 'promo' || 
               (product.originalPrice && product.originalPrice > product.price)
             )
+            .sort((a: any, b: any) => {
+              // Priorité 1 : Rating décroissant (plus d'étoiles en premier)
+              const ratingA = a.rating || 0;
+              const ratingB = b.rating || 0;
+              if (ratingA !== ratingB) {
+                return ratingB - ratingA;
+              }
+              // Priorité 2 : Si même rating, trier par pourcentage de réduction décroissant
+              const discountA = a.originalPrice && a.price ? ((a.originalPrice - a.price) / a.originalPrice) * 100 : 0;
+              const discountB = b.originalPrice && b.price ? ((b.originalPrice - b.price) / b.originalPrice) * 100 : 0;
+              return discountB - discountA;
+            })
             .slice(0, 6); // Limiter à 6 produits
           setBestOffers(offers);
         }
