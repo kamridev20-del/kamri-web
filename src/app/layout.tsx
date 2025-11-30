@@ -2,19 +2,19 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import ConnectedProviders from '../components/ConnectedProviders'
 import { AppProvider } from '../contexts/AppContext'
-import { CompareProvider } from '../contexts/CompareContext'
 import { AuthProvider } from '../contexts/AuthContext'
-import { ToastProvider } from '../contexts/ToastContext'
-import { GeoProvider } from '../contexts/GeoContext'
+import { CompareProvider } from '../contexts/CompareContext'
 import { CurrencyProvider } from '../contexts/CurrencyContext'
+import { GeoProvider } from '../contexts/GeoContext'
 import { LanguageProvider } from '../contexts/LanguageContext'
+import { ToastProvider } from '../contexts/ToastContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'KAMRI - E-commerce Platform',
-  description: 'Modern e-commerce platform built with Next.js',
+  title: 'KAMRI - Hub',
+  description: 'Sho-Buy-Go',
 }
 
 
