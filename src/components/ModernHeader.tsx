@@ -1,18 +1,17 @@
 'use client';
 
-import { Menu, Search, X as XIcon, Package, Tag } from 'lucide-react';
+import { Menu, Package, Search, Tag, X as XIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { apiClient } from '../lib/api';
 import AuthModal from './AuthModal';
 import CountrySelector from './CountrySelector';
 import CurrencySelector from './CurrencySelector';
-import LanguageSelector from './LanguageSelector';
-import { useTranslation } from '../contexts/LanguageContext';
 
 interface SearchResult {
   products: Array<{
@@ -472,13 +471,10 @@ export default function ModernHeader() {
                 <CurrencySelector />
               </div>
               
-              {/* Sélecteur de pays - Desktop seulement */}
+              {/* Sélecteur de pays et langue - Desktop seulement */}
               <div className="hidden sm:block">
                 <CountrySelector />
               </div>
-
-              {/* Sélecteur de langue */}
-              <LanguageSelector />
 
               {/* Favoris */}
               <Link href="/favorites" className="relative p-1.5 sm:p-2 lg:p-3 text-[#424242] hover:text-[#4CAF50] hover:bg-[#E8F5E8] rounded-full transition-all duration-300 ease-in-out hover:scale-110">

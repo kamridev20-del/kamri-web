@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useGeo } from '../contexts/GeoContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Globe } from 'lucide-react';
 
 const COUNTRIES = [
@@ -73,6 +74,7 @@ const COUNTRIES = [
 export default function CountrySelector() {
   const { country, setCountry, loading } = useGeo();
   const { currency } = useCurrency();
+  const { language, setLanguage } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [showHoverDropdown, setShowHoverDropdown] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -143,14 +145,35 @@ export default function CountrySelector() {
           {/* Section Langue */}
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1.5">Langue</p>
-            <div className="flex items-center gap-1.5">
-              <input
-                type="radio"
-                checked
-                readOnly
-                className="w-3 h-3 text-[#4CAF50] focus:ring-[#4CAF50]"
-              />
-              <span className="text-xs text-gray-700">Français</span>
+            <div className="space-y-1">
+              <button
+                onClick={() => setLanguage('fr')}
+                className="w-full flex items-center gap-1.5 text-left hover:bg-[#E8F5E8] rounded px-1 py-0.5 transition-colors"
+              >
+                <input
+                  type="radio"
+                  checked={language === 'fr'}
+                  readOnly
+                  className="w-3 h-3 text-[#4CAF50] focus:ring-[#4CAF50]"
+                />
+                <span className={`text-xs ${language === 'fr' ? 'text-[#4CAF50] font-semibold' : 'text-gray-700'}`}>
+                  🇫🇷 Français
+                </span>
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className="w-full flex items-center gap-1.5 text-left hover:bg-[#E8F5E8] rounded px-1 py-0.5 transition-colors"
+              >
+                <input
+                  type="radio"
+                  checked={language === 'en'}
+                  readOnly
+                  className="w-3 h-3 text-[#4CAF50] focus:ring-[#4CAF50]"
+                />
+                <span className={`text-xs ${language === 'en' ? 'text-[#4CAF50] font-semibold' : 'text-gray-700'}`}>
+                  🇬🇧 English
+                </span>
+              </button>
             </div>
           </div>
 
@@ -189,6 +212,47 @@ export default function CountrySelector() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 max-h-80 overflow-y-auto" style={{ zIndex: 9999 }}>
+          {/* Section Langue */}
+          <div className="px-3 py-2 border-b border-gray-100">
+            <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1.5">Langue</p>
+            <div className="space-y-1">
+              <button
+                onClick={() => setLanguage('fr')}
+                className="w-full flex items-center gap-1.5 text-left hover:bg-[#E8F5E8] rounded px-1 py-0.5 transition-colors"
+              >
+                <input
+                  type="radio"
+                  checked={language === 'fr'}
+                  readOnly
+                  className="w-3 h-3 text-[#4CAF50] focus:ring-[#4CAF50]"
+                />
+                <span className={`text-xs ${language === 'fr' ? 'text-[#4CAF50] font-semibold' : 'text-gray-700'}`}>
+                  🇫🇷 Français
+                </span>
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className="w-full flex items-center gap-1.5 text-left hover:bg-[#E8F5E8] rounded px-1 py-0.5 transition-colors"
+              >
+                <input
+                  type="radio"
+                  checked={language === 'en'}
+                  readOnly
+                  className="w-3 h-3 text-[#4CAF50] focus:ring-[#4CAF50]"
+                />
+                <span className={`text-xs ${language === 'en' ? 'text-[#4CAF50] font-semibold' : 'text-gray-700'}`}>
+                  🇬🇧 English
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Section Devise */}
+          <div className="px-3 py-2 border-b border-gray-100">
+            <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1">Devise</p>
+            <p className="text-xs text-gray-700">{currency}: €</p>
+          </div>
+
           <div className="px-3 py-2 border-b border-gray-100 sticky top-0 bg-white">
             <p className="text-[10px] font-semibold text-gray-500 uppercase">Sélectionner le pays</p>
           </div>
