@@ -418,10 +418,48 @@ export class ApiClient {
   }
 
   async setCountry(countryCode: string): Promise<ApiResponse<{ success: boolean; countryCode: string; countryName: string; currency: string }>> {
-    return this.fetchPublic('/geo/set-country', {
-      method: 'POST',
-      body: JSON.stringify({ countryCode }),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/geo/set-country`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ countryCode }),
+      });
+
+      const data = await response.json();
+      return response.ok ? { data } : { error: data.message || 'Erreur lors de la définition du pays' };
+    } catch (error) {
+      return { error: 'Erreur réseau' };
+    }
+  }
+
+  // ✅ Enregistrer une visite (tracking)
+  async trackVisit(data: {
+    countryCode?: string;
+    countryName?: string;
+    city?: string;
+    region?: string;
+    path?: string;
+    language?: string;
+    isAuthenticated?: boolean;
+  }): Promise<ApiResponse<{ success: boolean }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/visits`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      return response.ok ? { data: result } : { error: result.error || 'Erreur lors de l\'enregistrement de la visite' };
+    } catch (error) {
+      // Ne pas bloquer l'application si le tracking échoue
+      console.warn('⚠️ [API] Erreur tracking visite:', error);
+      return { error: 'Erreur réseau' };
+    }
   }
 
   async getCountryName(code: string): Promise<ApiResponse<{ countryCode: string; countryName: string }>> {

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import ConnectedProviders from '../components/ConnectedProviders'
+import VisitTracker from '../components/VisitTracker'
 import { AppProvider } from '../contexts/AppContext'
 import { AuthProvider } from '../contexts/AuthContext'
 import { CompareProvider } from '../contexts/CompareContext'
@@ -34,6 +35,7 @@ export default function RootLayout({
                   <CompareProvider>
                     <ToastProvider>
                       <ConnectedProviders>
+                        <VisitTracker />
                         <div className="min-h-screen bg-[#F5F5F5]">
                           <main>{children}</main>
                         </div>
